@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Bike;
+namespace App\Entity\Task;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,47 +11,42 @@ use App\Entity\User\User;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\Bike\BikeRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Task\TaskRepository")
  */
-class Bike extends AggregateBase {
+class Task extends AggregateBase {
 
 	/**
 	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User\User", inversedBy="bikes")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Part\Part")
+	 * @ORM\JoinColumn(name="part_id", referencedColumnName="id", nullable=true)
 	 */
-	private $owner;
-
-	/**
-	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\Model\Model")
-	 */
-	private $model;
+	private $part;
 
 	/**
 	 *
 	 * @ORM\Column(type="string", length=255)
 	 */
-	private $nickname;
-
-	/**
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $purchasePrice;
+	private $name;
 	
 	/**
 	 *
-	 * @ORM\OneToMany(targetEntity="App\Entity\ServiceInterval\ServiceInterval", mappedBy="bike")
+	 * @ORM\Column(type="string", length=1024)
 	 */
-	private $customServiceIntervals;
+	private $description;
 	
+	/**
+	 *
+	 * @ORM\Column(type="string", length=2048)
+	 */
+	private $comment;
+		
 	/**
 	 * 
-	 * @param CreateBikeCommand $c
+	 * @param CreateServiceIntervalCommand $c
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateBikeCommand $c, User $user) {
+	public function __construct(CreateServiceIntervalCommand $c, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
@@ -66,22 +61,14 @@ class Bike extends AggregateBase {
 	
 	/**
 	 * 
-	 * @param UpdateBikeCommand $c
+	 * @param UpdateServiceIntervalCommand $c
 	 * @param User $user
 	 * @throws \Exception
-	 * @return Bike
+	 * @return Task
 	 */
-	public function update(UpdateBikeCommand $c, User $user): Bike {
+	public function update(UpdateServiceIntervalCommand $c, User $user): ServiceInterval {
 		throw new \Exception ( "Not implemented yet." );
 		parent::updateBase ( $user );
 		return $this;
-	}
-	
-	/**
-	 * 
-	 * @return string|NULL
-	 */
-	public function getNickame(): ?string {
-		return $this->nickname;
 	}
 }

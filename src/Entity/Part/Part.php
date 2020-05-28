@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Bike;
+namespace App\Entity\Part;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,47 +11,29 @@ use App\Entity\User\User;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\Bike\BikeRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Part\TaskRepository")
  */
-class Bike extends AggregateBase {
-
-	/**
-	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\User\User", inversedBy="bikes")
-	 */
-	private $owner;
-
-	/**
-	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\Model\Model")
-	 */
-	private $model;
+class Part extends AggregateBase {
 
 	/**
 	 *
 	 * @ORM\Column(type="string", length=255)
 	 */
-	private $nickname;
-
-	/**
-	 *
-	 * @ORM\Column(type="integer")
-	 */
-	private $purchasePrice;
+	private $name;
 	
 	/**
 	 *
-	 * @ORM\OneToMany(targetEntity="App\Entity\ServiceInterval\ServiceInterval", mappedBy="bike")
+	 * @ORM\ManyToMany(targetEntity="App\Entity\Manufacturer\Manufacturer", inversedBy="parts")
 	 */
-	private $customServiceIntervals;
-	
+	private $manufacturer;
+		
 	/**
 	 * 
-	 * @param CreateBikeCommand $c
+	 * @param CreatePartCommand $c
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateBikeCommand $c, User $user) {
+	public function __construct(CreatePartCommand $c, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
@@ -66,22 +48,14 @@ class Bike extends AggregateBase {
 	
 	/**
 	 * 
-	 * @param UpdateBikeCommand $c
+	 * @param UpdatePartCommand $c
 	 * @param User $user
 	 * @throws \Exception
-	 * @return Bike
+	 * @return Part
 	 */
-	public function update(UpdateBikeCommand $c, User $user): Bike {
+	public function update(UpdatePartCommand $c, User $user): Part {
 		throw new \Exception ( "Not implemented yet." );
 		parent::updateBase ( $user );
 		return $this;
-	}
-	
-	/**
-	 * 
-	 * @return string|NULL
-	 */
-	public function getNickame(): ?string {
-		return $this->nickname;
 	}
 }
