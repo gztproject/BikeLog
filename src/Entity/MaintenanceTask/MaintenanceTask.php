@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Manufacturer;
+namespace App\Entity\MaintenanceTask;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,9 +9,9 @@ use App\Entity\Base\AggregateBase;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\Manufacturer\ManufacturerRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\MaintenanceTask\MaintenanceTaskRepository")
  */
-class Manufacturer extends AggregateBase {
+class MaintenanceTask extends AggregateBase {
 	/**
 	 *
 	 * @ORM\Column(type="string", length=255)
@@ -35,7 +35,7 @@ class Manufacturer extends AggregateBase {
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateManufacturerCommand $c, User $user) {
+	public function __construct(CreateMaintenanceTaskCommand $c, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
@@ -45,15 +45,12 @@ class Manufacturer extends AggregateBase {
 		$this->name = $c->name;
 		$this->owner = $c->owner;
 	}
-	public function update(UpdateManufacturerCommand $c, User $user): Manufacturer {
+	public function update(UpdateMaintenanceTaskCommand $c, User $user): MaintenanceTask {
 		throw new \Exception ( "Not implemented yet." );
 		parent::updateBase ( $user );
 		return $this;
 	}
 	public function getName(): ?string {
 		return $this->name;
-	}
-	public function getParts(): ?Part {
-		return $this->parts;
-	}
+	}	
 }

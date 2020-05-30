@@ -9,6 +9,26 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Entity\Base\AggregateBase;
+use App\Entity\Workshop\CreateWorkshopCommand;
+use App\Entity\Workshop\Workshop;
+use App\Entity\Bike\CreateBikeCommand;
+use App\Entity\Bike\Bike;
+use App\Entity\Model\CreateModelCommand;
+use App\Entity\Model\Model;
+use App\Entity\Manufacturer\CreateManufacturerCommand;
+use App\Entity\Manufacturer\Manufacturer;
+use App\Entity\Refueling\CreateRefuelingCommand;
+use App\Entity\Refueling\Refueling;
+use App\Entity\ServiceInterval\CreateServiceIntervalCommand;
+use App\Entity\ServiceInterval\ServiceInterval;
+use App\Entity\Maintenance\CreateMaintenanceCommand;
+use App\Entity\Maintenance\Maintenance;
+use App\Entity\MaintenanceTask\CreateMaintenanceTaskCommand;
+use App\Entity\MaintenanceTask\MaintenanceTask;
+use App\Entity\Task\CreateTaskCommand;
+use App\Entity\Task\Task;
+use App\Entity\Part\CreatePartCommand;
+use App\Entity\Part\Part;
 
 /**
  *
@@ -72,7 +92,7 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 * @ORM\OneToMany(targetEntity="App\Entity\Workshop\Workshop", mappedBy="owner")
 	 */
 	private $ownedWorkshops;
-	
+
 	/**
 	 *
 	 * @ORM\OneToMany(targetEntity="App\Entity\Bike\Bike", mappedBy="owner")
@@ -94,13 +114,14 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 */
 	public function __construct(CreateUserCommand $c, User $user, UserPasswordEncoderInterface $passwordEncoder) {
 		parent::__construct ( $user );
-		$this->isActive = true;
 
 		$this->username = $c->username;
-		$this->email = $c->email;
 		$this->firstName = $c->firstName;
 		$this->lastName = $c->lastName;
+		$this->email = $c->email;
 		$this->mobile = $c->mobile;
+
+		$this->isActive = true;
 
 		$this->checkPasswordRequirements ( $c->password );
 		$this->password = $passwordEncoder->encodePassword ( $this, $c->password );
@@ -108,6 +129,10 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 		$this->roles = array (
 				$c->isRoleAdmin ? 'ROLE_ADMIN' : 'ROLE_USER'
 		);
+
+		$this->bikes = new ArrayCollection ();
+		$this->workshops = new ArrayCollection ();
+		$this->ownedWorkshops = new ArrayCollection ();
 
 		return $this;
 	}
@@ -188,6 +213,96 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 		return new User ( $c, $this, $passwordEncoder );
 	}
 
+	/**
+	 *
+	 * @param CreateWorkshopCommand $c
+	 * @return Workshop
+	 */
+	public function createWorkshop(CreateWorkshopCommand $c): Workshop {
+		return new Workshop ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateBikeCommand $c
+	 * @return Bike
+	 */
+	public function createBike(CreateBikeCommand $c): Bike {
+		return new Bike ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateModelCommand $c
+	 * @return Model
+	 */
+	public function createModel(CreateModelCommand $c): Model {
+		return new Model ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateManufacturerCommand $c
+	 * @return Manufacturer
+	 */
+	public function createManufacturer(CreateManufacturerCommand $c): Manufacturer {
+		return new Manufacturer ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateRefuelingCommand $c
+	 * @return Refueling
+	 */
+	public function createRefueling(CreateRefuelingCommand $c): Refueling {
+		return new Refueling ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateServiceIntervalCommand $c
+	 * @return ServiceInterval
+	 */
+	public function createServiceInterval(CreateServiceIntervalCommand $c): ServiceInterval {
+		return new ServiceInterval ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateMaintenanceCommand $c
+	 * @return Maintenance
+	 */
+	public function createMaintenance(CreateMaintenanceCommand $c): Maintenance {
+		return new Maintenance ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateMaintenanceTaskCommand $c
+	 * @return MaintenanceTask
+	 */
+	public function createMaintenanceTask(CreateMaintenanceTaskCommand $c): MaintenanceTask {
+		return new MaintenanceTask ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreateTaskCommand $c
+	 * @return Task
+	 */
+	public function createTask(CreateTaskCommand $c): Task {
+		return new Task ( $c, $this );
+	}
+
+	/**
+	 *
+	 * @param CreatePartCommand $c
+	 * @return Part
+	 */
+	public function createPart(CreatePartCommand $c): Part {
+		return new Part ( $c, $this );
+	}
+
 	/*
 	 * ***************************************************************
 	 * Getters (Needed by Symfony)
@@ -235,6 +350,15 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	}
 	public function __toString(): string {
 		return $this->username . ": " . $this->getFullname ();
+	}
+	public function getBikes(): Collection {
+		return $this->bikes;
+	}
+	public function getWorkshops(): Collection {
+		return $this->workshops;
+	}
+	public function getOwnedWorkshops(): Collection {
+		return $this->ownedWorkshops;
 	}
 
 	/*

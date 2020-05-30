@@ -30,9 +30,9 @@ class Workshop extends AggregateBase {
 	 * @ORM\ManyToMany(targetEntity="App\Entity\User\User", inversedBy="workshops")
 	 */
 	private $clients;
-	
+
 	/**
-	 * 
+	 *
 	 * @param CreateWorkshopCommand $c
 	 * @param User $user
 	 * @throws \Exception
@@ -46,16 +46,33 @@ class Workshop extends AggregateBase {
 		parent::__construct ( $user );
 		$this->name = $c->name;
 		$this->owner = $c->owner;
+		$this->clients = new ArrayCollection ();
 	}
-	public function update(UpdateWorkshopCommand $c, User $user): Country {
+
+	/**
+	 *
+	 * @param UpdateWorkshopCommand $c
+	 * @param User $user
+	 * @throws \Exception
+	 * @return Workshop
+	 */
+	public function update(UpdateWorkshopCommand $c, User $user): Workshop {
 		throw new \Exception ( "Not implemented yet." );
 		parent::updateBase ( $user );
 		return $this;
 	}
-	public function getName(): ?string {
+
+	/*
+	 * Getters
+	 *
+	 */
+	public function getName(): string {
 		return $this->name;
 	}
 	public function getOwner(): User {
 		return $this->owner;
+	}
+	public function getClients(): Collection {
+		return $this->clients;
 	}
 }
