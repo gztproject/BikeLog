@@ -8,6 +8,8 @@ class CreateBikeCommand
 	public $model;
 	public $nickname;
 	public $purchasePrice;
+	public $year;
+	public $vin;
 	
 	
 	public function __get($name) {

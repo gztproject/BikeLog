@@ -4,11 +4,8 @@ namespace App\Entity\ServiceInterval;
 
 class CreateServiceIntervalCommand
 {
-	public $bike;
-	public $model;
 	public $interval;
-	public $task;
-	
+	public $task;	
 	
 	public function __get($name) {
 		return $this->$name;

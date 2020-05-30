@@ -4,7 +4,6 @@ namespace App\Entity\Workshop;
 
 class CreateWorkshopCommand
 {
-	public $owner;
 	public $name;	
 	
 	public function __get($name) {

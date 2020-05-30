@@ -219,7 +219,9 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 * @return Workshop
 	 */
 	public function createWorkshop(CreateWorkshopCommand $c): Workshop {
-		return new Workshop ( $c, $this );
+		$workshop = new Workshop ( $c, $this );
+		$this->ownedWorkshops->add ( $workshop );
+		return $workshop;
 	}
 
 	/**
@@ -228,16 +230,9 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 * @return Bike
 	 */
 	public function createBike(CreateBikeCommand $c): Bike {
-		return new Bike ( $c, $this );
-	}
-
-	/**
-	 *
-	 * @param CreateModelCommand $c
-	 * @return Model
-	 */
-	public function createModel(CreateModelCommand $c): Model {
-		return new Model ( $c, $this );
+		$bike = new Bike ( $c, $this );
+		$this->bikes->add ( $bike );
+		return $bike;
 	}
 
 	/**
@@ -247,51 +242,6 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 */
 	public function createManufacturer(CreateManufacturerCommand $c): Manufacturer {
 		return new Manufacturer ( $c, $this );
-	}
-
-	/**
-	 *
-	 * @param CreateRefuelingCommand $c
-	 * @return Refueling
-	 */
-	public function createRefueling(CreateRefuelingCommand $c): Refueling {
-		return new Refueling ( $c, $this );
-	}
-
-	/**
-	 *
-	 * @param CreateServiceIntervalCommand $c
-	 * @return ServiceInterval
-	 */
-	public function createServiceInterval(CreateServiceIntervalCommand $c): ServiceInterval {
-		return new ServiceInterval ( $c, $this );
-	}
-
-	/**
-	 *
-	 * @param CreateMaintenanceCommand $c
-	 * @return Maintenance
-	 */
-	public function createMaintenance(CreateMaintenanceCommand $c): Maintenance {
-		return new Maintenance ( $c, $this );
-	}
-
-	/**
-	 *
-	 * @param CreateMaintenanceTaskCommand $c
-	 * @return MaintenanceTask
-	 */
-	public function createMaintenanceTask(CreateMaintenanceTaskCommand $c): MaintenanceTask {
-		return new MaintenanceTask ( $c, $this );
-	}
-
-	/**
-	 *
-	 * @param CreateTaskCommand $c
-	 * @return Task
-	 */
-	public function createTask(CreateTaskCommand $c): Task {
-		return new Task ( $c, $this );
 	}
 
 	/**

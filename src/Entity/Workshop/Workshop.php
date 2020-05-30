@@ -45,7 +45,7 @@ class Workshop extends AggregateBase {
 
 		parent::__construct ( $user );
 		$this->name = $c->name;
-		$this->owner = $c->owner;
+		$this->owner = $user;
 		$this->clients = new ArrayCollection ();
 	}
 

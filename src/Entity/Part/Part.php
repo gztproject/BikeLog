@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Base\AggregateBase;
 use App\Entity\Manufacturer\Manufacturer;
+use App\Entity\Task\UpdatePartCommand;
 use App\Entity\User\User;
 
 /**
@@ -33,17 +34,15 @@ class Part extends AggregateBase {
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreatePartCommand $c, User $user) {
+	public function __construct(CreatePartCommand $c, Manufacturer $manufacturer, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
-		$this->nickname = $c->nickname;
-		$this->model = $c->model;
-		$this->owner = $c->owner;
-		$this->purchasePrice = $c->purchasePrice;
+		$this->name = $c->name;
+		$this->manufacturer = $manufacturer;
 	}
 	
 	/**

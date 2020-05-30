@@ -4,10 +4,12 @@ namespace App\Entity\Model;
 
 class CreateModelCommand
 {
-	public $manufacturer;
 	public $name;
-	public $alter_name;
+	public $alterName;
 	public $displacement;
+	public $yearFrom;
+	public $yearTo;
+	public $vinRanges;
 	
 	
 	public function __get($name) {
