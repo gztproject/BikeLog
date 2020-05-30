@@ -39,7 +39,7 @@ class ServiceInterval extends AggregateBase {
 
 	/**
 	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\Model\Model", inversedBy="customServiceIntervals")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Bike\Bike", inversedBy="customServiceIntervals")
 	 * @ORM\JoinColumn(name="bike_id", referencedColumnName="id", nullable=true)
 	 */
 	private $bike;

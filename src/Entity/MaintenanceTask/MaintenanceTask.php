@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Base\AggregateBase;
+use App\Entity\User\User;
 
 /**
  *
@@ -20,18 +21,19 @@ class MaintenanceTask extends AggregateBase {
 
 	/**
 	 *
-	 * @ORM\OneToMany(targetEntity="App\Entity\Model\Model", mappedBy="manufacturer")
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Maintenance\Maintenance", inversedBy="maintenanceTasks")
 	 */
-	private $models;
-
+	private $maintenance;
+	
 	/**
-	* @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="manufacturers")
-	*/
-	private $parts;
+	 *
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Task\Task")
+	 */
+	private $task;
 	
 	/**
 	 * 
-	 * @param CreateManufacturerCommand $c
+	 * @param CreateMaintenanceTaskCommand $c
 	 * @param User $user
 	 * @throws \Exception
 	 */

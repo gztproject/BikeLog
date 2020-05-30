@@ -32,7 +32,7 @@ class Manufacturer extends AggregateBase implements iHasParts {
 
 	/**
 	 *
-	 * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="manufacturers")
+	 * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", mappedBy="manufacturers")
 	 */
 	private $parts;
 

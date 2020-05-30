@@ -39,14 +39,15 @@ class Task extends AggregateBase {
 	 * @ORM\Column(type="string", length=2048)
 	 */
 	private $comment;
+	
 		
 	/**
 	 * 
-	 * @param CreateServiceIntervalCommand $c
+	 * @param CreateTaskCommand $c
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateServiceIntervalCommand $c, User $user) {
+	public function __construct(CreateTaskCommand $c, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
@@ -61,12 +62,12 @@ class Task extends AggregateBase {
 	
 	/**
 	 * 
-	 * @param UpdateServiceIntervalCommand $c
+	 * @param UpdateTaskCommand $c
 	 * @param User $user
 	 * @throws \Exception
 	 * @return Task
 	 */
-	public function update(UpdateServiceIntervalCommand $c, User $user): ServiceInterval {
+	public function update(UpdateTaskCommand $c, User $user): Task {
 		throw new \Exception ( "Not implemented yet." );
 		parent::updateBase ( $user );
 		return $this;

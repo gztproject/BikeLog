@@ -21,14 +21,10 @@ class Maintenance extends AggregateBase {
 
 	/**
 	 *
-	 * @ORM\OneToMany(targetEntity="App\Entity\Model\Model", mappedBy="manufacturer")
+	 * @ORM\OneToMany(targetEntity="App\Entity\MaintenanceTask\MaintenanceTask", mappedBy="maintenance")
 	 */
-	private $models;
+	private $maintenanceTasks;
 
-	/**
-	* @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="manufacturers")
-	*/
-	private $parts;
 	
 	/**
 	 * 

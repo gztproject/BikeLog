@@ -26,7 +26,7 @@ class Part extends AggregateBase {
 	 *
 	 * @ORM\ManyToMany(targetEntity="App\Entity\Manufacturer\Manufacturer", inversedBy="parts")
 	 */
-	private $manufacturer;
+	private $manufacturers;
 		
 	/**
 	 * 

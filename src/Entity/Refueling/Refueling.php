@@ -26,11 +26,6 @@ class Refueling extends AggregateBase {
 	private $models;
 
 	/**
-	* @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="manufacturers")
-	*/
-	private $parts;
-	
-	/**
 	 * 
 	 * @param CreateRefuelingCommand $c
 	 * @param User $user
