@@ -5,7 +5,7 @@ namespace App\Entity\MaintenanceTask;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\AggregateBase;
+use App\Entity\Base\AggregateBaseWithComment;
 use App\Entity\User\User;
 use App\Entity\Maintenance\Maintenance;
 use App\Entity\Task\Task;
@@ -14,7 +14,7 @@ use App\Entity\Task\Task;
  *
  * @ORM\Entity(repositoryClass="App\Repository\MaintenanceTask\MaintenanceTaskRepository")
  */
-class MaintenanceTask extends AggregateBase {
+class MaintenanceTask extends AggregateBaseWithComment {
 
 	/**
 	 *
@@ -27,13 +27,7 @@ class MaintenanceTask extends AggregateBase {
 	 * @ORM\ManyToOne(targetEntity="App\Entity\Task\Task")
 	 */
 	private $task;
-	
-	/**
-	 *
-	 * @ORM\Column(type="string", length=2048)
-	 */
-	private $comment;
-	
+			
 	/**
 	 *
 	 * @ORM\Column(type="decimal", precision=5, scale=2)
@@ -84,14 +78,6 @@ class MaintenanceTask extends AggregateBase {
 	 */
 	public function getTask(): Task{
 		return $this->task;
-	}
-	
-	/**
-	 * 
-	 * @return string
-	 */
-	public function getComment(): string{
-		return $this->comment;
 	}
 	
 	/**

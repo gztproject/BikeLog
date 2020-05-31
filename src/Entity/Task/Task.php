@@ -9,12 +9,13 @@ use App\Entity\Base\AggregateBase;
 use App\Entity\Manufacturer\Manufacturer;
 use App\Entity\User\User;
 use App\Entity\Part\Part;
+use App\Entity\Base\AggregateBaseWithComment;
 
 /**
  *
  * @ORM\Entity(repositoryClass="App\Repository\Task\TaskRepository")
  */
-class Task extends AggregateBase {
+class Task extends AggregateBaseWithComment {
 
 	/**
 	 *
@@ -34,12 +35,6 @@ class Task extends AggregateBase {
 	 * @ORM\Column(type="string", length=1024)
 	 */
 	private $description;
-
-	/**
-	 *
-	 * @ORM\Column(type="string", length=2048)
-	 */
-	private $comment;
 
 	/**
 	 *
@@ -95,13 +90,5 @@ class Task extends AggregateBase {
 	 */
 	public function getDescription(): string {
 		return $this->description;
-	}
-
-	/**
-	 *
-	 * @return string
-	 */
-	public function getComment(): string {
-		return $this->comment;
 	}
 }

@@ -3,7 +3,7 @@
 namespace App\Entity\Refueling;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\AggregateBase;
+use App\Entity\Base\AggregateBaseWithComment;
 use App\Entity\Bike\Bike;
 use App\Entity\User\User;
 
@@ -11,7 +11,7 @@ use App\Entity\User\User;
  *
  * @ORM\Entity(repositoryClass="App\Repository\Refueling\RefuelingRepository")
  */
-class Refueling extends AggregateBase {
+class Refueling extends AggregateBaseWithComment {
 	/**
 	 *
 	 * @ORM\Column(type="datetime")

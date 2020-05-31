@@ -18,7 +18,7 @@ abstract class AggregateBase extends Base
     protected $id;    
     
     /**
-     * Sets the creating user and datetime for the new entity. 
+     * Sets the ID and creating user and datetime for the new entity. 
      * @param User $user User that is creating the entity. (@see methods in User->create...)
      * @return Uuid Returns the Uuid of created entity.
      */

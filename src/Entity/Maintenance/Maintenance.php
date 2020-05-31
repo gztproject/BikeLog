@@ -5,7 +5,7 @@ namespace App\Entity\Maintenance;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\AggregateBase;
+use App\Entity\Base\AggregateBaseWithComment;
 use App\Entity\User\User;
 use App\Entity\Workshop\Workshop;
 use App\Entity\Bike\Bike;
@@ -14,7 +14,7 @@ use App\Entity\Bike\Bike;
  *
  * @ORM\Entity(repositoryClass="App\Repository\Maintenance\MaintenanceRepository")
  */
-class Maintenance extends AggregateBase {
+class Maintenance extends AggregateBaseWithComment {
 
 	/**
 	 *
@@ -57,12 +57,6 @@ class Maintenance extends AggregateBase {
 	 * @ORM\Column(type="decimal", precision=5, scale=2)
 	 */
 	private $unspecifiedCosts;
-	
-	/**
-	 *
-	 * @ORM\Column(type="string", length=2048)
-	 */
-	private $comment;
 
 	/**
 	 *
@@ -156,13 +150,5 @@ class Maintenance extends AggregateBase {
 	 */
 	public function getUnspecifiedCosts(): float {
 		return $this->unspecifiedCosts;
-	}
-	
-	/**
-	 *
-	 * @return string
-	 */
-	public function getComment(): string{
-		return $this->comment;
 	}
 }
