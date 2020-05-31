@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Base\AggregateBase;
 use App\Entity\Manufacturer\Manufacturer;
 use App\Entity\User\User;
+use App\Entity\Part\Part;
 
 /**
  *
@@ -27,22 +28,21 @@ class Task extends AggregateBase {
 	 * @ORM\Column(type="string", length=255)
 	 */
 	private $name;
-	
+
 	/**
 	 *
 	 * @ORM\Column(type="string", length=1024)
 	 */
 	private $description;
-	
+
 	/**
 	 *
 	 * @ORM\Column(type="string", length=2048)
 	 */
 	private $comment;
-	
-		
+
 	/**
-	 * 
+	 *
 	 * @param CreateTaskCommand $c
 	 * @param User $user
 	 * @throws \Exception
@@ -59,9 +59,9 @@ class Task extends AggregateBase {
 		$this->owner = $c->owner;
 		$this->purchasePrice = $c->purchasePrice;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param UpdateTaskCommand $c
 	 * @param User $user
 	 * @throws \Exception
@@ -71,5 +71,37 @@ class Task extends AggregateBase {
 		throw new \Exception ( "Not implemented yet." );
 		parent::updateBase ( $user );
 		return $this;
+	}
+
+	/**
+	 *
+	 * @return Part
+	 */
+	public function getPart(): Part {
+		return $this->part;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getName(): string {
+		return $this->name;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getDescription(): string {
+		return $this->description;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getComment(): string {
+		return $this->comment;
 	}
 }

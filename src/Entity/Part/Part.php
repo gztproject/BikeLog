@@ -57,4 +57,20 @@ class Part extends AggregateBase {
 		parent::updateBase ( $user );
 		return $this;
 	}
+	
+	/**
+	 * 
+	 * @return string
+	 */
+	public function getName(): string{
+		return $this->name;
+	}
+	
+	/**
+	 * 
+	 * @return Collection
+	 */
+	public function getManufacturers(): Collection{
+		return $this->manufacturers;
+	}
 }

@@ -30,6 +30,12 @@ class Workshop extends AggregateBase {
 	 * @ORM\ManyToMany(targetEntity="App\Entity\User\User", inversedBy="workshops")
 	 */
 	private $clients;
+	
+	/**
+	 *
+	 * @ORM\OneToMany(targetEntity="App\Entity\Maintenance\Maintenance", mappedBy="workshop")
+	 */
+	private $maintenances;
 
 	/**
 	 *

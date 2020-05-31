@@ -2,10 +2,9 @@
 
 namespace App\Entity\Refueling;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Base\AggregateBase;
+use App\Entity\Bike\Bike;
 use App\Entity\User\User;
 
 /**
@@ -15,18 +14,36 @@ use App\Entity\User\User;
 class Refueling extends AggregateBase {
 	/**
 	 *
-	 * @ORM\Column(type="string", length=255)
+	 * @ORM\Column(type="datetime")
 	 */
-	private $name;
+	private $datetime;
 
 	/**
 	 *
-	 * @ORM\OneToMany(targetEntity="App\Entity\Model\Model", mappedBy="manufacturer")
+	 * @ORM\Column(type="integer")
 	 */
-	private $models;
+	private $odometer;
 
 	/**
-	 * 
+	 *
+	 * @ORM\Column(type="decimal", precision=5, scale=2)
+	 */
+	private $fuelQuantity;
+
+	/**
+	 *
+	 * @ORM\Column(type="decimal", precision=5, scale=2)
+	 */
+	private $price;
+
+	/**
+	 *
+	 * @ORM\ManyToOne(targetEntity="App\Entity\Bike\Bike", inversedBy="refuelings")
+	 */
+	private $bike;
+
+	/**
+	 *
 	 * @param CreateRefuelingCommand $c
 	 * @param User $user
 	 * @throws \Exception
@@ -41,13 +58,90 @@ class Refueling extends AggregateBase {
 		$this->name = $c->name;
 		$this->owner = $c->owner;
 	}
+
+	/**
+	 *
+	 * @param UpdateRefuelingCommand $c
+	 * @param User $user
+	 * @throws \Exception
+	 * @return Refueling
+	 */
 	public function update(UpdateRefuelingCommand $c, User $user): Refueling {
 		throw new \Exception ( "Not implemented yet." );
 		parent::updateBase ( $user );
 		return $this;
 	}
-	public function getName(): ?string {
-		return $this->name;
+
+	/**
+	 *
+	 * @return Bike
+	 */
+	public function getBike(): Bike {
+		return $this->bike;
+	}
+
+	/**
+	 * @deprecated Use getDate() instead.
+	 * @return \DateTimeInterface
+	 */
+	public function getDatetime(): \DateTimeInterface {
+		return $this->datetime;
 	}
 	
+	
+	/**
+	 *
+	 * @return \DateTimeInterface
+	 */
+	public function getDate(): \DateTimeInterface {
+		return $this->datetime;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getDateString(): string {
+		return $this->datetime->format ( 'j. n. Y' );
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getTimeString(): string {
+		return $this->datetime->format ( 'H:i:s' );
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getDateTimeString(): string {
+		return $this->datetime->format ( 'j. n. Y, H:i:s' );
+	}
+
+	/**
+	 *
+	 * @return int
+	 */
+	public function getOdometer(): int {
+		return $this->odometer;
+	}
+
+	/**
+	 *
+	 * @return float
+	 */
+	public function getFuelQuantity(): float {
+		return $this->fuelQuantity;
+	}
+
+	/**
+	 *
+	 * @return float
+	 */
+	public function getPrice(): float {
+		return $this->price;
+	}
 }

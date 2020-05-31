@@ -103,7 +103,7 @@ class Manufacturer extends AggregateBase implements iHasParts {
 	 *
 	 * @return Collection
 	 */
-	public function getPModels(): Collection {
+	public function getModels(): Collection {
 		return $this->models;
 	}
 
