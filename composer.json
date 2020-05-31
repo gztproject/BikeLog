@@ -59,7 +59,8 @@
 	},
 	"name" : "gztproject/bike-log",
 	"require-dev" : {
-		"symfony/profiler-pack" : "^1.0"
+		"doctrine/doctrine-fixtures-bundle": "^3.3",
+		"symfony/profiler-pack": "^1.0"
 	},
 	"support" : {
 		"email" : "gasper.doljak@gmail.com",
