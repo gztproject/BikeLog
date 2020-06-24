@@ -112,8 +112,9 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 * @param UserPasswordEncoderInterface $passwordEncoder
 	 * @return \App\Entity\User\User
 	 */
-	public function __construct(CreateUserCommand $c, User $user, UserPasswordEncoderInterface $passwordEncoder) {
-		parent::__construct ( $user );
+	public function __construct(CreateUserCommand $c, ?User $user, UserPasswordEncoderInterface $passwordEncoder) {
+		
+		parent::__construct ( $user??$this );
 
 		$this->username = $c->username;
 		$this->firstName = $c->firstName;
@@ -160,8 +161,8 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	private function checkPasswordRequirements(string $password) {
 		// ToDo: Read this from application settings?
 		$minPasswordLength = 4;
-		$passwordMustHaveNumbers = true;
-		$passwordMustHaveSpecials = true;
+		$passwordMustHaveNumbers = false;
+		$passwordMustHaveSpecials = false;
 
 		if (strlen ( $password ) < $minPasswordLength)
 			throw new \Exception ( "The password is too short." );

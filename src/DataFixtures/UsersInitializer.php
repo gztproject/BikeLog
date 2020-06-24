@@ -42,11 +42,9 @@ class UsersInitializer implements IEntityInitializer
               
         $users = array();
         foreach ($rows as $row) {
-            // create the user and encode its password
-            //$user = new User();
-            $cuc = new CreateUserCommand();
-        	
-        	
+           
+           	$cuc = new CreateUserCommand();
+        	        	
             $cuc->firstName = $row["FirstName"];
             $cuc->lastName = $row["LastName"];
             $cuc->username = $row["UserName"];
