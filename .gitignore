@@ -14,3 +14,5 @@
 .project
 
 .settings/
+
+src/DataFixtures/InitData/users.tsv
