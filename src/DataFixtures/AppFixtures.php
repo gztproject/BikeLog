@@ -22,7 +22,10 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager)
     {   
     	$usersInitilizer = new UsersInitializer($manager, "/InitData/users.tsv", $this->passwordEncoder, $this->loggerInterface);
-        $usersInitilizer->generate();
+    	$migrator = $usersInitilizer->createDbMigrator();
+    	$usersInitilizer->generate($migrator);
                 
     }
 }
+
+

@@ -2,7 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\User\User;
+
 interface IEntityInitializer
 {
-	public function generate(): array;
+	public function generate(User $migrator): array;
 }

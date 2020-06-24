@@ -33,7 +33,7 @@ use App\Entity\Part\Part;
 /**
  *
  * @ORM\Table(name="app_users")
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\User\UserRepository")
  */
 class User extends AggregateBase implements UserInterface, \Serializable {
 	/**
@@ -112,9 +112,9 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 * @param UserPasswordEncoderInterface $passwordEncoder
 	 * @return \App\Entity\User\User
 	 */
-	public function __construct(CreateUserCommand $c, ?User $user, UserPasswordEncoderInterface $passwordEncoder) {
+	public function __construct(CreateUserCommand $c, User $user, UserPasswordEncoderInterface $passwordEncoder) {
 		
-		parent::__construct ( $user??$this );
+		parent::__construct ( $user );
 
 		$this->username = $c->username;
 		$this->firstName = $c->firstName;

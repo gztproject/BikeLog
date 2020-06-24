@@ -159,6 +159,9 @@
             "config/packages/sensio_framework_extra.yaml"
         ]
     },
+    "symfony/asset": {
+        "version": "v5.0.10"
+    },
     "symfony/cache": {
         "version": "v5.0.8"
     },
@@ -246,6 +249,9 @@
     "symfony/inflector": {
         "version": "v5.0.8"
     },
+    "symfony/intl": {
+        "version": "v5.0.10"
+    },
     "symfony/mime": {
         "version": "v5.0.8"
     },
@@ -269,6 +275,9 @@
     },
     "symfony/orm-pack": {
         "version": "v1.0.8"
+    },
+    "symfony/polyfill-intl-icu": {
+        "version": "v1.17.1"
     },
     "symfony/polyfill-intl-idn": {
         "version": "v1.17.0"
@@ -383,6 +392,25 @@
             "config/packages/dev/web_profiler.yaml",
             "config/packages/test/web_profiler.yaml",
             "config/routes/dev/web_profiler.yaml"
+        ]
+    },
+    "symfony/webpack-encore-bundle": {
+        "version": "1.6",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "1.6",
+            "ref": "69e1d805ad95964088bd510c05995e87dc391564"
+        },
+        "files": [
+            "assets/css/app.css",
+            "assets/js/app.js",
+            "config/packages/assets.yaml",
+            "config/packages/prod/webpack_encore.yaml",
+            "config/packages/test/webpack_encore.yaml",
+            "config/packages/webpack_encore.yaml",
+            "package.json",
+            "webpack.config.js"
         ]
     },
     "symfony/yaml": {
