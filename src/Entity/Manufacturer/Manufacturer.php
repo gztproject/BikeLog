@@ -87,7 +87,7 @@ class Manufacturer extends AggregateBase implements iHasParts {
 	 */
 	public function createModel(CreateModelCommand $c, User $user): Model {
 		$model = new Model ( $c, $this, $user );
-		$this->parts->add ( $model );
+		$this->models->add ( $model );
 		return $model;
 	}
 

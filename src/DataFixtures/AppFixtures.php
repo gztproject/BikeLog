@@ -23,8 +23,13 @@ class AppFixtures extends Fixture
     {   
     	$usersInitilizer = new UsersInitializer($manager, "/InitData/users.tsv", $this->passwordEncoder, $this->loggerInterface);
     	$migrator = $usersInitilizer->createDbMigrator();
-    	$usersInitilizer->generate($migrator);
-                
+    	$users = $usersInitilizer->generate($migrator);
+    	
+    	$mfgInitializer = new ManufacturersInitializer($manager, "/InitData/manufacturers.tsv", $this->loggerInterface);
+    	$mfgs = $mfgInitializer->generate($migrator);
+    	
+    	$modelInitializer = new ModelsInitializer($manager, "/InitData/models.tsv", $mfgs, $this->loggerInterface);
+    	$models = $modelInitializer->generate($migrator);
     }
 }
 

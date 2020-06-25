@@ -15,8 +15,6 @@
 
 .settings/
 
-src/DataFixtures/InitData/users.tsv
-
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
 /public/build/

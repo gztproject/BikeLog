@@ -5,6 +5,7 @@ namespace App\Entity\ServiceInterval;
 class CreateServiceIntervalCommand
 {
 	public $interval;
+	public $intervalType;
 	public $task;	
 	
 	public function __get($name) {

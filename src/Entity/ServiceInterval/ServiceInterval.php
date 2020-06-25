@@ -29,6 +29,12 @@ class ServiceInterval extends AggregateBase {
 	 * @ORM\Column(type="integer")
 	 */
 	private $interval;
+	
+	/**
+	 * 
+	 * @ORM\Column(type="integer")
+	 */
+	private $intervalType;
 
 	/**
 	 *
@@ -72,6 +78,7 @@ class ServiceInterval extends AggregateBase {
 		}
 
 		$this->interval = $c->interval;
+		$this->intervalType = $c->intervalType;
 		$this->task = $c->task;
 	}
 
@@ -117,4 +124,12 @@ class ServiceInterval extends AggregateBase {
 	public function getTask(): Task {
 		return $this->task;
 	}
+}
+
+/**
+ * 00-absolute, 10-relative
+ */
+abstract class IntervalTypes {
+	const absolute = 00;
+	const relative = 10;	
 }
