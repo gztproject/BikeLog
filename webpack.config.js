@@ -27,6 +27,7 @@ Encore
     //Styles
     .addStyleEntry('css/app', ['./assets/scss/app.scss'])
     .addStyleEntry('css/copyleft', ['./assets/css/copyleft.css'])
+    .addStyleEntry('css/dashboard', ['./assets/scss/dashboard.scss'])
 
 
      //plugins

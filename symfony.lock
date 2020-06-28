@@ -220,6 +220,9 @@
             ".env"
         ]
     },
+    "symfony/form": {
+        "version": "v5.0.10"
+    },
     "symfony/framework-bundle": {
         "version": "4.4",
         "recipe": {
@@ -273,6 +276,9 @@
             "config/packages/test/monolog.yaml"
         ]
     },
+    "symfony/options-resolver": {
+        "version": "v5.0.10"
+    },
     "symfony/orm-pack": {
         "version": "v1.0.8"
     },
@@ -287,6 +293,9 @@
     },
     "symfony/polyfill-php73": {
         "version": "v1.17.0"
+    },
+    "symfony/polyfill-php80": {
+        "version": "v1.17.1"
     },
     "symfony/profiler-pack": {
         "version": "v1.0.4"
@@ -337,6 +346,19 @@
     },
     "symfony/stopwatch": {
         "version": "v5.0.8"
+    },
+    "symfony/translation": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "2ad9d2545bce8ca1a863e50e92141f0b9d87ffcd"
+        },
+        "files": [
+            "config/packages/translation.yaml",
+            "translations/.gitignore"
+        ]
     },
     "symfony/translation-contracts": {
         "version": "v2.0.1"
@@ -417,6 +439,9 @@
         "version": "v5.0.8"
     },
     "twig/extra-bundle": {
+        "version": "v3.0.3"
+    },
+    "twig/intl-extra": {
         "version": "v3.0.3"
     },
     "twig/twig": {

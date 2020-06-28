@@ -21,12 +21,12 @@
 
     <body id="{% block body_id %}{% endblock %}">
 
-      <!-- {# {% block header %}
+       {% block header %}
             <header class="{{ app.environment }}"> 
                 <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-primary {{ app.environment }}" role="navigation">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <a href="{{ path('dashboard_index') }}" class="navbar-brand">Birokrat</a>                       
+                            <a href="{{ path('dashboard_index') }}" class="navbar-brand">{{ 'title.homepage'|trans({}, "messages", locale) }}</a>                       
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
@@ -37,7 +37,7 @@
                                 {% if app.user %}
                                     <li class="nav-item active">
                                         <a class="nav-link" href="{{ path('dashboard_index') }}">
-                                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.home'|trans }}
+                                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.home'|trans({}, "messages", locale) }}
                                         </a>
                                     </li>
                                 {% endif %}    
@@ -46,12 +46,12 @@
                                     {% if is_granted('ROLE_ADMIN') %}
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="{{ path('admin_index') }}">
-                                                <i class="fa fa-lock" aria-hidden="true"></i> {{ 'menu.admin'|trans }}                                                
+                                                <i class="fa fa-lock" aria-hidden="true"></i> {{ 'menu.admin'|trans({}, "messages", locale) }}                                                
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="admin">
-                                                <a class="dropdown-item" href="{{ path('admin_index') }}">{{ 'menu.admin'|trans }}</a>
+                                                <a class="dropdown-item" href="{{ path('admin_index') }}">{{ 'menu.admin'|trans({}, "messages", locale) }}</a>
                                                 <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="{{ path('admin_user_index') }}">{{ 'menu.users'|trans }}</a>
+                                                <a class="dropdown-item" href="{{ path('admin_user_index') }}">{{ 'menu.users'|trans({}, "messages", locale) }}</a>
                                             </div>
                                         </li>
                                     {% endif %}
@@ -65,13 +65,8 @@
                                             {{ 'menu.POC'|trans }}
                                         </a>
                                         <ul class="dropdown-menu poc" role="menu" aria-labelledby="poc">
-                                            <li>
-                                                <a class="nav-link" href="{{ path('POC_bootswatch') }}"> <i class="fa fa-book-medical"></i>{{ 'menu.POC.bootswatch'|trans }}</a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li>
-                                                <a class="nav-link" href="{{ path('POC_typeahead') }}"> <i class="fa fa-keyboard"></i>{{ 'menu.POC.typeahead'|trans }}</a>
-                                            </li>
+                                           
+                                            
                                         </ul>
                                     </li>                                                                 
                                     <li class="nav-item dropdown">
@@ -101,8 +96,8 @@
                                         {{ app.request.locale }}
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="locales">
-                                        {% for locale in locales() %}
-                                            <a class="dropdown-item" {% if app.request.locale == locale.code %}aria-checked="true" {% else %}aria-checked="false" {% endif %} href="{{ path(app.request.get('_route', 'dashboard_index'), app.request.get('_route_params', [])|merge({_locale: locale.code})) }}">{{ locale.name|capitalize }}</a>
+                                        {% for locale in locales|split('|') %}
+                                            <a class="dropdown-item" {% if app.request.locale == locale %}aria-checked="true" {% else %}aria-checked="false" {% endif %} href="{{ path(app.request.get('_route', 'dashboard_index'), app.request.get('_route_params', [])|merge({_locale: locale})) }}">{{ locale|locale_name|capitalize }}</a>
                                         {% endfor %}
                                     </div>
                                 </li> 
@@ -113,7 +108,7 @@
                 </nav>
             </header>            
         {% endblock %}
-        #} --> 
+         
 
         <div id="main_container" class="container-fluid">            
             {% block body %}
@@ -140,7 +135,7 @@
                 <div class="container">
                     <div class="row">
                         <div id="footer-copyright" class="col-md-6">                        
-                            <p><span class="copyleft">&copy;</span> 2018 - {{ 'now'|date('Y') }}  GZT Project</p>
+                            <p><span class="copyleft">&copy;</span> 2020 - {{ 'now'|date('Y') }}  GZT Project</p>
                         </div>
                         <div id="footer-resources" class="col-md-6">                            
                         </div>
@@ -152,10 +147,6 @@
         {% block javascripts %}
             {{ encore_entry_script_tags('js/app') }}
         {% endblock %}
-
-        {# it's not mandatory to set the timezone in localizeddate(). This is done to
-           avoid errors when the 'intl' PHP extension is not available and the application
-           is forced to use the limited "intl polyfill", which only supports UTC and GMT #}
-        <!--{# Page rendered on {{ 'now'|localizeddate('long', 'long', null, 'UTC') }} #}-->
+        
     </body>
 </html>

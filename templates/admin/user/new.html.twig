@@ -1,0 +1,20 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block body_id 'admin_user_new' %}
+
+{% block main %}
+    <h1>{{ 'title.user_new'|trans }}</h1>
+
+   {{ include('admin/user/_form.html.twig', {
+        form: form,
+        button_label: 'action.save'|trans,
+        include_back_to_home_link: true,
+        showNewPassword: true,
+    }, with_context = false) }}
+    
+{% endblock %}
+
+{% block sidebar %}
+    {{ parent() }}
+
+{% endblock %}

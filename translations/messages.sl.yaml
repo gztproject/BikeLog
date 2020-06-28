@@ -1,0 +1,16 @@
+title:
+  login: Varna prijava
+  homepage: BikeLog 
+  myBikes: Moji motorji
+
+label:
+  username: Uporabniško ime
+  password: Geslo
+  rememberMe: Zapomni si me
+
+action:
+  sign_in: Prijava
+  login: Prijava
+
+help:
+ login: Prijava

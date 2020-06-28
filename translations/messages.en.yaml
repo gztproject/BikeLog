@@ -1,0 +1,16 @@
+title:
+  login: Safe login
+  homepage: BikeLog 
+  myBikes: My motorcycles
+
+label:
+  username: Username
+  password: Password
+  rememberMe: Remember me
+
+action:
+  sign_in: Log in
+  login: Log in
+
+help:
+ login: Log in
