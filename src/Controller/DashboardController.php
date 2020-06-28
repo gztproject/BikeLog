@@ -12,12 +12,9 @@ class DashboardController extends AbstractController
 	/**
      * @Route("/dashboard", methods={"GET"}, name="dashboard_index")
      */
-	public function index(Request $request): Response
-    {  
-    	$locale = $request->getLocale();
-    	return $this->render ( 'dashboard/index.html.twig', [
-    			'locale' => $locale
-    	]);
+	public function index(): Response
+    {      	
+    	return $this->render ( 'dashboard/index.html.twig');
     }    
     
 }

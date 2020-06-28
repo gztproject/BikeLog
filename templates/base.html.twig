@@ -26,7 +26,7 @@
                 <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-primary {{ app.environment }}" role="navigation">
                     <div class="container-fluid">
                         <div class="navbar-header">
-                            <a href="{{ path('dashboard_index') }}" class="navbar-brand">{{ 'title.homepage'|trans({}, "messages", locale) }}</a>                       
+                            <a href="{{ path('dashboard_index') }}" class="navbar-brand">{{ 'title.homepage'|trans }}</a>                       
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
@@ -37,7 +37,7 @@
                                 {% if app.user %}
                                     <li class="nav-item active">
                                         <a class="nav-link" href="{{ path('dashboard_index') }}">
-                                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.home'|trans({}, "messages", locale) }}
+                                            <i class="fa fa-home" aria-hidden="true"></i> {{ 'menu.home'|trans }}
                                         </a>
                                     </li>
                                 {% endif %}    
@@ -46,12 +46,12 @@
                                     {% if is_granted('ROLE_ADMIN') %}
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="{{ path('admin_index') }}">
-                                                <i class="fa fa-lock" aria-hidden="true"></i> {{ 'menu.admin'|trans({}, "messages", locale) }}                                                
+                                                <i class="fa fa-lock" aria-hidden="true"></i> {{ 'menu.admin'|trans }}                                                
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="admin">
-                                                <a class="dropdown-item" href="{{ path('admin_index') }}">{{ 'menu.admin'|trans({}, "messages", locale) }}</a>
+                                                <a class="dropdown-item" href="{{ path('admin_index') }}">{{ 'menu.admin'|trans }}</a>
                                                 <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="{{ path('admin_user_index') }}">{{ 'menu.users'|trans({}, "messages", locale) }}</a>
+                                                <a class="dropdown-item" href="{{ path('admin_user_index') }}">{{ 'menu.users'|trans }}</a>
                                             </div>
                                         </li>
                                     {% endif %}

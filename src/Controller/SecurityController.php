@@ -13,8 +13,7 @@ class SecurityController extends AbstractController {
 	 *
 	 * @Route("/login", name="app_login")
 	 */
-	public function login(Request $request, AuthenticationUtils $authenticationUtils): Response {
-		$locale = $request->getLocale ();
+	public function login(AuthenticationUtils $authenticationUtils): Response {
 		// get the login error if there is one
 		$error = $authenticationUtils->getLastAuthenticationError ();
 		// last username entered by the user
@@ -22,8 +21,7 @@ class SecurityController extends AbstractController {
 
 		return $this->render ( 'security/login.html.twig', [ 
 				'last_username' => $lastUsername,
-				'error' => $error,
-				'locale' => $locale
+				'error' => $error
 		] );
 	}
 
@@ -33,16 +31,5 @@ class SecurityController extends AbstractController {
 	 */
 	public function logout(): void {
 		throw new \Exception ( 'This should never be reached!' );
-	}
-
-	/**
-	 *
-	 * @Route("/", methods={"GET"}, name="homepage")
-	 */
-	public function index(Request $request): Response {
-		$locale = $request->getLocale ();
-		return $this->render ( 'default/homepage.html.twig', [ 
-				'locale' => $locale
-		] );
 	}
 }

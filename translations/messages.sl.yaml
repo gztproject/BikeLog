@@ -12,5 +12,13 @@ action:
   sign_in: Prijava
   login: Prijava
 
+menu:
+  home: Domov
+  admin: Administrator
+  POC: POC
+  user: Uporabnik
+  logout: Odjava
+  users: Uporabniki
+
 help:
  login: Prijava
