@@ -80,6 +80,12 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @ORM\OneToMany(targetEntity="App\Entity\Refueling\Refueling", mappedBy="bike")
 	 */
 	private $refuelings;
+	
+	/**
+	 *
+	 * @ORM\OneToOne(targetEntity="App\Entity\Refueling\Refueling", nullable=true)
+	 */
+	private $lastRefueling;
 
 // 	/**
 // 	 *
@@ -184,8 +190,20 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 *
 	 * @return string|NULL
 	 */
-	public function getNickame(): ?string {
+	public function getNickname(): ?string {
 		return $this->nickname;
+	}
+	
+	/**
+	 *
+	 * @return string|NULL
+	 */
+	public function getName(): ?string {
+		if(trim($this->getNickname()) == "")
+			return $this->getModel()->getName() . " " . $this->getModel()->getAlterName();
+			
+		return $this->getNickname();
+		
 	}
 
 	/**

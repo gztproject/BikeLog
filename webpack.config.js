@@ -22,6 +22,10 @@ Encore
 
     //JavaScripts
     .addEntry('js/app', './assets/js/app.js')
+
+    //Common
+    //  ->filters
+    .addEntry('js/common/filters/dateBikeFilter', './assets/js/common/filters/dateBikeFilter.js')
     
 
     //Styles

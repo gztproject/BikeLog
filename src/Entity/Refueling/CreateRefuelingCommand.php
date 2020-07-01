@@ -3,9 +3,7 @@
 namespace App\Entity\Refueling;
 
 class CreateRefuelingCommand
-{
-	public $name;	
-	
+{		
 	public function __get($name) {
 		return $this->$name;
 	}

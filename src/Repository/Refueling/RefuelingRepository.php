@@ -3,8 +3,11 @@
 namespace App\Repository\Refueling;
 
 use App\Entity\Refueling\Refueling;
+use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
+use App\Entity\Bike\Bike;
 
 /**
  * @method Refueling|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,6 +20,46 @@ class RefuelingRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
     	parent::__construct($registry, Refueling::class);
+    }
+    
+    public function getQuery(): QueryBuilder
+    {
+    	return $this->createQueryBuilder('t')
+    	->addSelect('t')
+    	->orderBy('t.datetime', 'DESC');
+    }
+    
+    public function getFilteredQuery($from, $to, $bikeId, User $user, $order = "DESC"): QueryBuilder
+    {
+    	$qb = $this
+    	->createQueryBuilder('t')
+    	->addSelect('t') 	
+    	->leftJoin ( 'App\Entity\Bike\Bike', 'b', 'WITH', 't.bike = b.id' )
+    	
+    	->where('b.owner = :uid')
+    	->setParameter('uid', $user->getId());
+    	
+    	if($from)
+    	{
+    		$qb
+    		->andwhere('t.datetime >= :from')
+    		->setParameter('from', date('Y-m-d G:i:s', $from));
+    	}
+    	
+    	if($to)
+    	{
+    		$qb
+    		->andWhere('t.datetime <= :to')
+    		->setParameter('to', date('Y-m-d G:i:s', $to));
+    	}
+    	
+    	if($bikeId)
+    	{
+    		
+    		$qb->andWhere('t.bike = :orgid')->setParameter('bikeid', $bikeId);
+    	}
+    	
+    	return $qb->orderBy('t.datetime', $order);
     }
 
     // /**

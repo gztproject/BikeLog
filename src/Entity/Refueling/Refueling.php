@@ -41,6 +41,12 @@ class Refueling extends AggregateBaseWithComment {
 	 * @ORM\ManyToOne(targetEntity="App\Entity\Bike\Bike", inversedBy="refuelings")
 	 */
 	private $bike;
+	
+	/**
+	 *
+	 * @ORM\OneToOne(targetEntity="App\Entity\Refueling\Refueling", nullable=true)
+	 */
+	private $previousRefueling;
 
 	/**
 	 *
@@ -127,6 +133,14 @@ class Refueling extends AggregateBaseWithComment {
 	 */
 	public function getOdometer(): int {
 		return $this->odometer;
+	}
+	
+	/**
+	 *
+	 * @return int
+	 */
+	public function getDistance(): int {
+		return 0;
 	}
 
 	/**

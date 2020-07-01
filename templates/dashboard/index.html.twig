@@ -5,30 +5,34 @@
 {% block main %}
 
 <div class="row">
-    <div class="col-12">
-        <div class="bs-component">
-            <div class="card text-white bg-primary">
-                <div class="card-header">
-                  <h2>{{ 'title.myBikes'|trans }}</h2>
-                </div>
-                <div class="card-body">
-                
-                </div>
-            </div>
-        </div>        
-    </div>
+
+	<div class="col-12">
+		<div class="bs-component">
+			<div class="card text-white bg-primary">
+				<div class="card-header">
+					<a href="{{ path('bike_index') }}"><h2>
+							{{ 'title.myBikes'|trans }}
+						</h2></a>
+				</div>
+				<div class="card-body">
+					{{ include('dashboard/bike/_table.html.twig', {bikes: bikes}, with_context = false) }}
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
+
 </br>
 
-    
+
 {% endblock %}
 
 {% block sidebar %}
-    
-    {{ parent() }}    
+
+{{ parent() }}
 
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
+{{ parent() }}
 {% endblock %}

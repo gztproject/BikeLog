@@ -2,15 +2,23 @@ title:
   login: Varna prijava
   homepage: BikeLog 
   myBikes: Moji motorji
+  refueling: Točenje
 
 label:
   username: Uporabniško ime
   password: Geslo
   rememberMe: Zapomni si me
+  date: Datum
+  bike: Motor
+  year: Leto
+  dateFrom: Od
+  dateTo: Do
+  no_refuelings_found: Ne najdem nobenega točenja.
 
 action:
   sign_in: Prijava
   login: Prijava
+  create_refueling: Novo točenje
 
 menu:
   home: Domov
