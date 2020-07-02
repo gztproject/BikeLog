@@ -21,7 +21,18 @@
 		</a>
 	</div>
 	{% else %}
-	{{ 'label.no_bikes_found'|trans }}
+	<a href={{ path('bike_new')}}>
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top"
+                    src="{{ asset('img/plus.png') }}"
+                    alt={{ 'action.add_bike'|trans }}>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{ 'action.add_bike'|trans }}
+                    </h5>                    
+                </div>
+            </div>
+        </a>
 	{% endfor %}
 
 
