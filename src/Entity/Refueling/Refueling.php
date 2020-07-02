@@ -41,12 +41,18 @@ class Refueling extends AggregateBaseWithComment {
 	 * @ORM\ManyToOne(targetEntity="App\Entity\Bike\Bike", inversedBy="refuelings")
 	 */
 	private $bike;
+
+	/**
+	 *
+	 * @ORM\OneToOne(targetEntity="App\Entity\Refueling\Refueling")
+	 */
+	private $previousRefueling;
 	
 	/**
 	 *
-	 * @ORM\OneToOne(targetEntity="App\Entity\Refueling\Refueling", nullable=true)
+	 * @ORM\Column(type="boolean")
 	 */
-	private $previousRefueling;
+	private $isTankFull;
 
 	/**
 	 *
@@ -54,15 +60,14 @@ class Refueling extends AggregateBaseWithComment {
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateRefuelingCommand $c, User $user) {
+	public function __construct(CreateRefuelingCommand $c, ?Refueling $previousRefueling, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
-		$this->name = $c->name;
-		$this->owner = $c->owner;
+		$this->previousRefueling = $previousRefueling;
 	}
 
 	/**
@@ -87,14 +92,14 @@ class Refueling extends AggregateBaseWithComment {
 	}
 
 	/**
+	 *
 	 * @deprecated Use getDate() instead.
 	 * @return \DateTimeInterface
 	 */
 	public function getDatetime(): \DateTimeInterface {
 		return $this->datetime;
 	}
-	
-	
+
 	/**
 	 *
 	 * @return \DateTimeInterface
@@ -134,13 +139,23 @@ class Refueling extends AggregateBaseWithComment {
 	public function getOdometer(): int {
 		return $this->odometer;
 	}
-	
+
 	/**
 	 *
-	 * @return int
+	 * @return int|NULL
 	 */
-	public function getDistance(): int {
-		return 0;
+	public function getDistance(): ?int {
+		if ($this->previousRefueling)
+			return $this->getOdometer () - $this->previousRefueling->getOdometer ();
+		return null;
+	}
+
+	/**
+	 *
+	 * @return Refueling|NULL
+	 */
+	public function getPreviousRefueling(): ?Refueling {
+		return $this->previousRefueling;
 	}
 
 	/**

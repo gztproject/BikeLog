@@ -1,23 +1,17 @@
 // assets/scss/app.scss
 
-// customize some Bootstrap variables
-$primary: darken(#428bca, 20%);
-
 // the ~ allows you to reference things in node_modules
 @import "~bootstrap/scss/bootstrap";
 
-// assets/scss/app.scss
 // setting the value of this variable to an empty data URL is the only working solution
 // to load the Bootswatch web fonts locally and avoid loading them from Google servers
 // see https://github.com/thomaspark/bootswatch/issues/55#issuecomment-298093182
 $web-font-path: 'data:text/css;base64,';
 
-//@import '~@fortawesome/fontawesome-free/css/all.css';
-
-#main_container{
+#main_container {
     margin-top: 80px;
 }
 
-nav.dev{
-      background-color: darkred !important;
+nav.dev {
+    background-color: darkred !important;
 }

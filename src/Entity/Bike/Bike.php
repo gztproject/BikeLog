@@ -47,9 +47,15 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 *
-	 * @ORM\Column(type="decimal", precision=5, scale=2)
+	 * @ORM\Column(type="decimal", precision=8, scale=2)
 	 */
 	private $purchasePrice;
+
+	/**
+	 *
+	 * @ORM\Column(type="integer")
+	 */
+	private $purchaseOdometer;
 
 	/**
 	 *
@@ -80,18 +86,29 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @ORM\OneToMany(targetEntity="App\Entity\Refueling\Refueling", mappedBy="bike")
 	 */
 	private $refuelings;
-	
+
 	/**
 	 *
-	 * @ORM\OneToOne(targetEntity="App\Entity\Refueling\Refueling", nullable=true)
+	 * @ORM\OneToOne(targetEntity="App\Entity\Refueling\Refueling")
 	 */
 	private $lastRefueling;
 
-// 	/**
-// 	 *
-// 	 * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="bikes")
-// 	 */
-// 	private $parts;
+	/**
+	 *
+	 * @ORM\OneToOne(targetEntity="App\Entity\Maintenance\Maintenance")
+	 */
+	private $lastMaintenance;
+	
+	/**
+	 * @ORM\Column(type="string")
+	 */
+	private $pictureFilename;
+
+	// /**
+	// *
+	// * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="bikes")
+	// */
+	// private $parts;
 
 	/**
 	 *
@@ -106,16 +123,19 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
-		$this->nickname = $c->nickname;
+		$this->nickname = $c->nickname ?? "";
 		$this->model = $c->model;
 		$this->owner = $c->owner;
 		$this->purchasePrice = $c->purchasePrice;
 		$this->year = $c->year;
 		$this->customServiceIntervals = new ArrayCollection ();
-		$this->vin = $c->vin;
+		$this->vin = $c->vin ?? "";
+		$this->purchaseOdometer = $c->purchaseOdometer;
 
 		$this->maintenances = new ArrayCollection ();
 		$this->refuelings = new ArrayCollection ();
+		
+		$this->pictureFilename = $c->pictureFilename;
 	}
 
 	/**
@@ -151,7 +171,8 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return Refueling
 	 */
 	public function createRefueling(CreateRefuelingCommand $c, User $user): Refueling {
-		$refueling = new Refueling ( $c, $user );
+		$refueling = new Refueling ( $c, $this->lastRefueling, $user );
+		$this->lastRefueling = $refueling;
 		$this->refuelings->add ( $refueling );
 		return $refueling;
 	}
@@ -164,21 +185,22 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 */
 	public function createMaintenance(CreateMaintenanceCommand $c, User $user): Maintenance {
 		$maintenance = new Maintenance ( $c, $user );
+		$this->lastMaintenance = $maintenance;
 		$this->maintenances->add ( $maintenance );
 		return $maintenance;
 	}
 
-// 	/**
-// 	 * Creates a CUSTOM part for only the current bike.
-// 	 *
-// 	 * {@inheritdoc}
-// 	 * @see \App\Entity\Part\iHasParts::createPart()
-// 	 */
-// 	public function createPart(CreatePartCommand $c, User $user): Part {
-// 		$part = new Part ( $c, $this, $user );
-// 		$this->parts->add ( $part );
-// 		return $part;
-// 	}
+	// /**
+	// * Creates a CUSTOM part for only the current bike.
+	// *
+	// * {@inheritdoc}
+	// * @see \App\Entity\Part\iHasParts::createPart()
+	// */
+	// public function createPart(CreatePartCommand $c, User $user): Part {
+	// $part = new Part ( $c, $this, $user );
+	// $this->parts->add ( $part );
+	// return $part;
+	// }
 
 	/*
 	 * ===============================
@@ -193,17 +215,16 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	public function getNickname(): ?string {
 		return $this->nickname;
 	}
-	
+
 	/**
 	 *
 	 * @return string|NULL
 	 */
 	public function getName(): ?string {
-		if(trim($this->getNickname()) == "")
-			return $this->getModel()->getName() . " " . $this->getModel()->getAlterName();
-			
-		return $this->getNickname();
-		
+		if (trim ( $this->getNickname () ) == "")
+			return $this->getModel ()->getName () . " " . $this->getModel ()->getAlterName ();
+
+		return $this->getNickname ();
 	}
 
 	/**
@@ -292,33 +313,81 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 *
+	 * @return Refueling|NULL
+	 */
+	public function getLastRefueling(): ?Refueling {
+		return $this->lastRefueling;
+	}
+
+	/**
+	 *
+	 * @return Maintenance|NULL
+	 */
+	public function getLastMaintenance(): ?Maintenance {
+		return $this->lastMaintenance;
+	}
+
+	/**
+	 *
+	 * @return int
+	 */
+	public function getOdometer(): int {
+		return max ( 
+				$this->getPurchaseOdometer (), 
+				$this->getLastRefueling () != null ? $this->getLastRefueling ()->getOdometer () : 0, 
+				$this->getLastMaintenance () != null ? $this->getLastMaintenance ()->getOdometer () : 0 );
+	}
+
+	/**
+	 *
+	 * @return int
+	 */
+	public function getPurchaseOdometer(): int {
+		return $this->purchaseOdometer;
+	}
+
+	/**
+	 *
+	 * @return int
+	 */
+	public function getTotalDistance(): int {
+		return $this->getOdometer () - $this->getPurchaseOdometer ();
+	}
+
+	/**
+	 *
 	 * @return Collection
 	 */
 	public function getRefuelings(): Collection {
 		return $this->refuelings;
 	}
+	
+	public function getPictureFilename(): ?string
+	{
+		return $this->pictureFilename;
+	}
 
-// 	/**
-// 	 * Returns all of this bike's custom parts.
-// 	 *
-// 	 * @return Collection
-// 	 */
-// 	public function getCustomParts(): Collection {
-// 		return $this->parts;
-// 	}
+	// /**
+	// * Returns all of this bike's custom parts.
+	// *
+	// * @return Collection
+	// */
+	// public function getCustomParts(): Collection {
+	// return $this->parts;
+	// }
 
-// 	/**
-// 	 * Returns all the generic parts from the model AND all the custom ones.
-// 	 *
-// 	 * {@inheritdoc}
-// 	 * @see \App\Entity\Part\iHasParts::getParts()
-// 	 */
-// 	public function getParts(): Collection {
-// 		$parts = new ArrayCollection ();
-// 		foreach ( $this->getModel ()->getParts () as $p )
-// 			$parts->add ( $p );
-// 		foreach ( $this->getCustomParts () as $p )
-// 			$parts->add ( $p );
-// 		return $parts;
-// 	}
+	// /**
+	// * Returns all the generic parts from the model AND all the custom ones.
+	// *
+	// * {@inheritdoc}
+	// * @see \App\Entity\Part\iHasParts::getParts()
+	// */
+	// public function getParts(): Collection {
+	// $parts = new ArrayCollection ();
+	// foreach ( $this->getModel ()->getParts () as $p )
+	// $parts->add ( $p );
+	// foreach ( $this->getCustomParts () as $p )
+	// $parts->add ( $p );
+	// return $parts;
+	// }
 }

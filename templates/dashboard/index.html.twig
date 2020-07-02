@@ -5,10 +5,9 @@
 {% block main %}
 
 <div class="row">
-
 	<div class="col-12">
 		<div class="bs-component">
-			<div class="card text-white bg-primary">
+			<div class="card">
 				<div class="card-header">
 					<a href="{{ path('bike_index') }}"><h2>
 							{{ 'title.myBikes'|trans }}
@@ -30,6 +29,10 @@
 {% block sidebar %}
 
 {{ parent() }}
+<a href="{{ path('bike_new') }}"
+	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
+	aria-hidden="true"></i> {{ 'action.add_bike'|trans }}
+</a>
 
 {% endblock %}
 

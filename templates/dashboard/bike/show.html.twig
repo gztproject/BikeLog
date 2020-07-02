@@ -1,12 +1,18 @@
 {% extends 'dashboard/layout.html.twig' %}
 
-{% block body_id 'travelExpense_show' %}
+{% block body_id 'bike_show' %}
 
 {% block main %}
-    <h1>{{ travelExpense.TravelDescription }}</h1>
-    
-    {% endblock %}
+<h1>
+	{{ bike.name }}
+</h1>
+<div class="col-6">
+	<img src="{{ asset('uploads/bikes/' ~ bike.pictureFilename) }}"
+		alt="Bike picture" width="100%">
+</div>
+
+{% endblock %}
 
 {% block sidebar %}
-        {{ parent() }}
+{{ parent() }}
 {% endblock %}
