@@ -19,6 +19,7 @@ action:
   sign_in: Prijava
   login: Prijava
   create_refueling: Novo točenje
+  add_bike: Dodaj motor
 
 menu:
   home: Domov

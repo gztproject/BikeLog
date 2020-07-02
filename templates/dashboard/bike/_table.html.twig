@@ -1,23 +1,24 @@
 <div class="row">
 	{% for bike in bikes %}
-
 	<div class="col-md-3">
-		<div class="card" style="width: 18rem;">
-			<img class="card-img-top"
-				src="{{ asset('uploads/bikes/' ~ bike.pictureFilename) }}"
-				alt={{ bike.name }}>
-			<div class="card-body">
-				<h5 class="card-title">
-					{{ bike.name }}
-				</h5>
-				<p class="card-text">
-					{{ bike.year }}
-					</br>
-					{{ bike.odometer }}
-					km
-				</p>
+		<a href={{ path('bike_show', { 'id': bike.id } )}}>
+			<div class="card" style="width: 18rem;">
+				<img class="card-img-top"
+					src="{{ asset('uploads/bikes/' ~ bike.pictureFilename) }}"
+					alt={{ bike.name }}>
+				<div class="card-body">
+					<h5 class="card-title">
+						{{ bike.name }}
+					</h5>
+					<p class="card-text">
+						{{ bike.year }}
+						</br>
+						{{ bike.odometer }}
+						km
+					</p>
+				</div>
 			</div>
-		</div>
+		</a>
 	</div>
 	{% else %}
 	{{ 'label.no_bikes_found'|trans }}
