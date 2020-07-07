@@ -4,17 +4,15 @@
 		<a href={{ path('bike_show', { 'id': bike.id } )}}>
 			<div class="card" style="width: 18rem;">
 				<img class="card-img-top"
-					src="{{ asset('uploads/bikes/' ~ bike.pictureFilename) }}"
+				    style="height: 14rem; object-fit: cover;"
+					src="{{ asset(bike.pictureFilename) }}"
 					alt={{ bike.name }}>
 				<div class="card-body">
 					<h5 class="card-title">
-						{{ bike.name }}
+                        '{{ bike.year|slice(2,3) }} {{ bike.name }}
 					</h5>
 					<p class="card-text">
-						{{ bike.year }}
-						</br>
-						{{ bike.odometer }}
-						km
+						{{ bike.odometer }} km
 					</p>
 				</div>
 			</div>

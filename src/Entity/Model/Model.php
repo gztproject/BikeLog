@@ -19,7 +19,7 @@ use App\Entity\ServiceInterval\iHasServiceIntervals;
  *
  * @ORM\Entity(repositoryClass="App\Repository\Model\ModelRepository")
  */
-class Model extends AggregateBase implements iHasServiceIntervals{
+class Model extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 *
@@ -69,11 +69,18 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 	 */
 	private $vinRanges;
 	
-// 	/**
-// 	 *
-// 	 * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="models")
-// 	 */
-// 	private $parts;
+	
+	/**
+	 *
+	 * @ORM\Column(type="string")
+	 */
+	private $pictureFilename;
+
+	// /**
+	// *
+	// * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="models")
+	// */
+	// private $parts;
 
 	/**
 	 *
@@ -99,6 +106,8 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 		$this->vinRanges = $c->vinRanges;
 
 		$this->serviceIntervals = new ArrayCollection ();
+
+		$this->pictureFilename = $c->pictureFilename ?? "";
 	}
 
 	/**
@@ -113,8 +122,7 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 		parent::updateBase ( $user );
 		return $this;
 	}
-	
-	
+
 	/**
 	 * Creates a GENERIC(!) model service interval.
 	 *
@@ -123,23 +131,22 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 	 * @return ServiceInterval
 	 */
 	public function createServiceInterval(CreateServiceIntervalCommand $c, User $user): ServiceInterval {
-		$si = new ServiceInterval($c, $this, $user);
-		$this->serviceIntervals->add($si);
+		$si = new ServiceInterval ( $c, $this, $user );
+		$this->serviceIntervals->add ( $si );
 		return $si;
 	}
-	
-// 	/**
-// 	 * Creates a generic part on a model.
-// 	 * {@inheritDoc}
-// 	 * @see \App\Entity\Part\iHasParts::createPart()
-// 	 */
-// 	public function createPart(CreatePartCommand $c, User $user): Part {
-// 		$part = new Part($c, $this, $user);
-// 		$this->parts->add($part);
-// 		return $part;
-// 	}
-	
-	
+
+	// /**
+	// * Creates a generic part on a model.
+	// * {@inheritDoc}
+	// * @see \App\Entity\Part\iHasParts::createPart()
+	// */
+	// public function createPart(CreatePartCommand $c, User $user): Part {
+	// $part = new Part($c, $this, $user);
+	// $this->parts->add($part);
+	// return $part;
+	// }
+
 	/*
 	 * =================================================
 	 * Getters
@@ -153,7 +160,7 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 	public function getName(): string {
 		return $this->name;
 	}
-	
+
 	/**
 	 *
 	 * @return string
@@ -169,7 +176,7 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 	public function getManufacturer(): Manufacturer {
 		return $this->parts;
 	}
-	
+
 	/**
 	 *
 	 * @return array
@@ -177,7 +184,7 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 	public function getVinRanges(): array {
 		return $this->vinRanges;
 	}
-	
+
 	/**
 	 *
 	 * @return int
@@ -185,7 +192,7 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 	public function getYearFrom(): int {
 		return $this->yearFrom;
 	}
-	
+
 	/**
 	 *
 	 * @return int
@@ -193,7 +200,7 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 	public function getYearTo(): int {
 		return $this->yearTo;
 	}
-	
+
 	/**
 	 *
 	 * @return int
@@ -204,19 +211,30 @@ class Model extends AggregateBase implements iHasServiceIntervals{
 
 	/**
 	 * Returns all the generic serviceIntervals from the model.
-	 * {@inheritDoc}
+	 *
+	 * {@inheritdoc}
 	 * @see \App\Entity\ServiceInterval\iHasServiceIntervals::getServiceIntervals()
 	 */
 	public function getServiceIntervals(): Collection {
 		return $this->serviceIntervals;
 	}
-	
-// 	/**
-// 	 * Returns all the generic parts from the model.
-// 	 * {@inheritDoc}
-// 	 * @see \App\Entity\Part\iHasParts::getParts()
-// 	 */
-// 	public function getParts(): Collection {
-// 		return $this->parts;
-// 	}	
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getPictureFilename(): string {
+		if (trim ( $this->pictureFilename ) == "")
+			return "img/No_motorcycle.png";
+		return "uploads/models/" . $this->pictureFilename;
+	}
+
+	// /**
+	// * Returns all the generic parts from the model.
+	// * {@inheritDoc}
+	// * @see \App\Entity\Part\iHasParts::getParts()
+	// */
+	// public function getParts(): Collection {
+	// return $this->parts;
+	// }
 }

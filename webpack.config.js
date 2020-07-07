@@ -13,7 +13,7 @@ Encore
     .cleanupOutputBeforeBuild()
     .autoProvidejQuery()
     .autoProvideVariables({
-    //    "window.Bloodhound": require.resolve('bloodhound-js'),
+        //    "window.Bloodhound": require.resolve('bloodhound-js'),
         "jQuery.tagsinput": "bootstrap-tagsinput"
     })
     .enableSassLoader()
@@ -22,31 +22,34 @@ Encore
 
     //JavaScripts
     .addEntry('js/app', './assets/js/app.js')
+    .addEntry('js/user/admin', './assets/js/user/admin.js')
+    .addEntry('js/user/showUser', './assets/js/user/showUser.js')
 
     //Common
     //  ->filters
     .addEntry('js/common/filters/dateBikeFilter', './assets/js/common/filters/dateBikeFilter.js')
-    
+
 
     //Styles
     .addStyleEntry('css/app', ['./assets/scss/app.scss'])
     .addStyleEntry('css/copyleft', ['./assets/css/copyleft.css'])
     .addStyleEntry('css/dashboard', ['./assets/scss/dashboard.scss'])
+    .addStyleEntry('css/admin', ['./assets/scss/admin.scss'])
 
 
-     //plugins
+    //plugins
 
     //.addPlugin(new Dotenv({path: './.env.local'}))
 
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
-    
+
     // will require an extra script tag for runtime.js
     // but, you probably want this, unless you're building a single-page app
     .enableSingleRuntimeChunk()
 
-  
+
     /*
      * FEATURE CONFIG
      *
@@ -82,6 +85,6 @@ Encore
     // uncomment if you use API Platform Admin (composer req api-admin)
     //.enableReactPreset()
     //.addEntry('admin', './assets/js/admin.js')
-;
+    ;
 
 module.exports = Encore.getWebpackConfig();

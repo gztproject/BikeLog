@@ -4,7 +4,9 @@ namespace App\Entity\Base;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User\User;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DateTime;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 abstract class Base
 {       
@@ -36,7 +38,7 @@ abstract class Base
      * @param User $user User that is creating the entity. (@see methods in User->create...) 
      */
     public function __construct(User $user)
-    {    	
+    {
     	$this->createdOn = new Datetime('now');
     	//ToDo: Do some checks?
     	$this->createdBy = $user;

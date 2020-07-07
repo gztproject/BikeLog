@@ -98,8 +98,9 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @ORM\OneToOne(targetEntity="App\Entity\Maintenance\Maintenance")
 	 */
 	private $lastMaintenance;
-	
+
 	/**
+	 *
 	 * @ORM\Column(type="string")
 	 */
 	private $pictureFilename;
@@ -134,8 +135,8 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 
 		$this->maintenances = new ArrayCollection ();
 		$this->refuelings = new ArrayCollection ();
-		
-		$this->pictureFilename = $c->pictureFilename;
+
+		$this->pictureFilename = $c->pictureFilename ?? "";
 	}
 
 	/**
@@ -332,10 +333,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return int
 	 */
 	public function getOdometer(): int {
-		return max ( 
-				$this->getPurchaseOdometer (), 
-				$this->getLastRefueling () != null ? $this->getLastRefueling ()->getOdometer () : 0, 
-				$this->getLastMaintenance () != null ? $this->getLastMaintenance ()->getOdometer () : 0 );
+		return max ( $this->getPurchaseOdometer (), $this->getLastRefueling () != null ? $this->getLastRefueling ()->getOdometer () : 0, $this->getLastMaintenance () != null ? $this->getLastMaintenance ()->getOdometer () : 0 );
 	}
 
 	/**
@@ -361,10 +359,15 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	public function getRefuelings(): Collection {
 		return $this->refuelings;
 	}
-	
-	public function getPictureFilename(): ?string
-	{
-		return $this->pictureFilename;
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getPictureFilename(): string {
+		if (trim ( $this->pictureFilename ) == "")
+			return $this->getModel ()->getPictureFilename ();
+			return "uploads/bikes/" . $this->pictureFilename;
 	}
 
 	// /**

@@ -50,13 +50,13 @@ class UserType extends AbstractType
             		'required' => false,            		
             		'empty_data' => '',
             ])  
-            ->add('signature', FileType::class, [
-            		'label' => 'Signature (.png/.jpg image)',
+            ->add('profilePicture', FileType::class, [
+            		'label' => 'profilePicture (.png/.jpg image)',
             		'mapped' => false,
             		'required' => false,
             		'constraints' => [
             				new File([
-            						'maxSize' => '1024k',
+            						'maxSize' => '4M',
             						'mimeTypes' => [
             								'image/png',
             								'image/jpeg'

@@ -107,13 +107,20 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 
 	/**
 	 *
+	 * @ORM\Column(type="string")
+	 */
+	private $profilePictureFilename;
+	
+	
+
+	/**
+	 *
 	 * @param CreateUserCommand $c
 	 * @param User $user
 	 * @param UserPasswordEncoderInterface $passwordEncoder
 	 * @return \App\Entity\User\User
 	 */
 	public function __construct(CreateUserCommand $c, User $user, UserPasswordEncoderInterface $passwordEncoder) {
-		
 		parent::__construct ( $user );
 
 		$this->username = $c->username;
@@ -135,6 +142,8 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 		$this->workshops = new ArrayCollection ();
 		$this->ownedWorkshops = new ArrayCollection ();
 
+		$this->profilePictureFilename = $c->profilePictureFilename ?? "";
+
 		return $this;
 	}
 	public function update(UpdateUserCommand $c, User $user, UserPasswordEncoderInterface $passwordEncoder) {
@@ -149,6 +158,8 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 			$this->lastName = $c->lastName;
 		if ($c->mobile != null && $c->mobile != $this->mobile)
 			$this->mobile = $c->mobile;
+		if ($c->profilePictureFilename != null && $c->profilePictureFilename != $this->profilePictureFilename)
+			$this->profilePictureFilename = $c->profilePictureFilename;
 
 		if (strlen ( $c->password ) != 0) {
 			$this->checkPasswordRequirements ( $c->password );
@@ -310,6 +321,24 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	}
 	public function getOwnedWorkshops(): Collection {
 		return $this->ownedWorkshops;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function getProfilePictureFilename(): string {
+		if (! $this->hasProfilePicture ())
+			return "img/user.png";
+		return "uploads/users/" . $this->profilePictureFilename;
+	}
+
+	/**
+	 *
+	 * @return bool
+	 */
+	public function hasProfilePicture(): bool {
+		return trim ( $this->profilePictureFilename ) != "";
 	}
 
 	/*

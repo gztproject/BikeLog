@@ -14,6 +14,7 @@ class CreateUserCommand
 	public $mobile;	
 	public $isRoleAdmin;
 	public $oldPassword;
+	public $profilePictureFilename;
 	
 	public function __get($name) {
 		return $this->$name;

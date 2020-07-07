@@ -7,7 +7,7 @@
 	{{ bike.name }}
 </h1>
 <div class="col-6">
-	<img src="{{ asset('uploads/bikes/' ~ bike.pictureFilename) }}"
+	<img src="{{ asset(bike.pictureFilename) }}"
 		alt="Bike picture" width="100%">
 </div>
 

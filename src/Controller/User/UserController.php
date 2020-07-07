@@ -51,24 +51,24 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             
         	//Handle the file stuff
-        	$signatureFile = $form['signature']->getData();        	
-        	if($signatureFile)
+        	$profilePictureFile = $form['profilePicture']->getData();        	
+        	if($profilePictureFile)
         	{
-        		$originalFilename = pathinfo($signatureFile->getClientOriginalName(), PATHINFO_FILENAME);
+        		$originalFilename = pathinfo($profilePictureFile->getClientOriginalName(), PATHINFO_FILENAME);
         		// this is needed to safely include the file name as part of the URL
         		$safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-        		$newFilename = $safeFilename.'-'.uniqid().'.'.$signatureFile->guessExtension();
+        		$newFilename = $safeFilename.'-'.uniqid().'.'.$profilePictureFile->guessExtension();
         		
         		// Move the file to the directory where brochures are stored
         		try {
-        			$signatureFile->move(
-        					$this->getParameter('signatures_directory'),
+        			$profilePictureFile->move(
+        					$this->getParameter('users_directory'),
         					$newFilename
         					);
         		} catch (FileException $e) {
         			// ... handle exception if something happens during file upload
         		}        		
-        		$createUserCommand->signatureFilename = $newFilename;
+        		$createUserCommand->profilePictureFilename = $newFilename;
         	}
         	
         	try
@@ -137,23 +137,24 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
         	
         	//Handle the file stuff
-        	$signatureFile = $form['signature']->getData();
-        	if($signatureFile)
+        	$profilePictureFile = $form['profilePicture']->getData();
+        	if($profilePictureFile)
         	{
-        		$originalFilename = pathinfo($signatureFile->getClientOriginalName(), PATHINFO_FILENAME);
+        		$originalFilename = pathinfo($profilePictureFile->getClientOriginalName(), PATHINFO_FILENAME);
         		// this is needed to safely include the file name as part of the URL
         		$safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-        		$newFilename = $safeFilename.'-'.uniqid().'.'.$signatureFile->guessExtension();
+        		$newFilename = $safeFilename.'-'.uniqid().'.'.$profilePictureFile->guessExtension();
         		
         		// Move the file to the directory where brochures are stored
         		try {
-        			$signatureFile->move(
-        					$this->getParameter('signatures_directory'),
+        			$profilePictureFile->move(
+        					$this->getParameter('user_pictures_directory'),
         					$newFilename
         					);
         			
         			//delete old file
-        			unlink($this->getParameter('signatures_directory').'/'.$user->getSignatureFilename());
+        			if($user->hasProfilePicture())
+        				unlink($this->getParameter('user_pictures_directory').'/'.$user->getProfilePictureFilename());
         		} catch (\Exception $e) {
         			$this->addFlash('warning', "File Exception: ".$e->getMessage());
         			return $this->render('admin/user/edit.html.twig', [
@@ -162,7 +163,7 @@ class UserController extends AbstractController
         					'showChangePassword' => true,
         			]);
         		}
-        		$c->signatureFilename = $newFilename;
+        		$c->profilePictureFilename = $newFilename;
         	}
         	
         	try 

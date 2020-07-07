@@ -66,8 +66,8 @@ class UsersInitializer implements IEntityInitializer {
 		return $users;
 	}
 	public function createDbMigrator(): User {
-		$sql = "INSERT INTO `app_users` (`id`, `created_by_id`, `username`, `first_name`, `last_name`, `password`, `roles`, `email`, `mobile`, `is_active`, `created_on`)
-				VALUES ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000','DbMigrator','Database','Migrator','','','','',0, '" . date ( 'Y-m-d H:i:s' ) . "')";
+		$sql = "INSERT INTO `app_users` (`id`, `created_by_id`, `username`, `first_name`, `last_name`, `password`, `roles`, `email`, `mobile`, `is_active`, `created_on`, `profile_picture_filename`)
+				VALUES ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000','DbMigrator','Database','Migrator','','','','',0, '" . date ( 'Y-m-d H:i:s' ) . "', '')";
 
 		$stmt = $this->manager->getConnection ()->prepare ( $sql );
 
