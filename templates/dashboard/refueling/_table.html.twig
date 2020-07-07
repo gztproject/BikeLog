@@ -13,10 +13,10 @@
 		{% for refueling in refuelings %}
 		<tr>
 		<td>{{ refueling.dateString }}</td>
-		<td>{{ refueling.odometer }}</td>		
-        <td>{{ refueling.distance }}</td>
-		<td>{{ refueling.fuelQuantity }}</td>
-		<td>{{ refueling.price }}</td>
+		<td>{{ refueling.odometer|number_format }}</td>		
+        <td>{{ refueling.distance|number_format }}</td>
+		<td>{{ refueling.fuelQuantity|number_format(2) }}</td>
+		<td>{{ refueling.price|number_format(2) }}</td>
 		<td>{{ refueling.comment }}</td>
 		</tr>
 		{% else %}

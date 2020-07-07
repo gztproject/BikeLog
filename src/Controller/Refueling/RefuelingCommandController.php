@@ -42,6 +42,7 @@ class RefuelingCommandController extends AbstractController {
 	 */
 	private function compileForm(CreateRefuelingCommand $crc, Request $request): Response {
 		$crc->isTankFull = true;
+		$crc->isNotBreakingContinuum = true;
 
 		$form = $this->createForm ( RefuelingType::class, $crc );
 
@@ -53,11 +54,14 @@ class RefuelingCommandController extends AbstractController {
 					'id' => $crc->bike->getId ()
 			] );
 
-			$refueling = $bike->createRefueling ( $crc, $this->getUser () );
+			$refuelings = $bike->createRefueling ( $crc, $this->getUser () );
 
 			$em = $this->getDoctrine ()->getManager ();
 
-			$em->persist ( $refueling );
+			foreach ( $refuelings as $refueling ) {
+				$em->persist ( $refueling );
+				$em->flush ();
+			}
 			$em->persist ( $bike );
 			$em->flush ();
 

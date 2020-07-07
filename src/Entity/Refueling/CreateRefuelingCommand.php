@@ -10,6 +10,7 @@ class CreateRefuelingCommand
 	public $price;
 	public $bike;
 	public $isTankFull;
+	public $isNotBreakingContinuum;
 	public $comment;
 	
 	public function __get($name) {

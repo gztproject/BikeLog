@@ -171,11 +171,43 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @param User $user
 	 * @return Refueling
 	 */
-	public function createRefueling(CreateRefuelingCommand $c, User $user): Refueling {
-		$refueling = new Refueling ( $c, $this->lastRefueling, $user );
-		$this->lastRefueling = $refueling;
+	public function createRefueling(CreateRefuelingCommand $c, User $user): array {
+		$returnArray = Array ();
+		$refueling = new Refueling ( $c, $c->isNotBreakingContinuum ? $this->lastRefueling : null, $user );
+		// Is this chronologically a newer refueling?
+		if ($refueling->getDate () > $this->lastRefueling->getDate ()) {
+			if ($refueling->getOdometer () < $this->lastRefueling->getOdometer ())
+				throw new LogicException ( "New odometer state (" . $refueling->getOdometer () . ") is smaller 
+											than the last known odometer state (" . $this->lastRefueling->getOdometer () . ")." );
+			$this->lastRefueling = $refueling;
+			array_push ( $returnArray, $refueling );
+		} // If it's older we should find where it belongs and check the odometer
+		else {
+			// Find the preceeding and next refueling
+			$previous = null;
+			$next = $this->lastRefueling;
+			foreach ( $this->refuelings as $r ) {
+				if ($r->getDate () > $refueling->getDate ()) {
+					if ($next->getDate () > $r->getDate ())
+						$next = $r;
+					continue;
+				} else {
+					if ($previous == null || ($previous->getDate () < $r->getDate ()))
+						$previous = $r;
+					continue;
+				}
+			}
+			// Just assuming that there was nothing in between this and the next existing refueling
+			$next->setPreviousRefueling ( $refueling, $user );
+
+			if ($c->isNotBreakingContinuum)
+				$refueling->setPreviousRefueling ( $previous, $user );
+			array_push ( $returnArray, $next );
+			array_push ( $returnArray, $refueling );
+			array_push ( $returnArray, $previous );
+		}
 		$this->refuelings->add ( $refueling );
-		return $refueling;
+		return $returnArray;
 	}
 
 	/**
@@ -367,7 +399,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	public function getPictureFilename(): string {
 		if (trim ( $this->pictureFilename ) == "")
 			return $this->getModel ()->getPictureFilename ();
-			return "uploads/bikes/" . $this->pictureFilename;
+		return "uploads/bikes/" . $this->pictureFilename;
 	}
 
 	// /**

@@ -24,7 +24,7 @@ class RefuelingType extends AbstractType {
 	 * 	private $price;
 	 * 	private $bike;
 	 * 	private $isTankFull;
-	 * 
+	 *  private $isPreviousMissing;
 	 *
 	 * @param FormBuilderInterface $builder
 	 * @param array $options
@@ -52,6 +52,9 @@ class RefuelingType extends AbstractType {
 				'multiple' => false
 		] )->add ( 'isTankFull', CheckboxType::class, [
 				'label' => 'label.isTankFull'
+		] )
+		->add ( 'isNotBreakingContinuum', CheckboxType::class, [
+				'label' => 'label.isNotBreakingContinuum'
 		] )
 		->add('save', SubmitType::class);
 	}

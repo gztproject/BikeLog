@@ -74,7 +74,28 @@ class Refueling extends AggregateBaseWithComment {
 		$this->isTankFull = $c->isTankFull;
 		$this->odometer = $c->odometer;
 		$this->price = $c->price;
-		$this->previousRefueling = $previousRefueling;
+		$this->previousRefueling = $c->isNotBreakingContinuum ? $previousRefueling : null;
+	}
+
+	/**
+	 *
+	 * @param Refueling $r
+	 * @param User $user
+	 * @throws LogicException
+	 * @return Refueling
+	 */
+	public function setPreviousRefueling(?Refueling $r, User $user): Refueling {
+		parent::updateBase ( $user );
+		if ($r != null) {
+			if ($r->getDate () > $this->getDate ())
+				throw new LogicException ( "Previous refueling date (" . $r->getDateTimeString () . ") is bigger
+											than the current one (" . $this->getDateTimeString () . ")." );
+			if ($r->getOdometer () > $this->getOdometer ())
+				throw new LogicException ( "Previous odometer state (" . $r->getOdometer () . ") is bigger
+											than the current odometer state (" . $this->getOdometer () . ")." );
+		}
+		$this->previousRefueling = $r;
+		return $this;
 	}
 
 	/**
@@ -152,7 +173,7 @@ class Refueling extends AggregateBaseWithComment {
 	 * @return int|NULL
 	 */
 	public function getDistance(): ?int {
-		if ($this->previousRefueling)
+		if ($this->previousRefueling != null)
 			return $this->getOdometer () - $this->previousRefueling->getOdometer ();
 		return null;
 	}
@@ -179,5 +200,13 @@ class Refueling extends AggregateBaseWithComment {
 	 */
 	public function getPrice(): float {
 		return $this->price;
+	}
+
+	/**
+	 *
+	 * @return string
+	 */
+	public function __toString(): string {
+		return "Refueling: " . $this->getDateString () . ", " . $this->getOdometer () . " km, " . $this->getFuelQuantity() . " l.";
 	}
 }
