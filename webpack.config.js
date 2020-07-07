@@ -29,6 +29,9 @@ Encore
     //  ->filters
     .addEntry('js/common/filters/dateBikeFilter', './assets/js/common/filters/dateBikeFilter.js')
 
+    //Refueling
+    .addEntry('js/refueling/new', './assets/js/refueling/new.js')
+
 
     //Styles
     .addStyleEntry('css/app', ['./assets/scss/app.scss'])

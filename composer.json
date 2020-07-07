@@ -6,6 +6,7 @@
 		"ext-ctype": "*",
 		"ext-iconv": "*",
 		"knplabs/knp-paginator-bundle": "^5.2",
+		"moment/moment": "^2.27",
 		"ramsey/uuid": "^4.0",
 		"ramsey/uuid-doctrine": "^1.6",
 		"sensio/framework-extra-bundle": "^5.5",

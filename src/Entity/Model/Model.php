@@ -59,7 +59,7 @@ class Model extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 *
-	 * @ORM\OneToMany(targetEntity="App\Entity\Manufacturer\Manufacturer", mappedBy="model")
+	 * @ORM\OneToMany(targetEntity="App\Entity\ServiceInterval\ServiceInterval", mappedBy="model")
 	 */
 	private $serviceIntervals;
 

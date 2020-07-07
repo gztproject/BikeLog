@@ -1,13 +1,13 @@
 {% extends 'dashboard/layout.html.twig' %}
 
-{% block body_id 'transaction_new' %}
+{% block body_id 'refueling_new' %}
 
 {% block main %}
-    <h1>{{ 'title.transaction_new'|trans }}</h1>
+    <h1>{{ 'title.refueling_new'|trans }}</h1>
 
-    {{ include('dashboard/transaction/_form.html.twig', {
+    {{ include('dashboard/refueling/_form.html.twig', {
         form: form,
-        button_label: 'label.update_transaction'|trans,
+        button_label: 'label.update_refueling'|trans,
         include_save_and_create_new: true,
         include_back_to_home_link: true,        
     }, with_context = false) }}
@@ -21,5 +21,5 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('js/transaction/new') }}  
+    {{ encore_entry_script_tags('js/refueling/new') }}  
 {% endblock %}

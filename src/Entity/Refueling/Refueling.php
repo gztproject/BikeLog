@@ -47,7 +47,7 @@ class Refueling extends AggregateBaseWithComment {
 	 * @ORM\OneToOne(targetEntity="App\Entity\Refueling\Refueling")
 	 */
 	private $previousRefueling;
-	
+
 	/**
 	 *
 	 * @ORM\Column(type="boolean")
@@ -67,6 +67,13 @@ class Refueling extends AggregateBaseWithComment {
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
+		$this->bike = $c->bike;
+		$this->comment = $c->comment ?? "";
+		$this->datetime = $c->datetime;
+		$this->fuelQuantity = $c->fuelQuantity;
+		$this->isTankFull = $c->isTankFull;
+		$this->odometer = $c->odometer;
+		$this->price = $c->price;
 		$this->previousRefueling = $previousRefueling;
 	}
 

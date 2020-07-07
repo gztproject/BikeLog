@@ -2,6 +2,9 @@
     "brick/math": {
         "version": "0.8.15"
     },
+    "composer/installers": {
+        "version": "v1.9.0"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -111,6 +114,9 @@
     "laminas/laminas-zendframework-bridge": {
         "version": "1.0.1"
     },
+    "moment/moment": {
+        "version": "2.27.0"
+    },
     "monolog/monolog": {
         "version": "2.1.0"
     },
@@ -119,6 +125,9 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.7.0"
+    },
+    "oomphinc/composer-installers-extender": {
+        "version": "v1.1.2"
     },
     "php": {
         "version": "7.4"

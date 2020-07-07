@@ -3,7 +3,15 @@
 namespace App\Entity\Refueling;
 
 class CreateRefuelingCommand
-{		
+{	
+	public $datetime;
+	public $odometer;
+	public $fuelQuantity;
+	public $price;
+	public $bike;
+	public $isTankFull;
+	public $comment;
+	
 	public function __get($name) {
 		return $this->$name;
 	}
