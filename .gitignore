@@ -23,3 +23,5 @@ yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
 public/uploads/bikes/
+public/uploads/users/
+public/uploads/models/
