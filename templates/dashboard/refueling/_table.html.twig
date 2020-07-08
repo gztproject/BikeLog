@@ -4,7 +4,7 @@
 			<th scope="col">{{ 'label.date'|trans }}</th>
 			<th scope="col">{{ 'label.odometer'|trans }}</th>
 			<th scope="col">{{ 'label.distance'|trans }}</th>
-			<th scope="col">{{ 'label.fuel_quantity'|trans }}</th>
+			<th scope="col">{{ 'label.fuelQuantity'|trans }}</th>
 			<th scope="col">{{ 'label.price'|trans }}</th>
 			<th scope="col">{{ 'label.consumption'|trans }}</th>
 			<th scope="col">{{ 'label.comment'|trans }}</th>
@@ -34,7 +34,7 @@
 		</tr>
 		{% else %}
 		<tr class="table-warning">
-			<td colspan="6" align="center">{{ 'label.no_refuelings_found'|trans }}</td>
+			<td colspan="6" align="center">{{ 'label.noneFound.refuelings'|trans }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>

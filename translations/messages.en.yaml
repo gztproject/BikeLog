@@ -1,16 +1,88 @@
 title:
+  new:
+    bike: New bike
+    refueling: New refueling
+    user: New user
+  list:
+    users: User list
+  delete:
+    userModal: Deleting user
   login: Safe login
   homepage: BikeLog 
-  myBikes: My motorcycles
+  myBikes: My bikes
+  refueling: Refueling
+  
 
 label:
+  update:
+    bike: Update bike
+    refueling: Update refueling
+  noneFound:
+    users: Can't find any users.
+    refuelings: Can't find any refuelings
   username: Username
   password: Password
+  repeatPassword: Repeat password
   rememberMe: Remember me
+  date: Date
+  datetime: Date
+  bike: Bike
+  year: Year
+  dateFrom: From
+  dateTo: To  
+  odometer: Odometer
+  distance: Distance
+  fuelQuantity: fuel quantity
+  price: Price
+  consumption: Consumption
+  comment: Comment
+  nickname: Nickname
+  vin: VIN
+  purchasePrice: Purchase price
+  purchaseOdometer: Purchase odometer
+  model: Model
+  picture: Picture
+  isTankFull: Full tank
+  isNotBreakingContinuum: No skipped refuelings 
+  email: E-mail
+  actions: Actions
+  firstname: Name
+  lastname: Surname
+  mobile: Mobile
+  profilePicture: Profile picture
+  isRoleAdmin: Administrator
+
 
 action:
-  sign_in: Log in
+  add:
+    bike: Add bike
+    refueling: Add refueling
+    user: Add user
+  delete:
+    user: Delete user
+  show: Show
+  edit: Edit
+  sign_in: Sign in
   login: Log in
+  save: Save
+  backToList: Back to list
+  cancel: Cancel
+  
+body:
+  delete:
+    userModal: Do you really want to delete the user?
+
+
+  
+menu:
+  home: Home
+  admin: Administrator
+  POC: POC
+  user: User
+  logout: Logout
+  users: Users
 
 help:
- login: Log in
+ login: Login
+
+Save: Save

@@ -1,13 +1,13 @@
 {% extends 'dashboard/layout.html.twig' %}
 
-{% block body_id 'refueling_new' %}
+{% block body_id 'title.new.refueling' %}
 
 {% block main %}
-    <h1>{{ 'title.refueling_new'|trans }}</h1>
+    <h1>{{ 'title.new.refueling'|trans }}</h1>
 
     {{ include('dashboard/refueling/_form.html.twig', {
         form: form,
-        button_label: 'label.update_refueling'|trans,
+        button_label: 'label.update.refueling'|trans,
         include_save_and_create_new: true,
         include_back_to_home_link: true,        
     }, with_context = false) }}

@@ -1,26 +1,79 @@
 title:
+  new:
+    bike: Nov motor
+    refueling: Novo točenje
+    user: Nov uporabnik
+  list:
+    users: Seznam uporabnikov
+  delete:
+    userModal: Izbris uporabnika
   login: Varna prijava
   homepage: BikeLog 
   myBikes: Moji motorji
   refueling: Točenje
+  
 
 label:
+  update:
+    bike: Posodobi motor
+    refueling: Posodobi točenje
+  noneFound:
+    users: Ne najdem nobenega uporabnika
+    refuelings: Ne najdem nobenega točenja.
   username: Uporabniško ime
   password: Geslo
+  repeatPassword: Ponovi geslo
   rememberMe: Zapomni si me
   date: Datum
+  datetime: Datum
   bike: Motor
   year: Leto
   dateFrom: Od
-  dateTo: Do
-  no_refuelings_found: Ne najdem nobenega točenja.
+  dateTo: Do  
+  odometer: Števec
+  distance: Razdalja
+  fuelQuantity: Količina goriva
+  price: Cena
+  consumption: Poraba
+  comment: Komentar
+  nickname: Vzdevek
+  vin: VIN
+  purchasePrice: Nakupna cena
+  purchaseOdometer: Nakupna kilometrina
+  model: Model
+  picture: Slika
+  isTankFull: Polno točenje
+  isNotBreakingContinuum: Ni izpuščenih točenj
+  email: E-mail
+  actions: Dejanja
+  firstname: Ime
+  lastname: Priimek
+  mobile: GSM
+  profilePicture: Avatar
+  isRoleAdmin: Administrator
+
 
 action:
+  add:
+    bike: Dodaj motor
+    refueling: Dodaj točenje
+    user: Dodaj uporabnika
+  delete:
+    user: Izbriši uporabnika
+  show: Pokaži
+  edit: Urejanje
   sign_in: Prijava
   login: Prijava
-  create_refueling: Novo točenje
-  add_bike: Dodaj motor
+  save: Shrani
+  backToList: Nazaj na seznam
+  cancel: Prekliči
+  
+body:
+  delete:
+    userModal: Ali ste prepričani da želite izbrisati uporabnika?
 
+
+  
 menu:
   home: Domov
   admin: Administrator
@@ -31,3 +84,5 @@ menu:
 
 help:
  login: Prijava
+
+Save: Shrani

@@ -1,13 +1,13 @@
 {% extends 'dashboard/layout.html.twig' %}
 
-{% block body_id 'bike_new' %}
+{% block body_id 'title.new.bike' %}
 
 {% block main %}
-    <h1>{{ 'title.bike_new'|trans }}</h1>
+    <h1>{{ 'title.new.bike'|trans }}</h1>
 
     {{ include('dashboard/bike/_form.html.twig', {
         form: form,
-        button_label: 'label.update_bike'|trans,
+        button_label: 'label.update.bike'|trans,
         include_save_and_create_new: true,
         include_back_to_home_link: true,        
     }, with_context = false) }}

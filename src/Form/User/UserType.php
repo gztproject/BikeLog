@@ -41,7 +41,7 @@ class UserType extends AbstractType
                 'type' => PasswordType::class,
             	'invalid_message' => 'The password fields must match.',
                 'first_options'  => array('label' => 'label.password'),
-                'second_options' => array('label' => 'label.repeat_password'),
+                'second_options' => array('label' => 'label.repeatPassword'),
             	'required' => false,
             	'empty_data' => '',
             ))  
@@ -51,7 +51,7 @@ class UserType extends AbstractType
             		'empty_data' => '',
             ])  
             ->add('profilePicture', FileType::class, [
-            		'label' => 'profilePicture (.png/.jpg image)',
+            		'label' => 'label.profilePicture',
             		'mapped' => false,
             		'required' => false,
             		'constraints' => [

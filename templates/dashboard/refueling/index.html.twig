@@ -21,7 +21,7 @@
 <a
 	href="{{  bike ? path('refueling_new_id', { 'id': bike.id }) : path('refueling_new') }}"
 	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-	aria-hidden="true"></i> {{ 'action.create_refueling'|trans }}
+	aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
 </a>
 
 {{ include('common/filters/_dateBikeYearFilter.html.twig') }}
