@@ -1,6 +1,6 @@
-manufacturer	name	alterName	displacement	yearFrom	yearTo	vinRanges
-Yamaha	XV 535	Virago	535	1980	2004	2YL 
-Honda	Shadow		600	2000	2015	
-Kawasaki	VN700		700	1995	2004	
-Yamaha	XV17	Warrior	1700	2000	2009	
-Yamaha	XVS1100	Drag star	1100	2000	2015	
+manufacturer	name	alterName	displacement	yearFrom	yearTo	vinRanges	fuelTankSize
+Yamaha	XV 535	Virago	535	1980	2004	2YL 	12,5
+Honda	Shadow		600	2000	2015		13
+Kawasaki	VN700		700	1995	2004		14
+Yamaha	XV17	Warrior	1700	2000	2009		15
+Yamaha	XVS1100	Drag star	1100	2000	2015		16

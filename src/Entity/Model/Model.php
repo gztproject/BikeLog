@@ -69,6 +69,12 @@ class Model extends AggregateBase implements iHasServiceIntervals {
 	 */
 	private $vinRanges;
 	
+	/**
+	 *
+	 * @ORM\Column(type="integer")
+	 */
+	private $fuelTankSize;
+	
 	
 	/**
 	 *
@@ -227,6 +233,14 @@ class Model extends AggregateBase implements iHasServiceIntervals {
 		if (trim ( $this->pictureFilename ) == "")
 			return "img/No_motorcycle.png";
 		return "uploads/models/" . $this->pictureFilename;
+	}
+	
+	/**
+	 * 
+	 * @return float
+	 */
+	public function getFuelTankSize(): float{
+		return $this->fuelTankSize;
 	}
 
 	// /**

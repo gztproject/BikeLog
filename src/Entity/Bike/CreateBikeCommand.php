@@ -12,6 +12,7 @@ class CreateBikeCommand
 	public $year;
 	public $vin;
 	public $pictureFilename;
+	public $fuelTanksize;
 	
 	
 	public function __get($name) {

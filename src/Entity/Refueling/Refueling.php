@@ -81,17 +81,17 @@ class Refueling extends AggregateBaseWithComment {
 	 *
 	 * @param Refueling $r
 	 * @param User $user
-	 * @throws LogicException
+	 * @throws Exception
 	 * @return Refueling
 	 */
 	public function setPreviousRefueling(?Refueling $r, User $user): Refueling {
 		parent::updateBase ( $user );
 		if ($r != null) {
 			if ($r->getDate () > $this->getDate ())
-				throw new LogicException ( "Previous refueling date (" . $r->getDateTimeString () . ") is bigger
+				throw new Exception ( "Previous refueling date (" . $r->getDateTimeString () . ") is bigger
 											than the current one (" . $this->getDateTimeString () . ")." );
 			if ($r->getOdometer () > $this->getOdometer ())
-				throw new LogicException ( "Previous odometer state (" . $r->getOdometer () . ") is bigger
+				throw new Exception ( "Previous odometer state (" . $r->getOdometer () . ") is bigger
 											than the current odometer state (" . $this->getOdometer () . ")." );
 		}
 		$this->previousRefueling = $r;
@@ -204,9 +204,27 @@ class Refueling extends AggregateBaseWithComment {
 
 	/**
 	 *
+	 * @return float|NULL
+	 */
+	public function getConsumption(): ?float {
+		if (! $this->isValid ())
+			return null;
+		return $this->getFuelQuantity () / ($this->getDistance () / 100.00);
+	}
+
+	/**
+	 *
+	 * @return bool
+	 */
+	public function isValid(): bool {
+		return $this->getPreviousRefueling () != null;
+	}
+
+	/**
+	 *
 	 * @return string
 	 */
 	public function __toString(): string {
-		return "Refueling: " . $this->getDateString () . ", " . $this->getOdometer () . " km, " . $this->getFuelQuantity() . " l.";
+		return "Refueling: " . $this->getDateString () . ", " . $this->getOdometer () . " km, " . $this->getFuelQuantity () . " l.";
 	}
 }

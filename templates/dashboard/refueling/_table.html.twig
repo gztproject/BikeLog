@@ -6,17 +6,30 @@
 			<th scope="col">{{ 'label.distance'|trans }}</th>
 			<th scope="col">{{ 'label.fuel_quantity'|trans }}</th>
 			<th scope="col">{{ 'label.price'|trans }}</th>
+			<th scope="col">{{ 'label.consumption'|trans }}</th>
 			<th scope="col">{{ 'label.comment'|trans }}</th>
 		</tr>
+		{% if bike is not null%}
+		<tr>   
+		    <th scope="col">{{ bike.numberOfRefuelings|number_format }}</th>
+		    <th scope="col"></th>
+		    <th scope="col">{{ bike.totalDistance|number_format }} km</th>
+		    <th scope="col">{{ bike.totalFuelQuantity|number_format(2) }} l</th>
+		    <th scope="col">{{ bike.totalFuelPrice|number_format(2) }} €</th>         
+            <th scope="col">{{ bike.averageConsumption|number_format(2) }} l/100km</th>
+            <th scope="col"></th>
+        </tr>
+        {% endif %}
 	</thead>
 	<tbody>
 		{% for refueling in refuelings %}
 		<tr>
 		<td>{{ refueling.dateString }}</td>
-		<td>{{ refueling.odometer|number_format }}</td>		
-        <td>{{ refueling.distance|number_format }}</td>
-		<td>{{ refueling.fuelQuantity|number_format(2) }}</td>
-		<td>{{ refueling.price|number_format(2) }}</td>
+		<td>{{ refueling.odometer|number_format }} km</td>		
+        <td>{{ refueling.distance|number_format }} km</td>
+		<td>{{ refueling.fuelQuantity|number_format(2) }} l</td>
+		<td>{{ refueling.price|number_format(2) }} €</td>
+		<td>{{ refueling.consumption|number_format(2) }} l/100km</td>
 		<td>{{ refueling.comment }}</td>
 		</tr>
 		{% else %}

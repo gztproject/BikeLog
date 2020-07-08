@@ -54,15 +54,46 @@ class RefuelingCommandController extends AbstractController {
 					'id' => $crc->bike->getId ()
 			] );
 
-			$refuelings = $bike->createRefueling ( $crc, $this->getUser () );
+			$refueling = $bike->createRefueling ( $crc, $this->getUser () );
 
 			$em = $this->getDoctrine ()->getManager ();
 
-			foreach ( $refuelings as $refueling ) {
+			// If it's older we should find where it belongs and check the odometer
+			if ($refueling->getDate () < $bike->getLastRefueling ()->getDate ()) {
+				// Find the previous and next refueling
+				$previous = null;
+				$next = $bike->getLastRefueling ();
+				foreach ( $bike->getRefuelings () as $r ) {
+					if ($r->getDate () > $refueling->getDate ()) {
+						if ($next->getDate () > $r->getDate () && $r != $refueling)
+							$next = $r;
+						continue;
+					} else {
+						if (($previous == null || ($previous->getDate () < $r->getDate ())) && $r != $refueling)
+							$previous = $r;
+						continue;
+					}
+				}
+
+				// first we have to dereference old (and wrong) previous refuelings
+				$refueling->setPreviousRefueling ( null, $this->getUser () );
+				$next->setPreviousRefueling ( null, $this->getUser () );
+				$em->persist ( $refueling );
+				$em->persist ( $next );
+				$em->flush ();
+
+				// Just assuming that there was nothing in between this and the next existing refueling
+				$next->setPreviousRefueling ( $refueling, $this->getUser () );
+				if ($crc->isNotBreakingContinuum)
+					$refueling->setPreviousRefueling ( $previous, $this->getUser () );
 				$em->persist ( $refueling );
 				$em->flush ();
+				$em->persist ( $next );
+			} // In normal case just persist the new refueling and updated bike's reference.
+			else {
+				$em->persist ( $refueling );
+				$em->persist ( $bike );
 			}
-			$em->persist ( $bike );
 			$em->flush ();
 
 			return $this->redirectToRoute ( 'refueling_index' );

@@ -8,17 +8,20 @@
 </h1>
 <div class="col-12">
 	<img src="{{ asset(bike.pictureFilename) }}"
-		style="width: 80rem; height: 20rem; object-fit: cover;" alt="Bike picture"
-		width="100%">
+		style="width: 80rem; height: 20rem; object-fit: cover;"
+		alt="Bike picture" width="100%">
 </div>
 
-<h1>{{ 'title.refueling'|trans }}</h1>
-    <div class="bs-component">
-        {{ include('dashboard/refueling/_table.html.twig', {
+<h1>
+	{{ 'title.refueling'|trans }}
+</h1>
+<div class="bs-component">
+	{{ include('dashboard/refueling/_table.html.twig', {
+                bike : bike,
                 refuelings : refuelings        
             }, with_context = false) }}
-    </div>
-    {{ knp_pagination_render(refuelings) }}
+</div>
+{{ knp_pagination_render(refuelings) }}
 {% endblock %}
 
 {% block sidebar %}

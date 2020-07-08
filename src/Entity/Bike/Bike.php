@@ -95,6 +95,12 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 *
+	 * @ORM\Column(type="integer", nullable=true)
+	 */
+	private $fuelTankSize;
+
+	/**
+	 *
 	 * @ORM\OneToOne(targetEntity="App\Entity\Maintenance\Maintenance")
 	 */
 	private $lastMaintenance;
@@ -132,6 +138,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 		$this->customServiceIntervals = new ArrayCollection ();
 		$this->vin = $c->vin ?? "";
 		$this->purchaseOdometer = $c->purchaseOdometer;
+		$this->fuelTankSize = $c->fuelTanksize;
 
 		$this->maintenances = new ArrayCollection ();
 		$this->refuelings = new ArrayCollection ();
@@ -171,43 +178,17 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @param User $user
 	 * @return Refueling
 	 */
-	public function createRefueling(CreateRefuelingCommand $c, User $user): array {
-		$returnArray = Array ();
+	public function createRefueling(CreateRefuelingCommand $c, User $user): Refueling {
 		$refueling = new Refueling ( $c, $c->isNotBreakingContinuum ? $this->lastRefueling : null, $user );
 		// Is this chronologically a newer refueling?
 		if ($refueling->getDate () > $this->lastRefueling->getDate ()) {
 			if ($refueling->getOdometer () < $this->lastRefueling->getOdometer ())
-				throw new LogicException ( "New odometer state (" . $refueling->getOdometer () . ") is smaller 
+				throw new Exception ( "New odometer state (" . $refueling->getOdometer () . ") is smaller 
 											than the last known odometer state (" . $this->lastRefueling->getOdometer () . ")." );
 			$this->lastRefueling = $refueling;
-			array_push ( $returnArray, $refueling );
-		} // If it's older we should find where it belongs and check the odometer
-		else {
-			// Find the preceeding and next refueling
-			$previous = null;
-			$next = $this->lastRefueling;
-			foreach ( $this->refuelings as $r ) {
-				if ($r->getDate () > $refueling->getDate ()) {
-					if ($next->getDate () > $r->getDate ())
-						$next = $r;
-					continue;
-				} else {
-					if ($previous == null || ($previous->getDate () < $r->getDate ()))
-						$previous = $r;
-					continue;
-				}
-			}
-			// Just assuming that there was nothing in between this and the next existing refueling
-			$next->setPreviousRefueling ( $refueling, $user );
-
-			if ($c->isNotBreakingContinuum)
-				$refueling->setPreviousRefueling ( $previous, $user );
-			array_push ( $returnArray, $next );
-			array_push ( $returnArray, $refueling );
-			array_push ( $returnArray, $previous );
 		}
 		$this->refuelings->add ( $refueling );
-		return $returnArray;
+		return $refueling;
 	}
 
 	/**
@@ -400,6 +381,79 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 		if (trim ( $this->pictureFilename ) == "")
 			return $this->getModel ()->getPictureFilename ();
 		return "uploads/bikes/" . $this->pictureFilename;
+	}
+
+	/**
+	 *
+	 * @return float
+	 */
+	public function getFuelTankSize(): float {
+		if ($this->fuelTankSize)
+			return $this->fuelTankSize;
+		return $this->getModel ()->getfuelTankSize ();
+	}
+
+	/**
+	 *
+	 * @return float
+	 */
+	public function getNumberOfRefuelings(): float {
+		return $this->calculateRefuelingStats () ["numberOfRefuelings"];
+	}
+
+	/**
+	 *
+	 * @return float
+	 */
+	public function getTotalFuelQuantity(): float {
+		return $this->calculateRefuelingStats () ["totalFuelQuantity"];
+	}
+
+	/**
+	 *
+	 * @return float
+	 */
+	public function getTotalFuelPrice(): float {
+		return $this->calculateRefuelingStats () ["totalFuelPrice"];
+	}
+
+	/**
+	 *
+	 * @return float
+	 */
+	public function getAverageConsumption(): float {
+		return $this->calculateRefuelingStats () ["averageConsumption"];
+	}
+
+	/**
+	 *
+	 * @return array
+	 */
+	private function calculateRefuelingStats(): array {
+		$n = 0;
+		$nValid = 0;
+		$consAccu = 0;
+		$fuelAccu = 0;
+		$priceAccu = 0;
+		foreach ( $this->refuelings as $r ) {
+			if ($r->isValid ()) {
+				$nValid ++;
+				$consAccu += $r->getConsumption ();
+			}
+			$n ++;
+			$fuelAccu += $r->getFuelQuantity ();
+			$priceAccu += $r->getPrice ();
+		}
+		return [ 
+				"numberOfRefuelings" => $n,
+				"totalFuelQuantity" => $fuelAccu,
+				"totalFuelPrice" => $priceAccu,
+				"averageConsumption" => $consAccu / $nValid
+		];
+		// $this->numberOfRefuelings = $n;
+		// $this->totalFuelQuantity = $fuelAccu;
+		// $this->totalFuelPrice = $priceAccu;
+		// $this->averageConsumption = $consAccu / $n;
 	}
 
 	// /**

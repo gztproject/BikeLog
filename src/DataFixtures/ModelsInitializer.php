@@ -56,6 +56,7 @@ class ModelsInitializer implements IEntityInitializer {
 			$cmc->vinRanges = explode(",", $row ["vinRanges"]);
 			$cmc->yearFrom = $row ["yearFrom"];
 			$cmc->yearTo = $row ["yearTo"];
+			$cmc->fuelTankSize = $row ["fuelTankSize"];
 
 			$model = $mfg->createModel($cmc, $migrator);
 

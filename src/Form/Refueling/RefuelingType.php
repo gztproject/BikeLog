@@ -34,7 +34,7 @@ class RefuelingType extends AbstractType {
 		->add('datetime', DateTimePickerType::class,[
 				'label' => 'label.datetime',
 				'widget' => 'single_text',
-				'format' => 'dd. MM. yyyy H:mm:ss',
+				'format' => 'dd. MM. yyyy',
 				
 				// prevents rendering it as type="date", to avoid HTML5 date pickers
 				'html5' => false,

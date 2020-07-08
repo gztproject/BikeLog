@@ -11,6 +11,7 @@ class CreateModelCommand
 	public $yearTo;
 	public $vinRanges;
 	public $pictureFilename;
+	public $fuelTankSize;
 	
 	public function __get($name) {
 		return $this->$name;
