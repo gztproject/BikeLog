@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 abstract class AggregateBaseWithComment extends AggregateBase {
 	/**
 	 *
-	 * @ORM\Column(type="string", length=2048)
+	 * @ORM\Column(type="string", length=2048, nullable=true)
 	 */
 	protected $comment;
 

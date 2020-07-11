@@ -26,7 +26,7 @@ class ServiceInterval extends AggregateBase {
 
 	/**
 	 *
-	 * @ORM\Column(type="integer")
+	 * @ORM\Column(name="`interval`", type="integer")
 	 */
 	private $interval;
 	

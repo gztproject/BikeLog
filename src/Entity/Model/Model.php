@@ -14,6 +14,8 @@ use App\Entity\ServiceInterval\CreateServiceIntervalCommand;
 use App\Entity\ServiceInterval\ServiceInterval;
 use App\Entity\User\User;
 use App\Entity\ServiceInterval\iHasServiceIntervals;
+use App\Entity\Task\CreateTaskCommand;
+use App\Entity\Task\Task;
 
 /**
  *
@@ -108,6 +110,7 @@ class Model extends AggregateBase implements iHasServiceIntervals {
 		$this->displacement = $c->displacement;
 		$this->yearFrom = $c->yearFrom;
 		$this->yearTo = $c->yearTo;
+		$this->fuelTankSize = $c->fuelTankSize;
 
 		$this->vinRanges = $c->vinRanges;
 
@@ -140,6 +143,17 @@ class Model extends AggregateBase implements iHasServiceIntervals {
 		$si = new ServiceInterval ( $c, $this, $user );
 		$this->serviceIntervals->add ( $si );
 		return $si;
+	}
+	
+	/**
+	 * 
+	 * @param CreateTaskCommand $c
+	 * @param User $user
+	 * @return Task
+	 */
+	public function createTask(CreateTaskCommand $c, User $user): Task {
+		$task = new Task ( $c, $user );
+		return $task;
 	}
 
 	// /**

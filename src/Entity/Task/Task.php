@@ -49,10 +49,10 @@ class Task extends AggregateBaseWithComment {
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
-		$this->nickname = $c->nickname;
-		$this->model = $c->model;
-		$this->owner = $c->owner;
-		$this->purchasePrice = $c->purchasePrice;
+		$this->part = $c->part;
+		$this->name = $c->name;
+		$this->description = $c->description;
+		$this->comment = $c->comment;
 	}
 
 	/**

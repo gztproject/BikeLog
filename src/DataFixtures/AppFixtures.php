@@ -28,7 +28,7 @@ class AppFixtures extends Fixture
     	$mfgInitializer = new ManufacturersInitializer($manager, "/InitData/manufacturers.tsv", $this->loggerInterface);
     	$mfgs = $mfgInitializer->generate($migrator);
     	
-    	$modelInitializer = new ModelsInitializer($manager, "/InitData/models.tsv", $mfgs, $this->loggerInterface);
+    	$modelInitializer = new ModelsInitializer($manager, "/InitData/models.tsv", "/InitData/model_pictures/", $mfgs, $this->loggerInterface);
     	$models = $modelInitializer->generate($migrator);
     }
 }
