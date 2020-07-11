@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity\Task;
+namespace App\Entity\Part;
 
-class UpdatePartCommand extends CreateTaskCommand
+class UpdatePartCommand extends CreatePartCommand
 {
 	
 }

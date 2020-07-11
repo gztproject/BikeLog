@@ -44,7 +44,7 @@ class RefuelingCommandController extends AbstractController {
 		$crc->isTankFull = true;
 		$crc->isNotBreakingContinuum = true;
 
-		$form = $this->createForm ( RefuelingType::class, $crc );
+		$form = $this->createForm ( RefuelingType::class, $crc, ['user' => $this->getUser()] );
 
 		$form->handleRequest ( $request );
 
@@ -59,7 +59,7 @@ class RefuelingCommandController extends AbstractController {
 			$em = $this->getDoctrine ()->getManager ();
 
 			// If it's older we should find where it belongs and check the odometer
-			if ($refueling->getDate () < $bike->getLastRefueling ()->getDate ()) {
+			if ($bike->getLastRefueling() != null && $refueling->getDate () < $bike->getLastRefueling ()->getDate ()) {
 				// Find the previous and next refueling
 				$previous = null;
 				$next = $bike->getLastRefueling ();

@@ -6,9 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Base\AggregateBaseWithComment;
+use App\Entity\MaintenanceTask\CreateMaintenanceTaskCommand;
+use App\Entity\Task\Task;
 use App\Entity\User\User;
 use App\Entity\Workshop\Workshop;
 use App\Entity\Bike\Bike;
+use App\Entity\MaintenanceTask\MaintenanceTask;
 
 /**
  *
@@ -87,6 +90,19 @@ class Maintenance extends AggregateBaseWithComment {
 		parent::updateBase ( $user );
 		return $this;
 	}
+	
+	/**
+	 *
+	 * @param CreateMaintenanceTaskCommand $c
+	 * @param User $user
+	 * @return MaintenanceTask
+	 */
+	public function createMaintenance(CreateMaintenanceTaskCommand $c, User $user): MaintenanceTask {
+		$maintenanceTask = new MaintenanceTask( $c, $user );
+		$this->maintenanceTasks->add ( $maintenanceTask );
+		return $maintenanceTask;
+	}
+	
 
 	/**
 	 *
@@ -150,5 +166,19 @@ class Maintenance extends AggregateBaseWithComment {
 	 */
 	public function getUnspecifiedCosts(): float {
 		return $this->unspecifiedCosts;
+	}
+
+	/**
+	 *
+	 * @param Task $task
+	 * @return bool
+	 */
+	public function hasTask(Task $task): bool {
+		foreach($this->getMaintenanceTasks() as $t)
+		{
+			if($t->getTask() == $task)
+				return true;
+		}
+		return false;
 	}
 }

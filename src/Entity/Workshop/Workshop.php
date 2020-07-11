@@ -10,7 +10,7 @@ use App\Entity\User\User;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\Workshop\Workshop")
+ * @ORM\Entity(repositoryClass="App\Repository\Workshop\WorkshopRepository")
  */
 class Workshop extends AggregateBase {
 	/**

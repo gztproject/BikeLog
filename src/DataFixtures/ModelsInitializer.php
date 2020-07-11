@@ -49,6 +49,7 @@ class ModelsInitializer implements IEntityInitializer {
 		$rows = $fileReader->GetRows ( $this->path );
 
 		$models = array ();
+		$parts = array ();
 		foreach ( $rows as $row ) {
 
 			$mfg = $this->getManufacturer ( $row ["manufacturer"] );
@@ -63,7 +64,7 @@ class ModelsInitializer implements IEntityInitializer {
 			$cmc->vinRanges = explode ( ",", $row ["vinRanges"] );
 			$cmc->yearFrom = $row ["yearFrom"];
 			$cmc->yearTo = $row ["yearTo"];
-			$this->logger->debug($row ["fuelTankSize"]);
+			$this->logger->debug ( $row ["fuelTankSize"] );
 			$cmc->fuelTankSize = $row ["fuelTankSize"];
 
 			if ($row ["imageFile"]) {
@@ -83,7 +84,7 @@ class ModelsInitializer implements IEntityInitializer {
 			}
 
 			$model = $mfg->createModel ( $cmc, $migrator );
-
+			echo("Created model ". $model . "\n");
 			$this->logger->info ( "Checking for service intervals:" );
 			$intervals = array_filter ( $row, function ($item) {
 				if (strpos ( $item, "interval_" ) !== FALSE)
@@ -99,10 +100,23 @@ class ModelsInitializer implements IEntityInitializer {
 				$this->logger->debug ( "Naming info: " . implode ( "//", explode ( "_", $task ) ) );
 				$cpc = new CreatePartCommand ();
 				$cpc->name = ucfirst ( strtolower ( implode ( " ", preg_split ( '/(?=[A-Z])/', explode ( "_", $task ) [2] ) ) ) );
-				$this->logger->debug ( "Creating part: " . $cpc->name );
-				$part = $mfg->createPart ( $cpc, $migrator );
-				$this->manager->persist ( $part );
 
+				$part = null;
+				foreach ( $parts as $p ) {
+					if ($p->getName () == $cpc->name) {
+						$part = $p;
+						$mfg->addPart ( $part, $migrator );
+						break;
+					}
+				}
+				if ($part == null) {
+					$this->logger->debug ( "Creating part: " . $cpc->name );
+					$part = $mfg->createPart ( $cpc, $migrator );
+					$this->manager->persist ( $part );
+					array_push($parts, $part);
+				}
+
+				
 				$ctc = new CreateTaskCommand ();
 				$ctc->part = $part;
 				$ctc->name = ucfirst ( explode ( "_", $task ) [1] . " " . strtolower ( implode ( " ", preg_split ( '/(?=[A-Z])/', explode ( "_", $task ) [2] ) ) ) );
@@ -121,6 +135,7 @@ class ModelsInitializer implements IEntityInitializer {
 			}
 
 			$this->manager->persist ( $model );
+			$this->manager->persist ( $mfg );
 			array_push ( $models, $model );
 			$this->manager->flush ();
 		}

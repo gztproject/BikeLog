@@ -7,6 +7,7 @@ use App\Entity\Base\AggregateBase;
 use App\Entity\Maintenance\CreateMaintenanceCommand;
 use App\Entity\Maintenance\Maintenance;
 use App\Entity\Model\Model;
+use App\Entity\Task\Task;
 use App\Entity\User\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -181,9 +182,9 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	public function createRefueling(CreateRefuelingCommand $c, User $user): Refueling {
 		$refueling = new Refueling ( $c, $c->isNotBreakingContinuum ? $this->lastRefueling : null, $user );
 		// Is this chronologically a newer refueling?
-		if ($refueling->getDate () > $this->lastRefueling->getDate ()) {
-			if ($refueling->getOdometer () < $this->lastRefueling->getOdometer ())
-				throw new Exception ( "New odometer state (" . $refueling->getOdometer () . ") is smaller 
+		if ($this->lastRefueling == null || $refueling->getDate () > $this->lastRefueling->getDate ()) {
+			if ($this->lastRefueling != null && $refueling->getOdometer () < $this->lastRefueling->getOdometer ())
+				throw new \Exception ( "New odometer state (" . $refueling->getOdometer () . ") is smaller 
 											than the last known odometer state (" . $this->lastRefueling->getOdometer () . ")." );
 			$this->lastRefueling = $refueling;
 		}
@@ -381,6 +382,20 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 		if (trim ( $this->pictureFilename ) == "")
 			return $this->getModel ()->getPictureFilename ();
 		return "uploads/bikes/" . $this->pictureFilename;
+	}
+
+	/**
+	 *
+	 * @param Task $task
+	 * @return int
+	 */
+	public function getLastTask(Task $task): int {
+		$last = 0;
+		foreach ( $this->maintenances as $m ) {
+			if ($m->hasTask ( $task ) && $m->getOdometer () > $last)
+				$last = $m->getOdometer ();
+		}
+		return $last;
 	}
 
 	/**

@@ -11,7 +11,14 @@
 		style="width: 80rem; height: 20rem; object-fit: cover;"
 		alt="Bike picture" width="100%">
 </div>
-
+<h1>
+	{{ 'title.maintenance'|trans }}
+</h1>
+<div class="bs-component">
+	{{ include('dashboard/serviceInterval/_table.html.twig', {
+                bike : bike       
+            }, with_context = false) }}
+</div>
 <h1>
 	{{ 'title.refueling'|trans }}
 </h1>
@@ -20,8 +27,9 @@
                 bike : bike,
                 refuelings : refuelings        
             }, with_context = false) }}
+	{{ knp_pagination_render(refuelings) }}
 </div>
-{{ knp_pagination_render(refuelings) }}
+
 {% endblock %}
 
 {% block sidebar %}
@@ -29,11 +37,9 @@
 <a href="{{ path('refueling_new_id', { 'id': bike.id } ) }}"
 	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
 	aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
-</a>
-<!-- {# 
-<a href="{{ path('maintenance_new') }}"
+</a> 
+<a href="{{ path('maintenance_new_id', { 'id': bike.id }) }}"
     class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-    aria-hidden="true"></i> {{ 'action.add_maintenance'|trans }}
+    aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
 </a>
-#} -->
 {% endblock %}

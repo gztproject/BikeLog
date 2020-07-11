@@ -32,7 +32,7 @@ class Manufacturer extends AggregateBase implements iHasParts {
 
 	/**
 	 *
-	 * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", mappedBy="manufacturers")
+	 * @ORM\ManyToMany(targetEntity="App\Entity\Part\Part", inversedBy="manufacturers")
 	 */
 	private $parts;
 
@@ -74,7 +74,22 @@ class Manufacturer extends AggregateBase implements iHasParts {
 	 * @return Part
 	 */
 	public function createPart(CreatePartCommand $c, User $user): Part {
+		parent::updateBase ( $user );
 		$part = new Part ( $c, $this, $user );
+		$this->parts->add ( $part );
+		return $part;
+	}
+
+	/**
+	 *
+	 * @param Part $part
+	 * @param User $user
+	 * @return Part
+	 */
+	public function addPart(Part $part, User $user): Part {
+		if($this->parts->contains($part))
+			return $part;
+		parent::updateBase ( $user );
 		$this->parts->add ( $part );
 		return $part;
 	}
@@ -108,7 +123,7 @@ class Manufacturer extends AggregateBase implements iHasParts {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return Collection
 	 */
 	public function getParts(): Collection {

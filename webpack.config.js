@@ -32,6 +32,9 @@ Encore
     //Refueling
     .addEntry('js/refueling/new', './assets/js/refueling/new.js')
 
+    //Maintenance
+    .addEntry('js/maintenance/new', './assets/js/maintenance/new.js')
+
 
     //Styles
     .addStyleEntry('css/app', ['./assets/scss/app.scss'])

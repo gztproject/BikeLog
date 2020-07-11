@@ -1,0 +1,16 @@
+<table class="table-sm table-hover">
+	<tr>
+		<th scope="col">{{ "label.task"|trans }}</th>
+		<th scope="col">{{ "label.interval"|trans }}</th>
+		<th scope="col">{{ "label.remaining"|trans }}</th>
+	</tr>
+	{% for si in bike.serviceIntervals %}
+	<tr>
+		<td scope="col">{{ si.task.name }}</td>
+		<td scope="col">{{ si.interval | number_format }} km</td>
+		<td scope="col">{{ (si.interval - (bike.odometer - bike.lastTask(si.task))) | number_format}} km</td>		
+	</tr>
+
+	{% endfor %}
+
+</table>

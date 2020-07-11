@@ -194,7 +194,7 @@ class Model extends AggregateBase implements iHasServiceIntervals {
 	 * @return Manufacturer
 	 */
 	public function getManufacturer(): Manufacturer {
-		return $this->parts;
+		return $this->manufacturer;
 	}
 
 	/**
@@ -255,6 +255,14 @@ class Model extends AggregateBase implements iHasServiceIntervals {
 	 */
 	public function getFuelTankSize(): float{
 		return $this->fuelTankSize;
+	}
+	
+	/**
+	 * 
+	 * @return String
+	 */
+	public function __toString():String{
+		return $this->getManufacturer()->getName() . " " . $this->getName();
 	}
 
 	// /**
