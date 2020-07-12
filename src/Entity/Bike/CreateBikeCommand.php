@@ -4,7 +4,6 @@ namespace App\Entity\Bike;
 
 class CreateBikeCommand
 {
-	public $owner;
 	public $model;
 	public $nickname;
 	public $purchasePrice;

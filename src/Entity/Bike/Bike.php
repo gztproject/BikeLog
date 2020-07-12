@@ -133,7 +133,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 		parent::__construct ( $user );
 		$this->nickname = $c->nickname ?? "";
 		$this->model = $c->model;
-		$this->owner = $c->owner;
+		$this->owner = $user;
 		$this->purchasePrice = $c->purchasePrice;
 		$this->year = $c->year;
 		$this->customServiceIntervals = new ArrayCollection ();

@@ -26,7 +26,8 @@ class ManufacturersInitializer implements IEntityInitializer {
 	 */
 	public function __construct(ObjectManager $manager, string $path, LoggerInterface $loggerInterface) {
 		$this->manager = $manager;
-		$this->path = __DIR__ . $path;
+		$devpath = __DIR__ . str_replace(".tsv", "-dev.tsv", $path);
+		$this->path = file_exists($devpath)?$devpath:__DIR__ . $path;
 		$this->loggerInterface = $loggerInterface;
 	}
 

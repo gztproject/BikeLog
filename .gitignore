@@ -25,3 +25,5 @@ yarn-error.log
 public/uploads/bikes/
 public/uploads/users/
 public/uploads/models/
+
+src/DataFixtures/InitData/*-dev.tsv

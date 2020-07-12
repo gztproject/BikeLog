@@ -1,7 +1,8 @@
 manufacturer	name	alterName	displacement	yearFrom	yearTo	vinRanges	fuelTankSize	imageFile	interval_replace_engineOil	interval_replace_engineOilFilter	interval_replace_sparkPlug	interval_replace_airFilter	interval_replace_coolant	interval_replace_brakeFluid	interval_replace_secondaryDriveOil	interval_lubricate_cableBowdens	interval_checkTension_belt	interval_checkTension_chain	interval_lubricate_chain	interval_repack_steeringStem	interval_checkClearance_valve	interval_replace_ClutchFluid
-Yamaha	XV 535	Virago	535	1980	2004	2YL 	12,5	xv535.png	6000	12000	12000	12000		24000	25000	12000				25000	6000	
+Yamaha	XV535	Virago	535	1980	2004	2YL 	12,5	xv535.png	6000	12000	12000	12000		24000	25000	12000				25000	6000	
 Honda	Shadow		600	2000	2015		13	shadow600.png	12800	12800	12800	19200	38400	19200	38400	12000				12800	12800	
 Kawasaki	VN700		700	1995	2004		14	vn800.jpg	5000	10000	10000	10000	30000	20000		12000		800	300	20000	10000	
 Yamaha	XV17	Warrior	1700	2000	2009		15	warrior.jpg	6000	12000	12000	12000		24000	25000	12000	4000			25000	25000	
 Yamaha	XVS1100	Drag star	1100	2000	2015		16	xvs1100.jpg	6000	12000	12000	12000		24000	25000	12000				24000	6000	
 Honda	CBF1000		1000	2006			19	cbf1000.jpg	12000	12000	24000	18000	36000	18000		12000		1000	1000	12000	24000	18000
+Yamaha	XV250	Virago	250	1980	2004		12,5	xv250.png	6000	12000	12000	12000		24000		12000		1000	400	25000	6000	

@@ -67,6 +67,20 @@ class Workshop extends AggregateBase {
 		parent::updateBase ( $user );
 		return $this;
 	}
+	
+	/**
+	 * 
+	 * @param User $client
+	 * @param User $user
+	 * @return Workshop
+	 */
+	public function addClient(User $client, User $user): Workshop{
+		if ($this->clients->contains($client))
+			return $this;
+		parent::updateBase($user);
+		$this->clients->add($client);
+		return $this;
+	}
 
 	/*
 	 * Getters
