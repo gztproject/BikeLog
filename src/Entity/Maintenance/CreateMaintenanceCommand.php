@@ -11,7 +11,7 @@ class CreateMaintenanceCommand
 	public $date;
 	public $odometer;
 	public $spentTime;
-	public $unspecifiedCost;
+	public $unspecifiedCosts;
 	/**
 	 * Need this for getting them from the form to controller...
 	 * @var Array[CreateMaintenanceTaskCommand]

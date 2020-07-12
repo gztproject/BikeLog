@@ -15,6 +15,7 @@ use App\Entity\User\User;
 use App\Entity\Workshop\Workshop;
 use App\Entity\Bike\Bike;
 use App\Entity\Maintenance\CreateMaintenanceCommand;
+use App\Entity\Model\Model;
 use App\Repository\Workshop\WorkshopRepository;
 
 class MaintenanceType extends AbstractType {
@@ -37,10 +38,8 @@ class MaintenanceType extends AbstractType {
 				'multiple' => false,
 				'label' => 'label.workshop',
 				'query_builder' => function (WorkshopRepository $repository) use ($options) {
-				$qb = $repository->createQueryBuilder ( 'w' );
-				return $qb->
-				leftJoin('w.clients', 'wc')->
-				where ( $qb->expr ()->eq ( 'wc.id', '?1' ) )->setParameter ( '1', $options ["user"] );
+					$qb = $repository->createQueryBuilder ( 'w' );
+					return $qb->leftJoin ( 'w.clients', 'wc' )->where ( $qb->expr ()->eq ( 'wc.id', '?1' ) )->setParameter ( '1', $options ["user"] );
 				}
 		] )->add ( 'bike', EntityType::class, [ 
 				'class' => Bike::class,
@@ -51,8 +50,7 @@ class MaintenanceType extends AbstractType {
 				'query_builder' => function (BikeRepository $repository) use ($options) {
 					$qb = $repository->createQueryBuilder ( 'b' );
 					// the function returns a QueryBuilder object
-					return $qb->
-					where ( $qb->expr ()->eq ( 'b.owner', '?1' ) )->setParameter ( '1', $options ["user"] );
+					return $qb->where ( $qb->expr ()->eq ( 'b.owner', '?1' ) )->setParameter ( '1', $options ["user"] );
 				}
 		] )->add ( 'date', DateTimePickerType::class, [ 
 				'label' => 'label.date',
@@ -71,14 +69,17 @@ class MaintenanceType extends AbstractType {
 				'attr' => [ 
 						'class' => 'spentTimeInput'
 				]
-		] )->add ( 'unspecifiedCost', NumberType::class, [ 
-				'label' => 'label.unspecifiedCost',
+		] )->add ( 'unspecifiedCosts', NumberType::class, [ 
+				'label' => 'label.unspecifiedCosts',
 				'attr' => [ 
-						'class' => 'unspecifiedCostInput'
+						'class' => 'unspecifiedCostsInput'
 				]
 		] )->add ( 'maintenanceTaskCommands', CollectionType::class, [ 
 				'entry_type' => MaintenanceTaskType::class,
-				// 'entry_options' => ['label' => false],
+				'entry_options' => [ 
+						'bike' => $options ['bike'],
+						'model' => $options ['model']
+				],				
 				'allow_add' => true,
 				'allow_delete' => true,
 				'label' => 'label.maintenanceTask',
@@ -88,7 +89,9 @@ class MaintenanceType extends AbstractType {
 	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults ( array (
 				'data_class' => CreateMaintenanceCommand::class,
-				'user' => User::class
+				'user' => User::class,
+				'bike' => Bike::class,
+				'model' => Model::class
 		) );
 	}
 }

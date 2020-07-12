@@ -74,8 +74,13 @@ class Maintenance extends AggregateBaseWithComment {
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
-		$this->name = $c->name;
-		$this->owner = $c->owner;
+		$this->workshop = $c->workshop;
+		$this->bike = $c->bike;
+		$this->date = $c->date;
+		$this->odometer = $c->odometer ?? 0;
+		$this->spentTime = $c->spentTime ?? 0;
+		$this->unspecifiedCosts = $c->unspecifiedCosts ?? 0;
+		$this->maintenanceTasks = new ArrayCollection ();
 	}
 
 	/**
@@ -90,19 +95,18 @@ class Maintenance extends AggregateBaseWithComment {
 		parent::updateBase ( $user );
 		return $this;
 	}
-	
+
 	/**
 	 *
 	 * @param CreateMaintenanceTaskCommand $c
 	 * @param User $user
 	 * @return MaintenanceTask
 	 */
-	public function createMaintenance(CreateMaintenanceTaskCommand $c, User $user): MaintenanceTask {
-		$maintenanceTask = new MaintenanceTask( $c, $user );
+	public function createMaintenanceTask(CreateMaintenanceTaskCommand $c, User $user): MaintenanceTask {
+		$maintenanceTask = new MaintenanceTask ( $c, $this, $user );
 		$this->maintenanceTasks->add ( $maintenanceTask );
 		return $maintenanceTask;
 	}
-	
 
 	/**
 	 *
@@ -174,9 +178,8 @@ class Maintenance extends AggregateBaseWithComment {
 	 * @return bool
 	 */
 	public function hasTask(Task $task): bool {
-		foreach($this->getMaintenanceTasks() as $t)
-		{
-			if($t->getTask() == $task)
+		foreach ( $this->getMaintenanceTasks () as $t ) {
+			if ($t->getTask () == $task)
 				return true;
 		}
 		return false;

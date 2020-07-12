@@ -3,8 +3,7 @@
 namespace App\Entity\MaintenanceTask;
 
 class CreateMaintenanceTaskCommand
-{
-	public $maintenance;
+{	
 	public $task;
 	public $cost;
 	public $comment;

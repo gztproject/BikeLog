@@ -40,15 +40,17 @@ class MaintenanceTask extends AggregateBaseWithComment {
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateMaintenanceTaskCommand $c, User $user) {
+	public function __construct(CreateMaintenanceTaskCommand $c, Maintenance $maintenance, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
-		$this->name = $c->name;
-		$this->owner = $c->owner;
+		$this->maintenance = $maintenance;
+		$this->task = $c->task;
+		$this->cost = $c->cost;
+		$this->comment = $c->comment;
 	}
 	
 	/**

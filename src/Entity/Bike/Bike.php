@@ -385,9 +385,10 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	}
 
 	/**
+	 * Returns odometer state when a task was last executed.
 	 *
 	 * @param Task $task
-	 * @return int
+	 * @return int odometer
 	 */
 	public function getLastTask(Task $task): int {
 		$last = 0;

@@ -37,7 +37,11 @@ class MaintenanceCommandController extends AbstractController {
 	 * @return Response
 	 */
 	private function compileForm(CreateMaintenanceCommand $cmc, Request $request): Response {
-		$form = $this->createForm ( MaintenanceType::class, $cmc, ['user' => $this->getUser()] )->add ( 'saveAndCreateNew', SubmitType::class );
+		$form = $this->createForm ( MaintenanceType::class, $cmc, [ 
+				'user' => $this->getUser (),
+				'bike' => $cmc->bike,
+				'model' => $cmc->bike->getModel ()
+		] )->add ( 'saveAndCreateNew', SubmitType::class );
 
 		$form->handleRequest ( $request );
 
@@ -57,6 +61,7 @@ class MaintenanceCommandController extends AbstractController {
 			}
 
 			$em->persist ( $maintenance );
+			$em->persist ( $bike );
 			$em->flush ();
 
 			return $this->redirectToRoute ( 'maintenance_show', array (
