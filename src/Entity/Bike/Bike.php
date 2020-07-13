@@ -199,9 +199,10 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return Maintenance
 	 */
 	public function createMaintenance(CreateMaintenanceCommand $c, User $user): Maintenance {
-		$maintenance = new Maintenance ( $c, $user );
-		$this->lastMaintenance = $maintenance;
+		$maintenance = new Maintenance ( $c, $user );		
 		$this->maintenances->add ( $maintenance );
+		$this->sortMaintenances ();
+		$this->lastMaintenance = $this->maintenances->last();
 		return $maintenance;
 	}
 
@@ -323,6 +324,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return Collection
 	 */
 	public function getMaintenances(): Collection {
+		$this->sortMaintenances();
 		return $this->maintenances;
 	}
 
@@ -470,6 +472,16 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 		// $this->totalFuelQuantity = $fuelAccu;
 		// $this->totalFuelPrice = $priceAccu;
 		// $this->averageConsumption = $consAccu / $n;
+	}
+
+	/**
+	 */
+	private function sortMaintenances() {
+		$iterator = $this->maintenances->getIterator ();
+		$iterator->uasort ( function ($a, $b) {
+			return ($a->getDate () < $b->getDate ()) ? - 1 : 1;
+		} );
+		$this->maintenances = new ArrayCollection ( iterator_to_array ( $iterator ) );
 	}
 
 	// /**

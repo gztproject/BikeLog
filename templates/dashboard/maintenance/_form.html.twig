@@ -23,7 +23,8 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-sm-3">
+	<div class="col-sm-3" {% if not showBikeSelecor %} hidden="true"
+		{% endif %}>
 		<div class="form-group">
 			{{ form_label(form.bike, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
 			<div class='input-group'>

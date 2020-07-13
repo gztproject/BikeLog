@@ -70,7 +70,8 @@ class MaintenanceCommandController extends AbstractController {
 		}
 
 		return $this->render ( 'dashboard/maintenance/new.html.twig', [ 
-				'form' => $form->createView ()
+				'form' => $form->createView (),
+				'showBikeSelecor' => $cmc->bike == null
 		] );
 	}
 }

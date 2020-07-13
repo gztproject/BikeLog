@@ -30,7 +30,7 @@ class MaintenanceQueryController extends AbstractController
     
         
     /**
-     * @Route("/dashboard/maintenance/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}/show", methods={"GET"}, name="maintenance_show")
+     * @Route("/dashboard/maintenance/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}", methods={"GET"}, name="maintenance_show")
      */
     public function show(Maintenance $maintenance): Response
     {

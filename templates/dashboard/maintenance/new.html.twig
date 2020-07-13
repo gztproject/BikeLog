@@ -7,7 +7,8 @@
 
     {{ include('dashboard/maintenance/_form.html.twig', {
         form: form,
-        button_label: 'label.update.maintenance'|trans,
+        showBikeSelecor: showBikeSelecor,
+        button_label: 'label.save.maintenance'|trans,
         include_save_and_create_new: true,
         include_back_to_home_link: true,        
     }, with_context = false) }}
