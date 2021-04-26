@@ -1,0 +1,37 @@
+<div class="row">
+	{% for bike in bikes %}
+	<div class="col-md-3">
+		<a href={{ path('bike_show', { 'id': bike.id } )}}>
+			<div class="card" style="width: 18rem;">
+				<img class="card-img-top"
+				    style="height: 14rem; object-fit: cover;"
+					src="{{ asset(bike.pictureFilename) }}"
+					alt={{ bike.name }}>
+				<div class="card-body">
+					<h5 class="card-title">
+                        '{{ bike.year|slice(2,3) }} {{ bike.name }}
+					</h5>
+					<p class="card-text">
+						{{ bike.odometer }} km
+					</p>
+				</div>
+			</div>
+		</a>
+	</div>
+	{% else %}
+	<a href={{ path('bike_new')}}>
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top"
+                    src="{{ asset('img/plus.png') }}"
+                    alt={{ 'action.add_bike'|trans }}>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{ 'action.add_bike'|trans }}
+                    </h5>                    
+                </div>
+            </div>
+        </a>
+	{% endfor %}
+
+
+</div>

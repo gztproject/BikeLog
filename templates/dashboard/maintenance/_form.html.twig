@@ -1,0 +1,102 @@
+{{ form_start(form, {'attr': {'class': 'bs-component'}}) }}
+
+<div class="row">
+	<div class="col-sm-6">
+		<div class="form-group">
+			{{ form_label(form.workshop, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
+			<div class='input-group'>
+				{{ form_widget(form.workshop, {'attr': {'class': 'form-control'}}) }}
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-6">
+		<div class="form-group" id='DatePicker'>
+			{{ form_label(form.date, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
+			<div class='input-group'>
+				{{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+			</div>
+			<div class="input-group-append">
+				<span class="input-group-text"><i class="fa fa-calendar"
+					aria-hidden="true"></i></span>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-3" {% if not showBikeSelecor %} hidden="true"
+		{% endif %}>
+		<div class="form-group">
+			{{ form_label(form.bike, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
+			<div class='input-group'>
+				{{ form_widget(form.bike, {'attr': {'class': 'form-control'}}) }}
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-3">
+		<div class="form-group">
+			{{ form_label(form.odometer, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
+			<div class='input-group'>
+				{{ form_widget(form.odometer, {'attr': {'class': 'form-control'}}) }}
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-3">
+		<div class="form-group">
+			{{ form_label(form.spentTime, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
+			<div class='input-group'>
+				{{ form_widget(form.spentTime, {'attr': {'class': 'form-control'}}) }}
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-3">
+		<div class="form-group">
+			{{ form_label(form.unspecifiedCosts, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
+			<div class='input-group'>
+				{{ form_widget(form.unspecifiedCosts, {'attr': {'class': 'form-control'}}) }}
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="bs-component">
+	<table id="maintenance-tasks-table" class="table table-hover">
+		<thead>
+			<tr>
+				<th>{{ 'label.task'|trans }}</th>
+				<th>{{ 'label.cost'|trans }}</th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody id='tableBody' class="maintenanceTasks"
+			data-prototype="{{ form_widget(form.maintenanceTaskCommands.vars.prototype)|e('html_attr') }}">
+
+			{% for maintenanceTask in form.maintenanceTaskCommands %}
+			<tr class="form-group maintenance-task-tr-{{ loop.index0 }}">
+				<td class="task-Selector" data-stop-index="{{ loop.index0 }}">{{ form_widget(maintenanceTask.task, {'attr': {'class': 'form-control'}})}}</td>
+				<td colspan="2">{{ form_widget(maintenanceTask.cost, {'attr': {'class': 'form-control'}})}}</td>
+				<td><a id="remove-maintenance-task-{{ loop.index0 }}'"
+					class="btn btn-sm btn-block btn-danger"><i class="fa fa-minus"
+						aria-hidden="true"></i></a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+<div class="form-group">
+	<button type="submit" class="btn btn-primary">
+		<i class="fa fa-save" aria-hidden="true"></i>
+		{{ button_label|default('label.create.maintenance'|trans) }}
+	</button>
+	{% if include_save_and_create_new %}
+	{{ form_widget(form.saveAndCreateNew, {label: 'label.save_and_create_new', attr: {class: 'btn btn-primary'}}) }}
+	{% endif %}
+	{% if include_back_to_home_link %}
+	<a href="{{ path('maintenance_index') }}" class="btn btn-link"> <i
+		class="fa fa-list-alt" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+	</a>
+	{% endif %}
+</div>
+{{ form_row(form._token) }}
+{{ form_end(form, {'render_rest': false}) }}

@@ -1,0 +1,41 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'dashboard_index' %}
+
+{% block main %}
+
+<div class="row">
+	<div class="col-12">
+		<div class="bs-component">
+			<div class="card">
+				<div class="card-header">
+					<a href="{{ path('bike_index') }}"><h2>
+							{{ 'title.myBikes'|trans }}
+						</h2></a>
+				</div>
+				<div class="card-body">
+					{{ include('dashboard/bike/_table.html.twig', {bikes: bikes}, with_context = false) }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</br>
+
+
+{% endblock %}
+
+{% block sidebar %}
+
+{{ parent() }}
+<a href="{{ path('bike_new') }}"
+	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
+	aria-hidden="true"></i> {{ 'action.add.bike'|trans }}
+</a>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{% endblock %}

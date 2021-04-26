@@ -1,0 +1,26 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'title.new.refueling' %}
+
+{% block main %}
+    <h1>{{ 'title.new.refueling'|trans }}</h1>
+    <p id="demo"></p>
+
+    {{ include('dashboard/refueling/_form.html.twig', {
+        form: form,
+        button_label: 'label.update.refueling'|trans,
+        include_save_and_create_new: true,
+        include_back_to_home_link: true,        
+    }, with_context = false) }}
+
+{% endblock %}
+
+{% block sidebar %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('js/refueling/new') }}  
+{% endblock %}

@@ -1,0 +1,45 @@
+<div class="table-responsive-xl">
+	<table class="table table-hover table-striped">
+		<thead class="thead-dark">
+			<tr>
+				<th scope="col">{{ 'label.date'|trans }}</th>
+				<th scope="col">{{ 'label.odometer'|trans }}</th>
+				<th scope="col">{{ 'label.distance'|trans }}</th>
+				<th scope="col">{{ 'label.fuelQuantity'|trans }}</th>
+				<th scope="col">{{ 'label.price'|trans }}</th>
+				<th scope="col">{{ 'label.consumption'|trans }}</th>
+				<th scope="col">{{ 'label.comment'|trans }}</th>
+			</tr>
+			{% if bike is not null%}
+			<tr>
+				<th>{{ bike.numberOfRefuelings|number_format }}</th>
+				<th></th>
+				<th>{{ bike.totalDistance|number_format }} km</th>
+				<th>{{ bike.totalFuelQuantity|number_format(2) }} l</th>
+				<th>{{ bike.totalFuelPrice|number_format(2) }} €</th>
+				<th>{{ bike.averageConsumption|number_format(2) }} l/100km</th>
+				<th></th>
+			</tr>
+			{% endif %}
+		</thead>
+		<tbody>
+			{% for refueling in refuelings %}
+			<tr>
+				<th scope="row">{{ refueling.dateString }}</th>
+				<td>{{ refueling.odometer|number_format }} km</td>
+				<td>{{ refueling.distance|number_format }} km</td>
+				<td>{{ refueling.fuelQuantity|number_format(2) }} l</td>
+				<td>{{ refueling.price|number_format(2) }} €</td>
+				<td class={% if refueling.consumption < bike.averageConsumption %}
+					"table-success"{% elseif refueling.consumption > bike.averageConsumption%}"table-danger"{% endif %}>{{ refueling.consumption|number_format(2) }}
+					l/100km</td>
+				<td>{{ refueling.comment }}</td>
+			</tr>
+			{% else %}
+			<tr class="table-warning">
+				<td colspan="6" align="center">{{ 'label.noneFound.refuelings'|trans }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>

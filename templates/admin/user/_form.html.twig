@@ -1,0 +1,87 @@
+{#
+    By default, forms enable client-side validation. This means that you can't
+    test the server-side validation errors from the browser. To temporarily
+    disable this validation, add the 'novalidate' attribute:
+
+    {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+#}
+
+{% if show_confirmation|default(true) %}
+    {% set attr = {'data-confirmation': 'true', 'autocomplete': 'off'} %}
+    {{ include('admin/user/_delete_user_confirmation.html.twig') }}
+{% endif %}
+
+{{ form_start(form, {attr: attr|default({})}) }}
+   
+    {{ form_errors(form) }}
+    <div class="form-group">
+        {{ form_label(form.username) }}
+        {{ form_widget(form.username, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    {% if showChangePassword|default(false) %}
+    <div class="form-group">
+        {{ form_label(form.oldPassword) }}
+        {{ form_widget(form.oldPassword, {'attr': {'class': 'form-control', 'autocomplete':'new-password'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.password.first) }}
+        {{ form_widget(form.password.first, {'attr': {'class': 'form-control', 'autocomplete':'new-password'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.password.second) }}
+        {{ form_widget(form.password.second, {'attr': {'class': 'form-control', 'autocomplete':'new-password'}}) }}
+    </div>
+    {% endif %}
+    
+    {% if showNewPassword|default(false)%}   
+    
+    <div class="form-group">
+        {{ form_label(form.password.first) }}
+        {{ form_widget(form.password.first, {'attr': {'class': 'form-control', 'required':'required', 'autocomplete':'new-password'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.password.second) }}
+        {{ form_widget(form.password.second, {'attr': {'class': 'form-control', 'required':'required', 'autocomplete':'new-password'}}) }}
+    </div>
+    
+    {% endif %}
+    <div class="form-group">
+        {{ form_label(form.email) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+    </div>    
+    <div class="form-group">
+        {{ form_label(form.firstName) }}
+        {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.lastName) }}
+        {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.mobile) }}
+        {{ form_widget(form.mobile, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.profilePicture) }}  (.png/.jpg)
+        {{ form_widget(form.profilePicture, {'attr': {'class': 'form-control'}}) }}
+    </div>    
+    
+    
+    <div class="form-group">
+        {{ form_label(form.isRoleAdmin, "",{'label_attr': {'class': 'form-check-label'}}) }}<br>
+        {{ form_widget(form.isRoleAdmin, {'attr': {'class': 'form-check-input'}}) }}
+    </div>
+
+    <button type="submit" class="{{ button_css|default("btn btn-primary") }}">
+        <i class="fa fa-save" aria-hidden="true"></i> {{ button_label|default('action.add.user'|trans) }}
+    </button>
+
+    {% if include_back_to_home_link|default(false) %}
+        <a href="{{ path('admin_user_index') }}" class="btn btn-primary">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> {{ 'action.backToList'|trans }}
+        </a>
+    {% endif %}
+    
+{{ form_row(form._token) }}
+{{ form_end(form, {'render_rest': false}) }}
+

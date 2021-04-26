@@ -1,0 +1,14 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block body_id 'admin_index' %}
+
+{% block main %}
+    <h1>{{ 'title.admin'|trans({}, "messages", locale) }}</h1>
+    
+{% endblock %}
+
+{% block sidebar %}
+    
+    {{ parent() }}
+
+{% endblock %}
