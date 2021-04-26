@@ -4,9 +4,7 @@ namespace App\Entity\Base;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User\User;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DateTime;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 abstract class Base
 {       
