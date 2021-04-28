@@ -4,7 +4,7 @@ namespace App\Repository\Manufacturer;
 
 use App\Entity\Manufacturer\Manufacturer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Manufacturer|null find($id, $lockMode = null, $lockVersion = null)

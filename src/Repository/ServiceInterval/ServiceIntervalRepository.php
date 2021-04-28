@@ -4,7 +4,7 @@ namespace App\Repository\ServiceInterval;
 
 use App\Entity\ServiceInterval\ServiceInterval;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method ServiceInterval|null find($id, $lockMode = null, $lockVersion = null)
