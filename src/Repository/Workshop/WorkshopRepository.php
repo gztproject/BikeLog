@@ -4,7 +4,7 @@ namespace App\Repository\Workshop;
 
 use App\Entity\Workshop\Workshop;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Workshop|null find($id, $lockMode = null, $lockVersion = null)

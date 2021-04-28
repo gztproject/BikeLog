@@ -4,7 +4,7 @@ namespace App\Repository\Maintenance;
 
 use App\Entity\Maintenance\Maintenance;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Maintenance|null find($id, $lockMode = null, $lockVersion = null)

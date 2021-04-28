@@ -4,7 +4,7 @@ namespace App\Repository\Bike;
 
 use App\Entity\Bike\Bike;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Bike|null find($id, $lockMode = null, $lockVersion = null)

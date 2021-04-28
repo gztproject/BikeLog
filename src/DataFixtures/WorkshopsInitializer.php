@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use App\Entity\User\User;
 use Doctrine\ORM\EntityNotFoundException;
 use Psr\Log\LoggerInterface;
