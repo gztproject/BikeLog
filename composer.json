@@ -58,18 +58,26 @@
 		"symfony/polyfill-php56" : "*"
 	},
 	"conflict" : {
-		"symfony/symfony" : "*"
+		"symfony/symfony" : "~5.2"
 	},
 	"extra" : {
 		"symfony" : {
 			"allow-contrib" : false,
-			"require" : "5.0.*"
+			"require" : "~5.2"
 		}
 	},
 	"name" : "gztproject/bike-log",
 	"require-dev" : {
 		"doctrine/doctrine-fixtures-bundle" : "~3.4",
-		"symfony/profiler-pack" : "~1.0"
+		"symfony/profiler-pack" : "~1.0",
+		"symfony/browser-kit" : "~5.2",
+		"symfony/css-selector" : "~5.2",
+		"symfony/debug-bundle" : "~5.2",
+		"symfony/debug-pack" : "~1.0",
+		"symfony/phpunit-bridge" : "~5.2",
+		"symfony/stopwatch" : "~5.2",
+		"symfony/test-pack" : "~1.0",
+		"symfony/web-profiler-bundle" : "~5.2"
 	},
 	"support" : {
 		"email" : "gasper.doljak@gmail.com",
@@ -86,5 +94,5 @@
 			"role" : "Author"
 		}
 	],
-	"minimum-stability" : "dev"
+	"minimum-stability" : "stable"
 }
