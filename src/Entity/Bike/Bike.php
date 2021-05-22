@@ -345,7 +345,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 		$this->sortMaintenances ( null );
 		return $this->maintenances;
 	}
-	
+
 	/**
 	 *
 	 * @return Collection
@@ -469,6 +469,14 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	public function getAverageConsumption(): float {
 		return $this->calculateRefuelingStats () ["averageConsumption"];
 	}
+	
+	/**
+	 *
+	 * @return float
+	 */
+	public function getAverageRange(): float {
+		return $this->calculateRefuelingStats () ["averageRange"];
+	}
 
 	/**
 	 *
@@ -489,11 +497,14 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 			$fuelAccu += $r->getFuelQuantity ();
 			$priceAccu += $r->getPrice ();
 		}
+		$avgCons = $nValid > 0 ? ($consAccu / $nValid) : 0;
+		$range = ($this->fuelTankSize / $avgCons) * 100;
 		return [ 
 				"numberOfRefuelings" => $n,
 				"totalFuelQuantity" => $fuelAccu,
 				"totalFuelPrice" => $priceAccu,
-				"averageConsumption" => $nValid > 0 ? ($consAccu / $nValid) : 0
+				"averageConsumption" => $avgCons,
+				"averageRange" => $range
 		];
 		// $this->numberOfRefuelings = $n;
 		// $this->totalFuelQuantity = $fuelAccu;

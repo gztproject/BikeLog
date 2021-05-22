@@ -43,6 +43,7 @@ label:
   fuelQuantity: Količina goriva
   price: Cena
   consumption: Poraba
+  range: Doseg
   comment: Komentar
   nickname: Vzdevek
   vin: VIN
