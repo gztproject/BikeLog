@@ -104,4 +104,11 @@ class Workshop extends AggregateBase {
 		}
 		return false;
 	}
+	public function getWorkTime(): float
+	{
+		$total = 0;
+		foreach($this->maintenances as $m)
+			$total += $m->getSpentTime();
+		return $total;
+	}
 }

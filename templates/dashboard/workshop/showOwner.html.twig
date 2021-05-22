@@ -1,0 +1,46 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'workshop_show' %}
+
+{% block main %}
+
+<h1>
+	{{ 'title.workshop'|trans }}
+</h1>
+
+<h2>
+	{{ workshop.name }}
+</h2>
+<div>
+	<h3>
+		{{ 'label.workshop.clients' | trans}}
+		:
+	</h3>
+	<ul>
+		{% for client in workshop.getClients %}
+
+		<li>{{ client.username }}: </li>
+		<ul>
+			{% for bike in client.getBikes %}
+			<li>{{ bike.getYear }} {{ bike.getModel }} ({{ bike.getOdometer | number_format}} km): </li>
+			  <ul>
+              {% for maintenance in bike.getMaintenances %}
+              <li>{{ maintenance.getDateString }} @ {{ maintenance.getOdometer | number_format}} km: {{ maintenance.getDescription }} </li>
+              {% endfor %}
+        </ul>
+			{% endfor %}
+		</ul>
+
+		{% endfor %}
+	</ul>
+</div>
+<div>
+	<h3>
+		{{ 'label.workshop.totalWorkTime' | trans}}
+		:
+		{{ workshop.getWorkTime }}
+		{{ 'label.workshop.hours' | trans}}
+	</h3>
+</div>
+
+{% endblock %}

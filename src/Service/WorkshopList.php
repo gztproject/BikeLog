@@ -21,4 +21,11 @@ class WorkshopList
 		$myWorkshops = $user->getWorkshops ();
 		return $myWorkshops;
 	}
+	
+	public function getMyList(): Collection
+	{
+		$user = $this->security->getUser ();
+		$myWorkshops = $user->getOwnedWorkshops ();
+		return $myWorkshops;
+	}
 }

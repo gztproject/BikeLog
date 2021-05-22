@@ -13,6 +13,7 @@ title:
   myBikes: Moji motorji
   refueling: Točenje
   maintenance: Servisi
+  workshop: Delavnica
   
 
 label:
@@ -61,13 +62,20 @@ label:
   task: Opravilo
   interval: Interval
   remaining: Do nasl. servisa
-  workshop: Delavnica
   spentTime: Porabljen čas
   unspecifiedCosts: Neopredeljeni stroški
   cost: Strošek
   save_and_create_new: Shrani in ustvari novo
   images: Slike
   userData: Podatki
+  workshop:
+    workshop: Delavnica
+    mine: Moje 
+    owner: Lastnik
+    clients: Stranke
+    totalWorkTime: Skupen čas dela
+    hours: h
+
 
 action:
   add:
@@ -101,6 +109,8 @@ menu:
   user: Uporabnik
   logout: Odjava
   users: Uporabniki
+  bikes: Motorji
+  workshops: Delavnice
 
 help:
  login: Prijava

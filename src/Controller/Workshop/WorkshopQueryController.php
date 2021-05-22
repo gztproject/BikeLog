@@ -33,11 +33,18 @@ class WorkshopQueryController extends AbstractController {
 	 */
 	public function show(Workshop $workshop, PaginatorInterface $paginator): Response {
 		$user = $this->getUser ();
-		if (! $workshop->hasClient ( $user ))
-			throw new SecurityError ( "Workshops can only be shown to their members." );
 
-		return $this->render ( 'dashboard/workshop/show.html.twig', [ 
-				'workshop' => $workshop
-		] );
+		if ($workshop->getOwner () == $user) {
+			return $this->render ( 'dashboard/workshop/showOwner.html.twig', [
+					'workshop' => $workshop
+			] );
+		} else {
+			if (! $workshop->hasClient ( $user ))
+				throw new SecurityError ( "Workshops can only be shown to their members." );
+
+			return $this->render ( 'dashboard/workshop/show.html.twig', [ 
+					'workshop' => $workshop
+			] );
+		}
 	}
 }
