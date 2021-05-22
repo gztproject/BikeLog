@@ -9,6 +9,7 @@ use App\Entity\Maintenance\Maintenance;
 use App\Entity\Model\Model;
 use App\Entity\Task\Task;
 use App\Entity\User\User;
+use App\Entity\Workshop\Workshop;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
@@ -58,7 +59,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @ORM\Column(type="integer")
 	 */
 	private $purchaseOdometer;
-	
+
 	/**
 	 *
 	 * @ORM\Column(type="date")
@@ -189,10 +190,9 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 */
 	public function createRefueling(CreateRefuelingCommand $c, User $user): Refueling {
 		$refueling = new Refueling ( $c, $this, $c->isNotBreakingContinuum ? $this->lastRefueling : null, $user );
-		
+
 		// Is this chronologically a newer refueling?
-		if ($this->lastRefueling == null || $refueling->getDate () >= $this->lastRefueling->getDate ()) 
-		{
+		if ($this->lastRefueling == null || $refueling->getDate () >= $this->lastRefueling->getDate ()) {
 			if ($this->lastRefueling != null && $refueling->getOdometer () < $this->lastRefueling->getOdometer ())
 				throw new \Exception ( "New odometer state (" . $refueling->getOdometer () . ") is smaller 
 											than the last known odometer state (" . $this->lastRefueling->getOdometer () . ")." );
@@ -209,10 +209,10 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return Maintenance
 	 */
 	public function createMaintenance(CreateMaintenanceCommand $c, User $user): Maintenance {
-		$maintenance = new Maintenance ( $c, $this, $user );		
+		$maintenance = new Maintenance ( $c, $this, $user );
 		$this->maintenances->add ( $maintenance );
 		$this->sortMaintenances ();
-		$this->lastMaintenance = $this->maintenances->last();
+		$this->lastMaintenance = $this->maintenances->last ();
 		return $maintenance;
 	}
 
@@ -276,7 +276,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	public function getPurchasePrice(): float {
 		return $this->purchasePrice;
 	}
-	
+
 	/**
 	 *
 	 * @return DateTime
@@ -342,7 +342,16 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return Collection
 	 */
 	public function getMaintenances(): Collection {
-		$this->sortMaintenances();
+		$this->sortMaintenances ( null );
+		return $this->maintenances;
+	}
+	
+	/**
+	 *
+	 * @return Collection
+	 */
+	public function getFilteredMaintenances(?Workshop $workshop): Collection {
+		$this->sortMaintenances ( $workshop );
 		return $this->maintenances;
 	}
 
@@ -494,12 +503,18 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 */
-	private function sortMaintenances() {
+	private function sortMaintenances(?Workshop $workshop) {
 		$iterator = $this->maintenances->getIterator ();
 		$iterator->uasort ( function ($a, $b) {
 			return ($a->getDate () < $b->getDate ()) ? - 1 : 1;
 		} );
-		$this->maintenances = new ArrayCollection ( iterator_to_array ( $iterator ) );
+		$array = iterator_to_array ( $iterator );
+		if ($workshop != null) {
+			$array = array_filter ( $array, function ($a) use ($workshop) {
+				return $a->getWorkshop () == $workshop;
+			} );
+		}
+		$this->maintenances = new ArrayCollection ( $array );
 	}
 
 	// /**
