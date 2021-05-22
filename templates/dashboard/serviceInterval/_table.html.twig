@@ -5,7 +5,7 @@
 				<th scope="col">{{ "label.task"|trans }}</th>
 				<th scope="col">{{ "label.interval"|trans }}</th>
 				<th scope="col">{{ "label.remaining"|trans }}</th>
-				{% for m in bike.maintenances %}
+				{% for m in bike.maintenances[-5:] %}
 				<th>{{ m.dateString }}</th>
 				{% endfor %}
 			</tr>
@@ -19,7 +19,7 @@
 				<td>{{ si.interval | number_format }} km</td>
 				<td>{{ (si.interval - (bike.odometer - bike.lastTask(si.task))) | number_format}}
 					km</td>
-				{% for m in bike.maintenances %}
+				{% for m in bike.maintenances[-5:] %}
 				<td>{% if m.hasTask(si.task) %} {{ m.odometer|number_format }}
 					km{% endif %}</td>
 				{% endfor %}
