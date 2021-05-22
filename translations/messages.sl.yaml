@@ -3,6 +3,7 @@ title:
     bike: Nov motor
     refueling: Novo točenje
     user: Nov uporabnik
+    maintenance: Nov servis
   list:
     users: Seznam uporabnikov
   delete:
@@ -11,6 +12,7 @@ title:
   homepage: BikeLog 
   myBikes: Moji motorji
   refueling: Točenje
+  maintenance: Servisi
   
 
 label:
@@ -20,9 +22,14 @@ label:
   noneFound:
     users: Ne najdem nobenega uporabnika
     refuelings: Ne najdem nobenega točenja.
+  save:
+    maintenance: Shrani servis
+  create:
+    maintenance: Ustvari servis
   username: Uporabniško ime
   password: Geslo
   repeatPassword: Ponovi geslo
+  oldPassword: Staro geslo
   rememberMe: Zapomni si me
   date: Datum
   datetime: Datum
@@ -51,13 +58,23 @@ label:
   mobile: GSM
   profilePicture: Avatar
   isRoleAdmin: Administrator
-
+  task: Opravilo
+  interval: Interval
+  remaining: Do nasl. servisa
+  workshop: Delavnica
+  spentTime: Porabljen čas
+  unspecifiedCosts: Neopredeljeni stroški
+  cost: Strošek
+  save_and_create_new: Shrani in ustvari novo
+  images: Slike
+  userData: Podatki
 
 action:
   add:
     bike: Dodaj motor
     refueling: Dodaj točenje
     user: Dodaj uporabnika
+    maintenance: Dodaj servis
   delete:
     user: Izbriši uporabnika
   show: Pokaži
@@ -67,12 +84,15 @@ action:
   save: Shrani
   backToList: Nazaj na seznam
   cancel: Prekliči
+  back_to_list: Nazaj na seznam
+  edit_contents: Uredi vsebino
   
 body:
   delete:
     userModal: Ali ste prepričani da želite izbrisati uporabnika?
 
-
+user:
+  updated_successfuly: Spremembe uspešno shranjene.
   
 menu:
   home: Domov
