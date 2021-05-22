@@ -24,7 +24,7 @@
 			{% for bike in client.getBikes %}
 			<li>{{ bike.getYear }} {{ bike.getModel }} ({{ bike.getOdometer | number_format}} km): </li>
 			  <ul>
-              {% for maintenance in bike.getMaintenances %}
+              {% for maintenance in bike.getFilteredMaintenances(workshop) %}
               <li>{{ maintenance.getDateString }} @ {{ maintenance.getOdometer | number_format}} km: {{ maintenance.getDescription }} </li>
               {% endfor %}
         </ul>
