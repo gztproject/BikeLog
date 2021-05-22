@@ -9,14 +9,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractController
 {    
-	/**
+	/**	 
      * @Route("/dashboard", methods={"GET"}, name="dashboard_index")
      */
 	public function index(): Response
-    {      	
-    	$user = $this->getUser();
-    	$myBikes = $user->getBikes();
-    	return $this->render ( 'dashboard/index.html.twig', ['bikes' => $myBikes]);
+    {  
+    	return $this->render ( 'dashboard/index.html.twig');
     }    
     
 }

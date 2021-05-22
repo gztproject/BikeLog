@@ -95,4 +95,13 @@ class Workshop extends AggregateBase {
 	public function getClients(): Collection {
 		return $this->clients;
 	}
+	public function hasClient(User $user): bool
+	{
+		foreach($this->clients as $c)
+		{
+			if($c == $user)
+				return true;
+		}
+		return false;
+	}
 }
