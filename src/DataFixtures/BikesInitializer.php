@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ORM\Mapping\Driver\DatabaseDriver;
 use App\Entity\Model\Model;
 use App\Entity\Bike\CreateBikeCommand;
+use DateTime;
 
 class BikesInitializer implements IEntityInitializer {
 	private $manager;
@@ -56,6 +57,7 @@ class BikesInitializer implements IEntityInitializer {
 			$cbc->model = $model;
 			$cbc->purchaseOdometer = $row ["purchaseOdometer"] ?? 0;
 			$cbc->purchasePrice = $row ["purchasePrice"] == "" ? 0 : $row ["purchasePrice"];
+			$cbc->purchaseDate = new DateTime($row ["purchaseDate"] ?? "2000-01-01");			
 			$cbc->vin = $row ["vin"] ?? "";
 			$cbc->year = $row ["year"] ?? 2000;
 			$cbc->pictureFilename = $row ["picture"];

@@ -60,14 +60,14 @@ class Refueling extends AggregateBaseWithComment {
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateRefuelingCommand $c, ?Refueling $previousRefueling, User $user) {
+	public function __construct(CreateRefuelingCommand $c, Bike $bike, ?Refueling $previousRefueling, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
-		$this->bike = $c->bike;
+		$this->bike = $bike;
 		$this->comment = $c->comment ?? "";
 		$this->datetime = $c->datetime;
 		$this->fuelQuantity = $c->fuelQuantity;

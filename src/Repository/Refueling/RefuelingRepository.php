@@ -60,7 +60,7 @@ class RefuelingRepository extends ServiceEntityRepository
     		->setParameter('bikeid', $bikeId);
     	}
     	
-    	return $qb->orderBy('t.datetime', $order);
+    	return $qb->orderBy('t.id', $order);
     }
 
     // /**

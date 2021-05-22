@@ -31,7 +31,7 @@ class RefuelingType extends AbstractType {
 	 * @param FormBuilderInterface $builder
 	 * @param array $options
 	 */
-	public function buildForm(FormBuilderInterface $builder, array $options) {		
+	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$builder->add ( 'datetime', DateTimePickerType::class, [ 
 				'label' => 'label.datetime',
 				'widget' => 'single_text',
@@ -54,13 +54,14 @@ class RefuelingType extends AbstractType {
 				'query_builder' => function (BikeRepository $repository) use ($options) {
 					$qb = $repository->createQueryBuilder ( 'b' );
 					// the function returns a QueryBuilder object
-					return $qb->
-					where ( $qb->expr ()->eq ( 'b.owner', '?1' ) )->setParameter ( '1', $options["user"] );
+					return $qb->where ( $qb->expr ()->eq ( 'b.owner', '?1' ) )->setParameter ( '1', $options ["user"] );
 				}
 		] )->add ( 'isTankFull', CheckboxType::class, [ 
-				'label' => 'label.isTankFull'
+				'label' => 'label.isTankFull',
+				'required' => false
 		] )->add ( 'isNotBreakingContinuum', CheckboxType::class, [ 
-				'label' => 'label.isNotBreakingContinuum'
+				'label' => 'label.isNotBreakingContinuum',
+				'required' => false
 		] )->add ( 'save', SubmitType::class );
 	}
 	public function configureOptions(OptionsResolver $resolver) {
