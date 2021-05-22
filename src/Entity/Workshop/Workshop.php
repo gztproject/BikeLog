@@ -95,4 +95,20 @@ class Workshop extends AggregateBase {
 	public function getClients(): Collection {
 		return $this->clients;
 	}
+	public function hasClient(User $user): bool
+	{
+		foreach($this->clients as $c)
+		{
+			if($c == $user)
+				return true;
+		}
+		return false;
+	}
+	public function getWorkTime(): float
+	{
+		$total = 0;
+		foreach($this->maintenances as $m)
+			$total += $m->getSpentTime();
+		return $total;
+	}
 }

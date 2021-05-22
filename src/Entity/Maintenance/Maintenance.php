@@ -147,6 +147,21 @@ class Maintenance extends AggregateBaseWithComment {
 	public function getDateString(): string {
 		return $this->date->format ( 'j. n. Y' );
 	}
+	
+	/**
+	 *
+	 * @return string
+	 */
+	public function getDescription(): string {
+		
+		$description = "";
+		foreach($this->maintenanceTasks as $t)
+		{
+			$description .= $t->getTask()->getDescription();
+			$description .= ", ";
+		}
+		return substr($description, 0, -2);
+	}
 
 	/**
 	 *

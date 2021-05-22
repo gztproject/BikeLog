@@ -47,8 +47,9 @@ class BikeQueryController extends AbstractController {
 		] );
 	}
 
+	
 	/**
-	 *
+	 * @deprecated since 0.0.4
 	 * @Route("/dashboard/bike/list", methods={"GET"}, name="bike_list")
 	 */
 	public function list(): JsonResponse {

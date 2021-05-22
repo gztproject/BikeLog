@@ -1,0 +1,15 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'workshop_show' %}
+
+{% block main %}
+
+<h1>
+	{{ 'title.workshop'|trans }}
+</h1>
+
+<h2>{{ workshop.name }}</h2>
+<p>{{ 'label.workshop.owner' | trans}} : {{ workshop.owner.username }}</p>
+
+
+{% endblock %}
