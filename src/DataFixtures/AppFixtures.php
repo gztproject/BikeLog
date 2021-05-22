@@ -42,6 +42,9 @@ class AppFixtures extends Fixture {
 
 		$bikeInitializer = new BikesInitializer ( $manager, "/InitData/bikes.tsv", $users, $models, $this->loggerInterface );
 		$bikes = $bikeInitializer->generate ( $migrator );
+		
+		$refuelingInitializer = new RefuelingInitializer ( $manager, "/InitData/refuelings.tsv", $users, $this->loggerInterface );
+		$refuelings = $refuelingInitializer->generate ( $migrator );
 	}
 }
 

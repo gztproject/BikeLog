@@ -57,6 +57,12 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @ORM\Column(type="integer")
 	 */
 	private $purchaseOdometer;
+	
+	/**
+	 *
+	 * @ORM\Column(type="date")
+	 */
+	private $purchaseDate;
 
 	/**
 	 *
@@ -84,7 +90,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 *
-	 * @ORM\OneToMany(targetEntity="App\Entity\Refueling\Refueling", mappedBy="bike")
+	 * @ORM\OneToMany(targetEntity="App\Entity\Refueling\Refueling", mappedBy="bike", cascade={"persist"})
 	 */
 	private $refuelings;
 
@@ -135,6 +141,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 		$this->model = $c->model;
 		$this->owner = $user;
 		$this->purchasePrice = $c->purchasePrice;
+		$this->purchaseDate = $c->purchaseDate;
 		$this->year = $c->year;
 		$this->customServiceIntervals = new ArrayCollection ();
 		$this->vin = $c->vin ?? "";
@@ -180,9 +187,11 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return Refueling
 	 */
 	public function createRefueling(CreateRefuelingCommand $c, User $user): Refueling {
-		$refueling = new Refueling ( $c, $c->isNotBreakingContinuum ? $this->lastRefueling : null, $user );
+		$refueling = new Refueling ( $c, $this, $c->isNotBreakingContinuum ? $this->lastRefueling : null, $user );
+		
 		// Is this chronologically a newer refueling?
-		if ($this->lastRefueling == null || $refueling->getDate () > $this->lastRefueling->getDate ()) {
+		if ($this->lastRefueling == null || $refueling->getDate () >= $this->lastRefueling->getDate ()) 
+		{
 			if ($this->lastRefueling != null && $refueling->getOdometer () < $this->lastRefueling->getOdometer ())
 				throw new \Exception ( "New odometer state (" . $refueling->getOdometer () . ") is smaller 
 											than the last known odometer state (" . $this->lastRefueling->getOdometer () . ")." );
@@ -199,7 +208,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 * @return Maintenance
 	 */
 	public function createMaintenance(CreateMaintenanceCommand $c, User $user): Maintenance {
-		$maintenance = new Maintenance ( $c, $user );		
+		$maintenance = new Maintenance ( $c, $this, $user );		
 		$this->maintenances->add ( $maintenance );
 		$this->sortMaintenances ();
 		$this->lastMaintenance = $this->maintenances->last();
@@ -265,6 +274,14 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 	 */
 	public function getPurchasePrice(): float {
 		return $this->purchasePrice;
+	}
+	
+	/**
+	 *
+	 * @return DateTime
+	 */
+	public function getPurchaseDate(): DateTime {
+		return $this->purchaseDate;
 	}
 
 	/**

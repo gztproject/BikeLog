@@ -8,6 +8,7 @@ class CreateBikeCommand
 	public $nickname;
 	public $purchasePrice;
 	public $purchaseOdometer;
+	public $purchaseDate;
 	public $year;
 	public $vin;
 	public $pictureFilename;

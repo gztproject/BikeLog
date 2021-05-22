@@ -67,7 +67,7 @@ class Maintenance extends AggregateBaseWithComment {
 	 * @param User $user
 	 * @throws \Exception
 	 */
-	public function __construct(CreateMaintenanceCommand $c, User $user) {
+	public function __construct(CreateMaintenanceCommand $c, Bike $bike, User $user) {
 		if ($user == null)
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
@@ -75,7 +75,7 @@ class Maintenance extends AggregateBaseWithComment {
 
 		parent::__construct ( $user );
 		$this->workshop = $c->workshop;
-		$this->bike = $c->bike;
+		$this->bike = $bike;
 		$this->date = $c->date;
 		$this->odometer = $c->odometer ?? 0;
 		$this->spentTime = $c->spentTime ?? 0;
