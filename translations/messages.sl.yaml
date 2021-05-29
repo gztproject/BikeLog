@@ -76,6 +76,9 @@ label:
     clients: Stranke
     totalWorkTime: Skupen čas dela
     hours: h
+  years: let
+  months: mesecev
+  days: dni
 
 
 action:
