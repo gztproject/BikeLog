@@ -456,7 +456,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals
     {
         $last = 0;
         foreach ($this->maintenances as $m) {
-            if ($m->hasTask($task) && $m->getOdometer() > $last)
+            if ($m->hasTask($task) && $m->getDateInt() > $last)
                 $last = $m->getDateInt();
         }
         return $last;
