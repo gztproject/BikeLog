@@ -503,7 +503,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals {
 
 	/**
 	 */
-	private function sortMaintenances(?Workshop $workshop) {
+	private function sortMaintenances(?Workshop $workshop = null) {
 		$iterator = $this->maintenances->getIterator ();
 		$iterator->uasort ( function ($a, $b) {
 			return ($a->getDate () < $b->getDate ()) ? - 1 : 1;
