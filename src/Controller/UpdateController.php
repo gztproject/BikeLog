@@ -17,6 +17,17 @@ class UpdateController extends AbstractController
         if(!$user->getIsRoleAdmin())
             throw new AccessDeniedHttpException(); 
         return $this->render('admin/update.html.twig');
-    }    
+    }
+    
+    /**
+     * @Route("/admin/update/check", methods={"GET"}, name="admin_update_check")
+     */
+    public function checkForUpdates()
+    {
+        $user = $this->getUser();
+        if(!$user->getIsRoleAdmin())
+            throw new AccessDeniedHttpException();
+        return $this->render('admin/update.html.twig');
+    }
     
 }
