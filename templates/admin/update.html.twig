@@ -27,7 +27,9 @@ Current version: {{ shivas_app_version }}</br>
 			<div class="modal-body"></div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-danger" data-dismiss="modal">{{ 'label.cancel'|trans }}</button>
-				<button type="button" class="btn btn-primary" id="btn-do-update" disabled=true>{{ 'label.update'|trans }}</button>
+				<a href="{{ path('admin_do_update') }}" class="btn btn-success disabled" aria-disabled="true" id="btn-do-update" role="button">
+                    <i class="fa fa-plus" aria-hidden="true"></i> {{ 'label.update'|trans }}
+                </a>				
 			</div>
 		</div>
 	</div>

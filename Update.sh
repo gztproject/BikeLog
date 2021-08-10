@@ -21,3 +21,5 @@ yarn encore prod
 
 #Migrate DB if necessary
 php bin/console doctrine:migrations:migrate -n
+
+php bin/console cache:clear

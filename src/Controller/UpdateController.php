@@ -30,10 +30,24 @@ class UpdateController extends AbstractController
             throw new AccessDeniedHttpException();
         
         $currentVersion = $manager->getVersion();
-        $newVersion = $manager->getVersion();
-        $updateAvailable = $newVersion>$currentVersion;
         
-        return $this->json(['update_available' => $updateAvailable, 'current_version' => $currentVersion, 'new_version' => $newVersion]);
+        return $this->json(['current_version' => $currentVersion]);
+    }
+    
+    /**
+     * @Route("/admin/update/do", methods={"GET"}, name="admin_do_update")
+     */
+    public function doUpdate(Request $request, VersionManagerInterface $manager)
+    {
+        $user = $this->getUser();
+        if(!$user->getIsRoleAdmin())
+            throw new AccessDeniedHttpException();
+            
+            $currentVersion = $manager->getVersion();
+            
+            $url = $request->query->get('url');
+            
+            return $this->json(['url' => $url]);
     }
     
 }
