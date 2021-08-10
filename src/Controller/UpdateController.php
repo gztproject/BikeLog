@@ -5,6 +5,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception;
 use App\Entity\User\User;
+use Shivas\VersioningBundle\Service\VersionManagerInterface;
 
 class UpdateController extends AbstractController
 {    
@@ -22,12 +23,17 @@ class UpdateController extends AbstractController
     /**
      * @Route("/admin/update/check", methods={"GET"}, name="admin_update_check")
      */
-    public function checkForUpdates()
+    public function checkForUpdates(VersionManagerInterface $manager)
     {
         $user = $this->getUser();
         if(!$user->getIsRoleAdmin())
             throw new AccessDeniedHttpException();
-        return $this->render('admin/update.html.twig');
+        
+        $currentVersion = $manager->getVersion();
+        $newVersion = $manager->getVersion();
+        $updateAvailable = $newVersion>$currentVersion;
+        
+        return $this->json(['update_available' => $updateAvailable, 'current_version' => $currentVersion, 'new_version' => $newVersion]);
     }
     
 }
