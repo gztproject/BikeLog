@@ -43,6 +43,7 @@ label:
   fuelQuantity: Količina goriva
   price: Cena
   consumption: Poraba
+  range: Doseg
   comment: Komentar
   nickname: Vzdevek
   vin: VIN
@@ -75,6 +76,9 @@ label:
     clients: Stranke
     totalWorkTime: Skupen čas dela
     hours: h
+  years: let
+  months: mesecev
+  days: dni
 
 
 action:

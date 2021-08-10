@@ -1,0 +1,48 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block body_id 'admin_update' %}
+
+{% block main %}
+<h1>
+	{{ 'title.update'|trans }}
+</h1>
+Current version: {{ shivas_app_version }}</br>
+<button type="button" class="btn btn-primary" id="btn-check-updates">    
+	<i class="fa fa-refresh" aria-hidden="true"></i>
+	{{ 'action.update.check'|trans }}
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
+	aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">{{ 'title.updater'|trans }}</h5>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body"></div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">{{ 'label.cancel'|trans }}</button>
+				<button type="button" class="btn btn-primary" id="btn-do-update" disabled=true>{{ 'label.update'|trans }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+
+{{ parent() }}
+
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('js/admin/update') }}  
+{% endblock %}

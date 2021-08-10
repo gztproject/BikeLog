@@ -72,7 +72,7 @@ class Task extends AggregateBaseWithComment {
 	 *
 	 * @return Part
 	 */
-	public function getPart(): Part {
+	public function getPart(): ?Part {
 		return $this->part;
 	}
 

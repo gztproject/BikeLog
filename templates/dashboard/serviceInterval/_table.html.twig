@@ -12,16 +12,42 @@
 		</thead>
 		<tbody>
 			{% for si in bike.serviceIntervals %}
-			<tr
-				class={% if (si.interval - (bike.odometer - bike.lastTask(si.task))) > 500 %}
-				"table-success" {% elseif (si.interval - (bike.odometer - bike.lastTask(si.task))) < 0 %}"table-danger"{% else %}"table-warning"{% endif %}>
+			{% set warning = 0 %}
+			{% set remaining = 0 %}
+			{% if si.intervalType == 00 %}
+			{% set warning = 500 %}
+			{% set remaining = (bike.odometer - bike.lastTaskOdometer(si.task)) %}
+			{% elseif si.intervalType == 10 %}
+			{% set warning = 500 %}
+			{% set remaining = (bike.odometer - bike.lastTaskOdometer(si.task)) %}
+			{% elseif si.intervalType == 20 %}
+			{% set warning = 7 %}
+			{% set remaining =  date("now").diff(date(bike.lastTaskDate(si.task))).days %}
+			{% elseif si.intervalType == 30 %}
+			{% set warning = 14 %}
+			{% set remaining = date("now").diff(date(bike.lastTaskDate(si.task))).days %}
+			{% elseif si.intervalType == 40 %}
+			{% set warning = 30 %}
+			{% set remaining = date("now").diff(date(bike.lastTaskDate(si.task))).days %}
+			{% endif %}			
+			<tr class={% if (si.interval - remaining) > warning %}
+				"table-success"
+				{% elseif (si.interval - remaining) < 0 %}"table-danger"
+				{% else %}"table-warning"
+				{% endif %}>
 				<th scope="row">{{ si.task.name }}</th>
-				<td>{{ si.interval | number_format }} km</td>
-				<td>{{ (si.interval - (bike.odometer - bike.lastTask(si.task))) | number_format}}
-					km</td>
+				<td>{{ si.interval | number_format }} {% if si.intervalType == 00 or si.intervalType == 10 %}km
+					{% elseif si.intervalType == 20 %} {{ "label.days"|trans }} {% elseif si.intervalType == 30 %}
+					{{ "label.months"|trans }} {% elseif si.intervalType == 40 %} {{ "label.years"|trans }}
+					{% endif %}</td>
+				<td>{% if si.intervalType == 00 or si.intervalType == 10 %} {{ (si.interval - remaining) | number_format}} km
+					{% elseif si.intervalType >= 20 %} {{ remaining | number_format}} {{ "label.days"|trans }} 
+					{% endif %}</td>
 				{% for m in bike.maintenances[-5:] %}
-				<td>{% if m.hasTask(si.task) %} {{ m.odometer|number_format }}
-					km{% endif %}</td>
+				<td>{% if m.hasTask(si.task) %} 
+					{% if si.intervalType == 00 or si.intervalType == 10 %}{{ m.odometer|number_format }}km {% elseif si.intervalType == 20 %}{{ m.dateString }} {% elseif si.intervalType == 30 %} {{ m.dateString }}
+					{% elseif si.intervalType == 40 %} {{ m.dateString }} {% endif %}
+					{% endif %}</td>
 				{% endfor %}
 			</tr>
 
