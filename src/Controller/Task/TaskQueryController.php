@@ -29,7 +29,7 @@ class TaskQueryController extends AbstractController {
 				throw new SecurityError ( "Bikes can only be shown to their owners." );
 		}
 
-		$queryBuilder = $tasks->getFilteredQuery ( $bikeId, $this->getUser () );
+		$queryBuilder = $tasks->getBikeTasks( $bike->getId()->toString(), $bike->getModel()->getId()->toString());
 
 		$pagination = $paginator->paginate ( $queryBuilder, $request->query->getInt ( 'page', 1 ), 10 );
 		return $this->render ( 'dashboard/task/index.html.twig', [ 
