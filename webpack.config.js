@@ -24,6 +24,7 @@ Encore
     .addEntry('js/app', './assets/js/app.js')
     .addEntry('js/user/admin', './assets/js/user/admin.js')
     .addEntry('js/user/showUser', './assets/js/user/showUser.js')
+    .addEntry('js/admin/update', './assets/js/admin/update.js')
 
     //Common
     //  ->filters

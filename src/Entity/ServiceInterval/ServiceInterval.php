@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Entity\ServiceInterval;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,120 +15,146 @@ use App\Entity\Task\Task;
  *
  * @ORM\Entity(repositoryClass="App\Repository\ServiceInterval\ServiceIntervalRepository")
  */
-class ServiceInterval extends AggregateBase {
+class ServiceInterval extends AggregateBase
+{
 
-	/**
-	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\Task\Task")
-	 */
-	private $task;
+    /**
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Task\Task")
+     */
+    private $task;
 
-	/**
-	 *
-	 * @ORM\Column(name="`interval`", type="integer")
-	 */
-	private $interval;
-	
-	/**
-	 * 
-	 * @ORM\Column(type="integer")
-	 */
-	private $intervalType;
+    /**
+     * A service interval which may be in KM or days/months/years as indicated with the intervalType.
+     *
+     * @ORM\Column(name="`interval`", type="integer")
+     */
+    private $interval;
 
-	/**
-	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\Model\Model", inversedBy="serviceIntervals")
-	 * @ORM\JoinColumn(name="model_id", referencedColumnName="id", nullable=true)
-	 */
-	private $model;
+    /**
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $intervalType;
 
-	/**
-	 *
-	 * @ORM\ManyToOne(targetEntity="App\Entity\Bike\Bike", inversedBy="customServiceIntervals")
-	 * @ORM\JoinColumn(name="bike_id", referencedColumnName="id", nullable=true)
-	 */
-	private $bike;
+    /**
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Model\Model", inversedBy="serviceIntervals")
+     * @ORM\JoinColumn(name="model_id", referencedColumnName="id", nullable=true)
+     */
+    private $model;
 
-	/**
-	 *
-	 * @param CreateServiceIntervalCommand $c
-	 * @param iHasServiceIntervals $perishable
-	 * @param User $user
-	 * @throws \Exception
-	 */
-	public function __construct(CreateServiceIntervalCommand $c, iHasServiceIntervals $perishable, User $user) {
-		if ($user == null)
-			throw new \Exception ( "Can't create entity without a user." );
-		if ($c == null)
-			throw new \Exception ( "Can't create entity without a command." );
+    /**
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\Bike\Bike", inversedBy="customServiceIntervals")
+     * @ORM\JoinColumn(name="bike_id", referencedColumnName="id", nullable=true)
+     */
+    private $bike;
 
-		parent::__construct ( $user );
+    /**
+     *
+     * @param CreateServiceIntervalCommand $c
+     * @param iHasServiceIntervals $perishable
+     * @param User $user
+     * @throws \Exception
+     */
+    public function __construct(CreateServiceIntervalCommand $c, iHasServiceIntervals $perishable, User $user)
+    {
+        if ($user == null)
+            throw new \Exception("Can't create entity without a user.");
+        if ($c == null)
+            throw new \Exception("Can't create entity without a command.");
 
-		switch (get_class ( $perishable )) {
-			case Bike::class :
-				$this->bike = $perishable;
-				break;
-			case Model::class :
-				$this->model = $perishable;
-				break;
-			default :
-				throw new \Exception ( 'Not implemented yet.' );
-				break;
-		}
+        parent::__construct($user);
 
-		$this->interval = $c->interval;
-		$this->intervalType = $c->intervalType;
-		$this->task = $c->task;
-	}
+        switch (get_class($perishable)) {
+            case Bike::class:
+                $this->bike = $perishable;
+                break;
+            case Model::class:
+                $this->model = $perishable;
+                break;
+            default:
+                throw new \Exception('Not implemented yet.');
+                break;
+        }
 
-	/**
-	 *
-	 * @param UpdateServiceIntervalCommand $c
-	 * @param User $user
-	 * @throws \Exception
-	 * @return ServiceInterval
-	 */
-	public function update(UpdateServiceIntervalCommand $c, User $user): ServiceInterval {
-		throw new \Exception ( "Not implemented yet." );
-		parent::updateBase ( $user );
-		return $this;
-	}
+        $this->interval = $c->interval;
+        $this->intervalType = $c->intervalType;
+        $this->task = $c->task;
+    }
 
-	/*
-	 * ==============================================
-	 * Getters
-	 * ==============================================
-	 */
+    /**
+     *
+     * @param UpdateServiceIntervalCommand $c
+     * @param User $user
+     * @throws \Exception
+     * @return ServiceInterval
+     */
+    public function update(UpdateServiceIntervalCommand $c, User $user): ServiceInterval
+    {
+        throw new \Exception("Not implemented yet.");
+        parent::updateBase($user);
+        return $this;
+    }
 
-	/**
-	 * Not sure when we actually need this, just leaving it here for now :)
-	 * @return iHasServiceIntervals
-	 */
-	public function getPerishable(): iHasServiceIntervals {
-		return $this->bike ?? $this->model;
-	}
+    /*
+     * ==============================================
+     * Getters
+     * ==============================================
+     */
 
-	/**
-	 *
-	 * @return int
-	 */
-	public function getInterval(): int {
-		return $this->interval;
-	}
+    /**
+     * Not sure when we actually need this, just leaving it here for now :)
+     *
+     * @return iHasServiceIntervals
+     */
+    public function getPerishable(): iHasServiceIntervals
+    {
+        return $this->bike ?? $this->model;
+    }
 
-	/**
-	 *
-	 * @return Task
-	 */
-	public function getTask(): Task {
-		return $this->task;
-	}
+    /**
+     *
+     * @return int
+     */
+    public function getInterval(): int
+    {
+        return $this->interval;
+    }
+
+    /**
+     *
+     * @return int
+     */
+    public function getIntervalType(): int
+    {
+        return $this->intervalType;
+    }
+
+    /**
+     *
+     * @return Task
+     */
+    public function getTask(): Task
+    {
+        return $this->task;
+    }
 }
 
 /**
  * 00-absolute, 10-relative
  */
-abstract class IntervalTypes {
-	const absolute = 00;
-	const relative = 10;	
+abstract class IntervalTypes
+{
+
+    const absoluteDistance = 00;
+
+    const relativeDistance = 10;
+
+    const days = 20;
+
+    const months = 30;
+
+    const years = 40;
 }

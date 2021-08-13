@@ -1,4 +1,7 @@
 {
+    "beberlei/assert": {
+        "version": "v3.3.1"
+    },
     "brick/math": {
         "version": "0.9.2"
     },
@@ -121,6 +124,9 @@
     "monolog/monolog": {
         "version": "2.2.0"
     },
+    "nikolaposa/version": {
+        "version": "4.1.0"
+    },
     "oomphinc/composer-installers-extender": {
         "version": "2.0.0"
     },
@@ -165,6 +171,9 @@
         "files": [
             "config/packages/sensio_framework_extra.yaml"
         ]
+    },
+    "shivas/versioning-bundle": {
+        "version": "4.0.0"
     },
     "symfony/asset": {
         "version": "v5.2.4"
@@ -350,6 +359,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "v1.22.1"
+    },
+    "symfony/process": {
+        "version": "v5.3.4"
     },
     "symfony/profiler-pack": {
         "version": "v1.0.5"

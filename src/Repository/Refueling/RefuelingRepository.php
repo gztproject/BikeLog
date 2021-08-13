@@ -59,8 +59,10 @@ class RefuelingRepository extends ServiceEntityRepository
     		$qb->andWhere('t.bike = :bikeid')
     		->setParameter('bikeid', $bikeId);
     	}
+    	$qb->orderBy('t.datetime', $order);
+    	$qb->orderBy('t.odometer', $order);
     	
-    	return $qb->orderBy('t.id', $order);
+    	return $qb;
     }
 
     // /**

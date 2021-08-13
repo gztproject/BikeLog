@@ -8,6 +8,7 @@
 				<th scope="col">{{ 'label.fuelQuantity'|trans }}</th>
 				<th scope="col">{{ 'label.price'|trans }}</th>
 				<th scope="col">{{ 'label.consumption'|trans }}</th>
+				<th scope="col">{{ 'label.range'|trans }}</th>
 				<th scope="col">{{ 'label.comment'|trans }}</th>
 			</tr>
 			{% if bike is not null%}
@@ -18,6 +19,7 @@
 				<th>{{ bike.totalFuelQuantity|number_format(2) }} l</th>
 				<th>{{ bike.totalFuelPrice|number_format(2) }} €</th>
 				<th>{{ bike.averageConsumption|number_format(2) }} l/100km</th>
+				<th>{{ bike.averageRange|number_format(2) }} km</th>
 				<th></th>
 			</tr>
 			{% endif %}
@@ -33,6 +35,8 @@
 				<td class={% if refueling.consumption < bike.averageConsumption %}
 					"table-success"{% elseif refueling.consumption > bike.averageConsumption%}"table-danger"{% endif %}>{{ refueling.consumption|number_format(2) }}
 					l/100km</td>
+				<td class={% if refueling.range > bike.averageRange %}
+                    "table-success"{% elseif refueling.range < bike.averageRange%}"table-danger"{% endif %}>{{ refueling.range|number_format(2) }} km</td>
 				<td>{{ refueling.comment }}</td>
 			</tr>
 			{% else %}

@@ -211,6 +211,16 @@ class Refueling extends AggregateBaseWithComment {
 			return null;
 		return $this->getFuelQuantity () / ($this->getDistance () / 100.00);
 	}
+	
+	/**
+	 *
+	 * @return float|NULL
+	 */
+	public function getRange(): ?float {
+		if (! $this->isValid ())
+			return null;
+		return ($this->getBike()->getFuelTankSize() / $this->getConsumption()) * 100.00;
+	}
 
 	/**
 	 *

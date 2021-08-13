@@ -150,6 +150,14 @@ class Maintenance extends AggregateBaseWithComment {
 	
 	/**
 	 *
+	 * @return int
+	 */
+	public function getDateInt(): int {
+	    return $this->date->format('U');
+	}
+	
+	/**
+	 *
 	 * @return string
 	 */
 	public function getDescription(): string {

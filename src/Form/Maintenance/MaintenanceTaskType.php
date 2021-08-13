@@ -21,17 +21,15 @@ class MaintenanceTaskType extends AbstractType {
 	 * @param array $options
 	 *
 	 */
-	public function buildForm(FormBuilderInterface $builder, array $options) {		
+	public function buildForm(FormBuilderInterface $builder, array $options) {	   
 		$builder->add ( 'task', EntityType::class, [ 
 				'class' => Task::class,
 				'choice_label' => 'name',
 				'expanded' => false,
 				'multiple' => false,
 				'label' => 'label.task',
-				'query_builder' => function (TaskRepository $repository) use ($options) {
-					$qb = $repository->createQueryBuilder ( 't' );
-					// the function returns a QueryBuilder object
-					return $qb->leftJoin ( 'App\Entity\ServiceInterval\ServiceInterval', 'si', 'WITH', 't.id = si.task' )->where ( 'si.bike = :bikeId' )->orWhere ( 'si.model = :modelId' )->setParameter ( 'bikeId', $options ["bike"] )->setParameter ( 'modelId', $options ["model"] );
+		    'query_builder' => function (TaskRepository $repository) use ($options) {
+		    return $repository->getBikeTasksQuery($options["bike"]->getId(), $options["model"]->getId());
 				}
 		] )->add ( 'cost', NumberType::class, [ 
 				'label' => false,
