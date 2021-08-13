@@ -36,6 +36,8 @@ Encore
     //Maintenance
     .addEntry('js/maintenance/new', './assets/js/maintenance/new.js')
 
+    //Bike
+    .addEntry('js/bike/new', './assets/js/bike/new.js')
 
     //Styles
     .addStyleEntry('css/app', ['./assets/scss/app.scss'])
