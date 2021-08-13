@@ -539,7 +539,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals
             $priceAccu += $r->getPrice();
         }
         $avgCons = $nValid > 0 ? ($consAccu / $nValid) : 0;
-        $range = ($this->fuelTankSize / $avgCons) * 100;
+        $range = $avgCons > 0 ? (($this->fuelTankSize / $avgCons) * 100) : 0;
         return [
             "numberOfRefuelings" => $n,
             "totalFuelQuantity" => $fuelAccu,
