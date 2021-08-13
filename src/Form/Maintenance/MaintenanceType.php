@@ -56,7 +56,6 @@ class MaintenanceType extends AbstractType {
 				'label' => 'label.date',
 				'widget' => 'single_text',
 				'format' => 'dd. MM. yyyy',
-
 				// prevents rendering it as type="date", to avoid HTML5 date pickers
 				'html5' => false
 		] )->add ( 'odometer', NumberType::class, [ 

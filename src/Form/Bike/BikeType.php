@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Entity\Bike\CreateBikeCommand;
 use App\Entity\Model\Model;
+use App\Form\Type\DateTimePickerType;
 use Symfony\Component\Validator\Constraints\File;
 
 class BikeType extends AbstractType {
@@ -27,6 +28,12 @@ class BikeType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$builder->add ( 'nickname', TextType::class, [ 
 				'label' => 'label.nickname'
+		] )->add ( 'purchaseDate', DateTimePickerType::class, [
+		    'label' => 'label.PurchaseDate',
+		    'widget' => 'single_text',
+		    'format' => 'dd. MM. yyyy',
+		    // prevents rendering it as type="date", to avoid HTML5 date pickers
+		    'html5' => false
 		] )->add ( 'vin', TextType::class, [ 
 				'label' => 'label.vin'
 		] )->add ( 'purchasePrice', TextType::class, [ 
