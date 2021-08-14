@@ -12,6 +12,8 @@ class CreateRefuelingCommand
 	public $isTankFull;
 	public $isNotBreakingContinuum;
 	public $comment;
+	public $latitude;
+	public $longitude;
 	
 	public function __get($name) {
 		return $this->$name;

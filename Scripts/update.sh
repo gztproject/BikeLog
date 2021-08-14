@@ -15,7 +15,7 @@ cd ..
 # Pull master branch
 if [[ -n $VER ]];
 then
-    git pull origin master
+    git pull
     git checkout tags/$VER
 else
     echo "No version provided via the -v argument"
