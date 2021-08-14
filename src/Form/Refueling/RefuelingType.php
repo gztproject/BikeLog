@@ -16,6 +16,7 @@ use App\Entity\Refueling\CreateRefuelingCommand;
 use Symfony\Component\Validator\Constraints\File;
 use App\Repository\Bike\BikeRepository;
 use App\Entity\User\User;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class RefuelingType extends AbstractType {
 	/**
@@ -62,6 +63,10 @@ class RefuelingType extends AbstractType {
 		] )->add ( 'isNotBreakingContinuum', CheckboxType::class, [ 
 				'label' => 'label.isNotBreakingContinuum',
 				'required' => false
+		] )->add ( 'longitude', HiddenType::class, [		    
+		    'required' => false
+		] )->add ( 'latitude', HiddenType::class, [
+		    'required' => false
 		] )->add ( 'save', SubmitType::class );
 	}
 	public function configureOptions(OptionsResolver $resolver) {

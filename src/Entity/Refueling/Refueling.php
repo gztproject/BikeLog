@@ -53,6 +53,18 @@ class Refueling extends AggregateBaseWithComment {
 	 * @ORM\Column(type="boolean")
 	 */
 	private $isTankFull;
+	
+	/**
+	 *
+	 * @ORM\Column(type="decimal", precision=9, scale=6)
+	 */
+	private $latitude;
+	
+	/**
+	 * 
+	 * @ORM\Column(type="decimal", precision=9, scale=6)
+	 */
+	private $longitude;
 
 	/**
 	 *
@@ -75,6 +87,8 @@ class Refueling extends AggregateBaseWithComment {
 		$this->odometer = $c->odometer;
 		$this->price = $c->price;
 		$this->previousRefueling = $c->isNotBreakingContinuum ? $previousRefueling : null;
+		$this->latitude = $c->latitude;
+		$this->longitude = $c->longitude;
 	}
 
 	/**
@@ -220,6 +234,14 @@ class Refueling extends AggregateBaseWithComment {
 		if (! $this->isValid ())
 			return null;
 		return ($this->getBike()->getFuelTankSize() / $this->getConsumption()) * 100.00;
+	}
+	
+	public function getLatitude(): ?float{
+	    return $this->latitude;
+	}
+	
+	public function getLongitude(): ?float{
+	    return $this->longitude;
 	}
 
 	/**
