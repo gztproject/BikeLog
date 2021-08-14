@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception;
 use App\Entity\User\User;
 use Shivas\VersioningBundle\Service\VersionManagerInterface;
@@ -42,12 +43,18 @@ class UpdateController extends AbstractController
         $user = $this->getUser();
         if(!$user->getIsRoleAdmin())
             throw new AccessDeniedHttpException();
-            
-            $currentVersion = $manager->getVersion();
-            
-            $url = $request->query->get('url');
-            
-            return $this->json(['url' => $url]);
+                        
+        $version = $request->query->get('version');
+        $matches = [];
+        preg_match('/^(\d+)\.(\d+)\.(\d+)/', $version, $matches);
+        
+        $version = $matches[0];
+        $maj = $matches[1];
+        $min = $matches[2];
+        $rev = $matches[3];
+        
+        $out = shell_exec("./../Scripts/update.sh -v $version");
+        return $this->json(['result' => $out]);
     }
     
 }
