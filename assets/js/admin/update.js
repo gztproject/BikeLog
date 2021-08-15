@@ -13,10 +13,8 @@ $('#btn-do-update').on('click', function (event) {
     $version = $('#btn-do-update').attr('data-version');
     $.get("update/do?version=" + $version, function (data) {
         $('.modal-body').html = data.response;
+        CheckUpdates();
     });
-
-    CheckUpdates();
-
 });
 
 function CheckUpdates() {

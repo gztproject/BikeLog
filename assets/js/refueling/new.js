@@ -4,10 +4,11 @@ import moment from 'moment';
 $(function () {
     // Datetime picker initialization.
     // See http://eonasdan.github.io/bootstrap-datetimepicker/
-    $('#refueling_datetime').datetimepicker({
+    $('#datetimepicker1').datetimepicker({
         locale: 'sl',
         format: 'dd. mm. yyyy',
-        icons: {
+        icons:
+        {
             time: "fa fa-clock",
             date: "fa fa-calendar",
             up: "fa fa-arrow-up",
@@ -19,6 +20,7 @@ $(function () {
             close: "fa fa-times"
         }
     });
+
 });
 
 
@@ -37,7 +39,7 @@ function setPosition(position) {
 
 jQuery(document).ready(function () {
 
-    $('#refueling_datetime').data("DateTimePicker").date(moment());
+    $('#datetimepicker1').data("DateTimePicker").date(moment());
 
     getLocation();
 

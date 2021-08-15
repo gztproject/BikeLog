@@ -37,8 +37,6 @@ class RefuelingType extends AbstractType {
 				'label' => 'label.datetime',
 				'widget' => 'single_text',
 				'format' => 'dd. MM. yyyy',
-
-				// prevents rendering it as type="date", to avoid HTML5 date pickers
 				'html5' => false
 		] )->add ( 'odometer', NumberType::class, [ 
 				'label' => 'label.odometer'

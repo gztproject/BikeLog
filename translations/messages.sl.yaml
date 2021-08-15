@@ -14,6 +14,9 @@ title:
   refueling: Točenje
   maintenance: Servisi
   workshop: Delavnica
+  update: Posodobitve
+  updater: Posodabljanje
+  serviceIntervals: Servisni intervali
   
 
 label:
@@ -79,6 +82,10 @@ label:
   years: let
   months: mesecev
   days: dni
+  location: Lokacija
+  cancel: Prekliči
+  do-update: Posodobi
+  description: Opis
 
 
 action:
@@ -98,6 +105,8 @@ action:
   cancel: Prekliči
   back_to_list: Nazaj na seznam
   edit_contents: Uredi vsebino
+  update:
+    check: Preveri posodobitve
   
 body:
   delete:
@@ -115,6 +124,7 @@ menu:
   users: Uporabniki
   bikes: Motorji
   workshops: Delavnice
+  updater: Posodobitve
 
 help:
  login: Prijava
