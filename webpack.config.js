@@ -41,8 +41,6 @@ Encore
 
     //Styles
     .addStyleEntry('css/app', ['./assets/scss/app.scss'])
-    .addStyleEntry('css/copyleft', ['./assets/css/copyleft.css'])
-    .addStyleEntry('css/dashboard', ['./assets/scss/dashboard.scss'])
     .addStyleEntry('css/admin', ['./assets/scss/admin.scss'])
     .addStyleEntry('css/maintenance', ['./assets/scss/maintenance.scss'])
 

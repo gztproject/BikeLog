@@ -82,11 +82,16 @@ class MaintenanceTask extends AggregateBaseWithComment {
 		return $this->task;
 	}
 	
+	public function getDescription(): string
+	{
+	    return $this->getTask()->getDescription();
+	}
+	
 	/**
 	 *
 	 * @return float
 	 */
 	public function getCost(): float {
 		return $this->cost;
-	}
+	}	
 }

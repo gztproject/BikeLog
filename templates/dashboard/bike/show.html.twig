@@ -3,36 +3,73 @@
 {% block body_id 'bike_show' %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('css/maintenance') }}
+{{ parent() }}
+{{ encore_entry_link_tags('css/maintenance') }}
 {% endblock %}
 
 {% block main %}
-<h1>
-	{{ bike.name }}
-</h1>
-<div class="col-12">
-	<img src="{{ asset(bike.pictureFilename) }}"
-		style="width: 80rem; height: 20rem; object-fit: cover;"
-		alt="Bike picture" width="100%">
+<div class="row">
+	<h1>
+		{{ bike.name }}
+	</h1>
 </div>
-<h1>
-	{{ 'title.maintenance'|trans }}
-</h1>
-<div class="bs-component">
-	{{ include('dashboard/serviceInterval/_table.html.twig', {
+<div class="row">
+	<div class="col-sm-12">
+		<img src="{{ asset(bike.pictureFilename) }}"
+			style="height: 20rem; object-fit: cover;" class="img-fluid"
+			alt="Bike picture" width="100%">
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<h1>
+			{{ 'title.serviceIntervals'|trans }}
+		</h1>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<div class="bs-component">
+			{{ include('dashboard/serviceInterval/_table.html.twig', {
                 bike : bike       
             }, with_context = false) }}
+		</div>
+	</div>
 </div>
-<h1>
-	{{ 'title.refueling'|trans }}
-</h1>
-<div class="bs-component">
-	{{ include('dashboard/refueling/_table.html.twig', {
+<div class="row">
+	<div class="col-sm-12">
+		<h1>
+			{{ 'title.refueling'|trans }}
+		</h1>
+
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<div class="bs-component">
+			{{ include('dashboard/refueling/_table.html.twig', {
                 bike : bike,
                 refuelings : refuelings        
+            }, with_context = false) }}			
+		</div>
+	</div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <h1>
+            {{ 'title.maintenance'|trans }}
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="bs-component">
+            {{ include('dashboard/maintenance/_table.html.twig', {
+                bike : bike,
+                maintenances : maintenances       
             }, with_context = false) }}
-	{{ knp_pagination_render(refuelings) }}
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -42,9 +79,9 @@
 <a href="{{ path('refueling_new_id', { 'id': bike.id } ) }}"
 	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
 	aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
-</a> 
+</a>
 <a href="{{ path('maintenance_new_id', { 'id': bike.id }) }}"
-    class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-    aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
+	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
+	aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
 </a>
 {% endblock %}

@@ -16,8 +16,11 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "@mdi/font": "^5.9.55",
+        "@mdi/js": "^5.9.55",
         "eonasdan-bootstrap-datetimepicker": "^4.17.47",
         "jquery": "^3.5.1",
+        "material-design-icons": "^3.0.1",
         "moment": "^2.27.0",
         "node-sass": "^4.14.1",
         "popper": "^1.0.1",

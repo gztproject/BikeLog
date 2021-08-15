@@ -27,7 +27,7 @@ class MaintenanceTaskType extends AbstractType {
 				'choice_label' => 'name',
 				'expanded' => false,
 				'multiple' => false,
-				'label' => 'label.task',
+				'label' => false,
 		    'query_builder' => function (TaskRepository $repository) use ($options) {
 		    return $repository->getBikeTasksQuery($options["bike"]->getId(), $options["model"]->getId());
 				}

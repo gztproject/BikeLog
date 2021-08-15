@@ -1,1 +1,101 @@
-{{ form(form) }}
+{{ form_start(form, {'attr': {'class': 'bs-component'}}) }}
+
+<div class="row">
+	<div class="col-sm-4">
+		<div class="form-group">
+			{{ form_label(form.datetime, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
+			<div class='input-group date' id='datetimepicker1'>
+				{{ form_widget(form.datetime, {'attr': {'class': 'form-control'}}) }}
+				<div class="input-group-append input-group-addon">
+					<span class="input-group-text mdi mdi-calendar"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-4">
+		<div class="form-group">
+			{{ form_label(form.odometer, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
+			<div class='input-group'>
+				<div class="input-group-prepend">
+					<span class="input-group-text mdi mdi-map-marker-distance"></span>
+				</div>
+				{{ form_widget(form.odometer, {'attr': {'class': 'form-control'}}) }}
+				<div class="input-group-append">
+					<span class="input-group-text">km</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-4">
+		<div class="form-group">
+			{{ form_label(form.fuelQuantity, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
+			<div class='input-group'>
+				<div class="input-group-prepend">
+					<span class="input-group-text mdi mdi-gas-station"></span>
+				</div>
+				{{ form_widget(form.fuelQuantity, {'attr': {'class': 'form-control'}}) }}
+				<div class="input-group-append">
+					<span class="input-group-text">l</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+
+	<div class="col-sm-4">
+		<div class="form-group" id='DatePicker'>
+			{{ form_label(form.price, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
+			<div class='input-group'>
+				<div class="input-group-prepend">
+					<span class="input-group-text mdi mdi-circle-multiple"></span>
+				</div>
+				{{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+				<div class="input-group-append">
+					<span class="input-group-text">€</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-4">
+		<div class="form-group">
+			{{ form_label(form.bike, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
+			<div class='input-group'>
+				<div class="input-group-prepend">
+					<span class="input-group-text mdi mdi-motorbike"></span>
+				</div>
+				{{ form_widget(form.bike, {'attr': {'class': 'form-control'}}) }}
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-sm-2">
+        <div class="form-group">
+            {{ form_label(form.isTankFull, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
+            <div class='input-group'>
+                {{ form_widget(form.isTankFull, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-sm-2">
+        <div class="form-group">
+            {{ form_label(form.isNotBreakingContinuum, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
+            <div class='input-group'>
+                {{ form_widget(form.isNotBreakingContinuum, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    </div>
+	
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<button type="submit" class="btn btn-primary">
+			<i class="fa fa-save" aria-hidden="true"></i>
+			{{ button_label|default('label.create.refueling'|trans) }}
+		</button>
+	</div>
+</div>
+{{ form_row(form._token) }}
+{{ form_end(form, {'render_rest': false}) }}

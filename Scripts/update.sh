@@ -15,6 +15,7 @@ cd ..
 # Pull master branch
 if [[ -n $VER ]];
 then
+    git reset --hard
     git pull
     git checkout tags/$VER
 else

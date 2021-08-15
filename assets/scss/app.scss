@@ -2,6 +2,16 @@
 
 // the ~ allows you to reference things in node_modules
 @import "~bootstrap/scss/bootstrap";
+@import "~@mdi/font/css/materialdesignicons.min.css";
+@import "~@mdi/font/scss/materialdesignicons";
+
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+@import '~@fortawesome/fontawesome-free/scss/regular';
+@import '~@fortawesome/fontawesome-free/scss/solid';
+@import '~@fortawesome/fontawesome-free/scss/brands';
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
+
+@import '~eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css';
 
 // setting the value of this variable to an empty data URL is the only working solution
 // to load the Bootswatch web fonts locally and avoid loading them from Google servers
