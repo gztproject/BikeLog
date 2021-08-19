@@ -16,7 +16,7 @@ cd ..
 if [[ -n $VER ]];
 then
     git reset --hard
-    git pull
+    git pull origin master
     git checkout tags/$VER
 else
     echo "No version provided via the -v argument"

@@ -56,13 +56,13 @@ class Refueling extends AggregateBaseWithComment {
 	
 	/**
 	 *
-	 * @ORM\Column(type="decimal", precision=9, scale=6)
+	 * @ORM\Column(type="decimal", precision=9, scale=6, nullable=true)
 	 */
 	private $latitude;
 	
 	/**
 	 * 
-	 * @ORM\Column(type="decimal", precision=9, scale=6)
+	 * @ORM\Column(type="decimal", precision=9, scale=6, nullable=true)
 	 */
 	private $longitude;
 
