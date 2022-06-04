@@ -44,3 +44,15 @@
 </div>
 
 {% endblock %}
+
+{% block sidebar %}
+
+{{ parent() }}
+<a
+    href="{{  path('addWorkshopUser', { 'id': workshop.id }) }}"
+    class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
+    aria-hidden="true"></i> {{ 'action.add.user'|trans }}
+</a>
+
+
+{% endblock %}

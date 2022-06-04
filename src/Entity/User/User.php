@@ -200,7 +200,7 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 					$to->$name = $this->$name;
 				}
 			}
-			$to->isRoleAdmin = $this->getIsRoleAdmin ();
+			$to->isRoleAdmin = $this->isAdmin();
 			$to->password = "";
 		} else {
 			throw (new \Exception ( 'Can\'t map ' . get_class ( $this ) . ' to ' . get_class ( $to ) ));
@@ -307,7 +307,7 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	public function isEnabled() {
 		return $this->isActive;
 	}
-	public function getIsRoleAdmin(): bool {
+	public function isAdmin(): bool {
 		return in_array ( 'ROLE_ADMIN', $this->getRoles () );
 	}
 	public function __toString(): string {

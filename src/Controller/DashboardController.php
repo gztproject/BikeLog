@@ -13,8 +13,8 @@ class DashboardController extends AbstractController
      * @Route("/dashboard", methods={"GET"}, name="dashboard_index")
      */
 	public function index(): Response
-    {  
-    	return $this->render ( 'dashboard/index.html.twig');
+    {          
+        return $this->render ( 'dashboard/index.html.twig');
     }    
     
 }

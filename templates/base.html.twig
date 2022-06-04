@@ -40,35 +40,35 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 						<li class="nav-item active"><a class="nav-link"
 							href="{{ path('dashboard_index') }}"> <i class="fa fa-home"
 								aria-hidden="true"></i> {{ 'menu.home'|trans }}</a></li>
-						{% if bikes.getList is not empty %}
+						{% if bikesDropDown.getList is not empty %}
 						<li class="nav-item dropdown"><a
 							class="nav-link dropdown-toggle" data-toggle="dropdown"
 							href="{{ path('dashboard_index') }}"> <i class="fa fa-lock"
 								aria-hidden="true"></i> {{ 'menu.bikes'|trans }}
 						</a>
 							<div class="dropdown-menu" aria-labelledby="admin">
-								{% for bike in bikes.getList %}
+								{% for bike in bikesDropDown.getList %}
 								<a class="dropdown-item"
 									href={{ path('bike_show', { 'id': bike.id } )}}>{{ bike.name }}</a>
 								{% endfor %}
 							</div></li>
 						{% endif %}
-						{% if workshops.getList is not empty or workshops.getMyList is not empty%}
+						{% if workshopsDropDown.getList is not empty or workshopsDropDown.getMyList is not empty%}
 						<li class="nav-item dropdown"><a
 							class="nav-link dropdown-toggle" data-toggle="dropdown"
 							href="{{ path('dashboard_index') }}"> <i class="fa fa-lock"
 								aria-hidden="true"></i> {{ 'menu.workshops'|trans }}
 						</a>
 							<div class="dropdown-menu" aria-labelledby="workshops">
-								{% if workshops.getMyList is not empty%}
+								{% if workshopsDropDown.getMyList is not empty%}
 								<a class="dropdown-item disabled"><b>{{ 'label.workshop.mine'|trans }}</b></a>
-								{% for workshop in workshops.getMyList %}
+								{% for workshop in workshopsDropDown.getMyList %}
 								<a class="dropdown-item"
 									href={{ path('workshop_show', { 'id': workshop.id } )}}><b>{{ workshop.name }}</b></a>
 								{% endfor %}
 								<div class="dropdown-divider"></div>
 								{% endif %}
-								{% for workshop in workshops.getList %}
+								{% for workshop in workshopsDropDown.getList %}
 								<a class="dropdown-item"
 									href={{ path('workshop_show', { 'id': workshop.id } )}}>{{ workshop.name }}</a>
 								{% endfor %}
@@ -129,7 +129,7 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 								aria-hidden="true"></i> {{ app.request.locale }}
 						</a>
 							<div class="dropdown-menu" aria-labelledby="locales">
-								{% for locale in locales|split('|') %}
+								{% for locale in localesDropDown|split('|') %}
 								<a class="dropdown-item" {% if app.request.locale == locale %}
 									aria-checked="true" {% else %} aria-checked="false" {% endif %}
 									href="{{ path(app.request.get('_route', 'dashboard_index'), app.request.get('_route_params', [])|merge({_locale: locale})) }}">{{ locale|locale_name|capitalize }}</a>
