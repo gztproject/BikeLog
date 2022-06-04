@@ -28,10 +28,11 @@ class RefuelingQueryController extends AbstractController {
 			if ($bike->getOwner () != $this->getUser ())
 				throw new SecurityError ( "Bikes can only be shown to their owners." );
 		}
+				
+		$myRefuelings = $refuelings->getFilteredQuery ( $dateFrom, $dateTo, $bikeId, $this->getUser () );
+		
 
-		$queryBuilder = $refuelings->getFilteredQuery ( $dateFrom, $dateTo, $bikeId, $this->getUser () );
-
-		$pagination = $paginator->paginate ( $queryBuilder, $request->query->getInt ( 'page', 1 ), 10 );
+		$pagination = $paginator->paginate ( $myRefuelings, $request->query->getInt ( 'page', 1 ), 10 );
 		return $this->render ( 'dashboard/refueling/index.html.twig', [ 
 				'refuelings' => $pagination,
 				'bike' => $bike

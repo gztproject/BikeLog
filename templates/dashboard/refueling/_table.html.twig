@@ -34,12 +34,12 @@
 				<td>{{ refueling.distance|number_format }} km</td>
 				<td>{{ refueling.fuelQuantity|number_format(2) }} l</td>
 				<td>{{ refueling.price|number_format(2) }} €</td>
-				<td class={% if refueling.consumption < bike.averageConsumption %}
+				<td class={% if bike == null %}"table-primary"{% elseif refueling.consumption < bike.averageConsumption %}
 					"table-success"{% elseif refueling.consumption > bike.averageConsumption%}"table-danger"{% endif %}>{{ refueling.consumption|number_format(2) }}
 					l/100km</td>
-				<td class={% if refueling.range > bike.averageRange %}
+				<td class={% if bike == null %}"table-primary"{% elseif refueling.range > bike.averageRange %}
                     "table-success"{% elseif refueling.range < bike.averageRange%}"table-danger"{% endif %}>{{ refueling.range|number_format(2) }} km</td>
-				<td><a href="https://maps.google.com/?q={{ refueling.latitude }},{{ refueling.longitude }}" target="blank">{{ refueling.latitude }}, {{ refueling.longitude }}</a></td>
+				<td><a href="https://www.openstreetmap.org/#map=19/{{ refueling.latitude }}/{{ refueling.longitude }}" target="blank">{{ refueling.latitude }}, {{ refueling.longitude }}</a></td>
 				<td>{{ refueling.comment }}</td>
 			</tr>
 			{% else %}

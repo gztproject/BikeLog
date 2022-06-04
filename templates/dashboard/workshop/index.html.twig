@@ -1,0 +1,23 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'workshops_index' %}
+
+{% block main %}
+<h1>
+	{{ 'title.workshops'|trans }}
+</h1>
+<div class="bs-component">
+	{{ include('dashboard/workshop/_table.html.twig', {
+                workshops : workshops,
+                area : area,
+             }, with_context = false) }}
+</div>
+{{ knp_pagination_render(workshops) }}
+{% endblock %}
+
+{% block sidebar %}
+
+{{ parent() }}
+
+
+{% endblock %}

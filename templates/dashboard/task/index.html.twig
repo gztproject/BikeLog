@@ -1,0 +1,23 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'tasks_index' %}
+
+{% block main %}
+<h1>
+	{{ 'title.tasks'|trans }}
+</h1>
+<div class="bs-component">
+	{{ include('dashboard/task/_table.html.twig', {
+                tasksDto : tasksDto,
+                area : area,
+             }, with_context = false) }}
+</div>
+{{ knp_pagination_render(tasksDto) }}
+{% endblock %}
+
+{% block sidebar %}
+
+{{ parent() }}
+
+
+{% endblock %}

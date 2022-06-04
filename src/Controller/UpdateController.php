@@ -14,10 +14,7 @@ class UpdateController extends AbstractController
      * @Route("/admin/update", methods={"GET"}, name="admin_update")
      */
     public function index()
-    {   
-        $user = $this->getUser();
-        if(!$user->getIsRoleAdmin())
-            throw new AccessDeniedHttpException(); 
+    {           
         return $this->render('admin/update.html.twig');
     }
     
@@ -25,10 +22,7 @@ class UpdateController extends AbstractController
      * @Route("/admin/update/check", methods={"GET"}, name="admin_update_check")
      */
     public function checkForUpdates(VersionManagerInterface $manager)
-    {
-        $user = $this->getUser();
-        if(!$user->getIsRoleAdmin())
-            throw new AccessDeniedHttpException();
+    {  
         
         $currentVersion = $manager->getVersion();
         
@@ -40,10 +34,6 @@ class UpdateController extends AbstractController
      */
     public function doUpdate(Request $request, VersionManagerInterface $manager)
     {
-        $user = $this->getUser();
-        if(!$user->getIsRoleAdmin())
-            throw new AccessDeniedHttpException();
-                        
         $version = $request->query->get('version');
         $matches = [];
         preg_match('/^(\d+)\.(\d+)\.(\d+)/', $version, $matches);
