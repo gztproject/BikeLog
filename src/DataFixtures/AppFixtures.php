@@ -26,7 +26,7 @@ class AppFixtures extends Fixture {
 	 * {@inheritdoc}
 	 * @see \Doctrine\Common\DataFixtures\FixtureInterface::load()
 	 */
-	public function load(ObjectManager $manager) {
+	public function load(ObjectManager $manager): void {
 		$usersInitilizer = new UsersInitializer ( $manager, "/InitData/users.tsv", $this->passwordEncoder, $this->loggerInterface );
 		$migrator = $usersInitilizer->createDbMigrator ();
 		$users = $usersInitilizer->generate ( $migrator );
