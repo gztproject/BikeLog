@@ -29,7 +29,6 @@ public/uploads/models/
 src/DataFixtures/InitData/*-dev.tsv
 
 ###> symfony/phpunit-bridge ###
-.phpunit
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
