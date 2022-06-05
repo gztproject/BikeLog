@@ -5,6 +5,9 @@
 		"php": "~7.4||~8.0",
 		"ext-ctype": "*",
 		"ext-iconv": "*",
+		"doctrine/doctrine-bundle": "^2.6",
+		"doctrine/doctrine-migrations-bundle": "^3.2",
+		"doctrine/orm": "^2.12",
 		"knplabs/knp-paginator-bundle": "~5.4",
 		"moment/moment": "~2.29",
 		"ramsey/uuid": "~4.1",
@@ -22,24 +25,31 @@
 		"symfony/mailer": "~5.2",
 		"symfony/mime": "~5.2",
 		"symfony/monolog-bundle": "^3.7",
-		"symfony/orm-pack": "~2.1",
+		"symfony/proxy-manager-bridge": "~5.2",
 		"symfony/security-bundle": "~5.2",
 		"symfony/security-core": "~5.2",
 		"symfony/security-csrf": "~5.2",
 		"symfony/security-guard": "~5.2",
 		"symfony/security-http": "~5.2",
 		"symfony/translation": "~5.2",
-		"symfony/twig-pack": "~1.0",
+		"symfony/twig-bundle": "~5.2",
 		"symfony/validator": "~5.2",
 		"symfony/webpack-encore-bundle": "~1.11",
 		"symfony/yaml": "~5.2",
-		"twig/intl-extra": "~3.3"
+		"twig/extra-bundle": "^2.12|^3.0",
+		"twig/intl-extra": "~3.3",
+		"twig/twig": "^2.12|^3.0"
 	},
 	"config" : {
 		"preferred-install" : {
 			"*" : "dist"
 		},
-		"sort-packages" : true
+		"sort-packages" : true,
+		"allow-plugins": {
+			"composer/installers": true,
+			"oomphinc/composer-installers-extender": true,
+			"symfony/flex": true
+		}
 	},
 	"autoload" : {
 		"psr-4" : {
@@ -72,15 +82,13 @@
 	"name" : "gztproject/bike-log",
 	"require-dev" : {
 		"doctrine/doctrine-fixtures-bundle": "~3.4",
+		"phpunit/phpunit": "^9.5",
 		"symfony/browser-kit": "~5.2",
 		"symfony/css-selector": "~5.2",
 		"symfony/debug-bundle": "~5.2",
-		"symfony/debug-pack": "~1.0",
 		"symfony/maker-bundle": "^1.33",
 		"symfony/phpunit-bridge": "~5.2",
-		"symfony/profiler-pack": "~1.0",
 		"symfony/stopwatch": "~5.2",
-		"symfony/test-pack": "~1.0",
 		"symfony/web-profiler-bundle": "~5.2"
 	},
 	"support" : {
