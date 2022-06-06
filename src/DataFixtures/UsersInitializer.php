@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User\User;
 use Doctrine\ORM\EntityNotFoundException;
 use App\Entity\User\CreateUserCommand;
@@ -11,9 +11,9 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ORM\Mapping\Driver\DatabaseDriver;
 
 class UsersInitializer implements IEntityInitializer {
-	private $manager;
-	private $path;
-	private $encoder;
+    private ObjectManager $manager;
+	private string $path;
+	private UserPasswordHasherInterface $hasher;
 	private $loggerInterface;
 
 	/**
@@ -26,11 +26,11 @@ class UsersInitializer implements IEntityInitializer {
 	 * @param UserPasswordEncoderInterface $encoder
 	 *        	User password encoder
 	 */
-	public function __construct(ObjectManager $manager, string $path, UserPasswordEncoderInterface $encoder, LoggerInterface $loggerInterface) {
+	public function __construct(ObjectManager $manager, string $path, UserPasswordHasherInterface $hasher, LoggerInterface $loggerInterface) {
 		$this->manager = $manager;
 		$devpath = __DIR__ . str_replace(".tsv", "-dev.tsv", $path);
 		$this->path = file_exists($devpath)?$devpath:__DIR__ . $path;
-		$this->encoder = $encoder;
+		$this->hasher = $hasher;
 		$this->loggerInterface = $loggerInterface;
 	}
 
@@ -58,7 +58,7 @@ class UsersInitializer implements IEntityInitializer {
 
 			$cuc->password = $row ["Password"];
 
-			$user = new User ( $cuc, $migrator, $this->encoder );
+			$user = new User ( $cuc, $migrator, $this->hasher );
 
 			$this->manager->persist ( $user );
 			array_push ( $users, $user );
@@ -66,6 +66,7 @@ class UsersInitializer implements IEntityInitializer {
 		}
 		return $users;
 	}
+	
 	public function createDbMigrator(): User {
 		$sql = "INSERT INTO `app_users` (`id`, `created_by_id`, `username`, `first_name`, `last_name`, `password`, `roles`, `email`, `mobile`, `is_active`, `created_on`, `profile_picture_filename`)
 				VALUES ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000','DbMigrator','Database','Migrator','','','','',0, '" . date ( 'Y-m-d H:i:s' ) . "', '')";

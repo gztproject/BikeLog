@@ -6,8 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\Base\AggregateBase;
 use App\Entity\Workshop\CreateWorkshopCommand;
 use App\Entity\Workshop\Workshop;
@@ -35,7 +36,7 @@ use App\Entity\Part\Part;
  * @ORM\Table(name="app_users")
  * @ORM\Entity(repositoryClass="App\Repository\User\UserRepository")
  */
-class User extends AggregateBase implements UserInterface, \Serializable {
+class User extends AggregateBase implements UserInterface, PasswordAuthenticatedUserInterface {
 	/**
 	 *
 	 * @ORM\Column(type="string", length=255)
@@ -120,7 +121,7 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 * @param UserPasswordEncoderInterface $passwordEncoder
 	 * @return \App\Entity\User\User
 	 */
-	public function __construct(CreateUserCommand $c, User $user, UserPasswordEncoderInterface $passwordEncoder) {
+	public function __construct(CreateUserCommand $c, User $user, UserPasswordHasherInterface $passwordHasher) {
 		parent::__construct ( $user );
 
 		$this->username = $c->username;
@@ -132,7 +133,7 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 		$this->isActive = true;
 
 		$this->checkPasswordRequirements ( $c->password );
-		$this->password = $passwordEncoder->encodePassword ( $this, $c->password );
+		$this->password = $passwordHasher->hashPassword ( $this, $c->password );
 
 		$this->roles = array (
 				$c->isRoleAdmin ? 'ROLE_ADMIN' : 'ROLE_USER'
@@ -146,7 +147,8 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 
 		return $this;
 	}
-	public function update(UpdateUserCommand $c, User $user, UserPasswordEncoderInterface $passwordEncoder) {
+	
+	public function update(UpdateUserCommand $c, User $user, UserPasswordHasherInterface $passwordHasher) {
 		parent::updateBase ( $user );
 		if ($c->username != null && $c->username != $this->username)
 			$this->username = $c->username;
@@ -163,8 +165,8 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 
 		if (strlen ( $c->password ) != 0) {
 			$this->checkPasswordRequirements ( $c->password );
-			if ($passwordEncoder->isPasswordValid ( $this, $c->oldPassword ))
-				$this->password = $passwordEncoder->encodePassword ( $this, $c->password );
+			if ($passwordHasher->isPasswordValid ( $this, $c->oldPassword ))
+			    $this->password = $passwordHasher->hashPassword ( $this, $c->password );
 			else
 				throw new \Exception ( "Old password is incorrect." );
 		}
@@ -221,8 +223,8 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 	 * @param UserPasswordEncoderInterface $passwordEncoder
 	 * @return User New user
 	 */
-	public function createUser(CreateUserCommand $c, UserPasswordEncoderInterface $passwordEncoder): User {
-		return new User ( $c, $this, $passwordEncoder );
+	public function createUser(CreateUserCommand $c, UserPasswordHasherInterface $passwordHasher): User {
+	    return new User ( $c, $this, $passwordHasher );
 	}
 
 	/**
@@ -343,34 +345,21 @@ class User extends AggregateBase implements UserInterface, \Serializable {
 
 	/*
 	 * ********************************************************************
-	 * Stuff needed by UserInterface and Serializable
+	 * Stuff needed by UserInterface
 	 * ********************************************************************
 	 */
-
-	/**
-	 *
-	 * @see \Serializable::serialize()
-	 */
-	public function serialize() {
-		return serialize ( array (
-				$this->id,
-				$this->username,
-				$this->password,
-				$this->isActive
-		) );
-	}
-
-	/**
-	 *
-	 * @see \Serializable::unserialize()
-	 */
-	public function unserialize($serialized) {
-		list ( $this->id, $this->username, $this->password, $this->isActive, ) = unserialize ( $serialized );
-	}
+	
 	public function eraseCredentials() {
 		return;
 	}
 	public function getSalt() {
 		return;
+	}
+	/**
+	 * Returns the identifier for this user (e.g. its username or email address).
+	 */
+	public function getUserIdentifier(): string
+	{
+	    return $this->username;
 	}
 }
