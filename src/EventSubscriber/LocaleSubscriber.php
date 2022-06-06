@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
 class LocaleSubscriber implements EventSubscriberInterface {
 	private $defaultLocale;
 	private $logger;
-	public function __construct($defaultLocale = 'en', LoggerInterface $logger) {
+	public function __construct(LoggerInterface $logger, $defaultLocale = 'en') {
 		$this->logger = $logger;
 		$this->defaultLocale = $defaultLocale;
 	}

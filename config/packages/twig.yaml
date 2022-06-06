@@ -1,8 +1,13 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+
     globals:
         localesDropDown: '%app_locales%'
         bikesDropDown: '@App\Service\BikeList'
         workshopsDropDown: '@App\Service\WorkshopList'
     form_themes:
                 - "bootstrap_3_layout.html.twig"
+
+when@test:
+    twig:
+        strict_variables: true

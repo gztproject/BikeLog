@@ -10,8 +10,7 @@ use App\Entity\User\User;
 abstract class AggregateBase extends Base
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Id()    
      * @ORM\Column(type="uuid")
      * @ORM\JoinColumn(nullable=false)
      */

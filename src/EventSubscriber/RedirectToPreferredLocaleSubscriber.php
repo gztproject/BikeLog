@@ -60,7 +60,7 @@ class RedirectToPreferredLocaleSubscriber implements EventSubscriberInterface {
 		$request = $event->getRequest ();
 
 		// Ignore sub-requests and all URLs but the homepage
-		if (! $event->isMasterRequest () || '/' !== $request->getPathInfo ()) {
+		if (! $event->isMainRequest () || '/' !== $request->getPathInfo ()) {
 			return;
 		}
 

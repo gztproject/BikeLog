@@ -4,11 +4,11 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;;
 use Psr\Log\LoggerInterface;
 
 class AppFixtures extends Fixture {
-	private $passwordEncoder;
+    private $passwordHasher;
 	private $loggerInterface;
 
 	/**
@@ -16,8 +16,8 @@ class AppFixtures extends Fixture {
 	 * @param UserPasswordEncoderInterface $encoder
 	 * @param LoggerInterface $loggerInterface
 	 */
-	public function __construct(UserPasswordEncoderInterface $encoder, LoggerInterface $loggerInterface) {
-		$this->passwordEncoder = $encoder;
+	public function __construct(UserPasswordHasherInterface $hasher, LoggerInterface $loggerInterface) {
+	    $this->passwordHasher = $hasher;
 		$this->loggerInterface = $loggerInterface;
 	}
 
@@ -27,7 +27,7 @@ class AppFixtures extends Fixture {
 	 * @see \Doctrine\Common\DataFixtures\FixtureInterface::load()
 	 */
 	public function load(ObjectManager $manager): void {
-		$usersInitilizer = new UsersInitializer ( $manager, "/InitData/users.tsv", $this->passwordEncoder, $this->loggerInterface );
+	    $usersInitilizer = new UsersInitializer ( $manager, "/InitData/users.tsv", $this->$passwordHasher, $this->loggerInterface );
 		$migrator = $usersInitilizer->createDbMigrator ();
 		$users = $usersInitilizer->generate ( $migrator );
 
