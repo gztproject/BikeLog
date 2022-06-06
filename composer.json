@@ -2,53 +2,55 @@
 	"type" : "project",
 	"license" : "MIT",
 	"require" : {
-		"php": "~7.4||~8.0",
-		"ext-ctype": "*",
-		"ext-iconv": "*",
-		"doctrine/doctrine-bundle": "^2.6",
-		"doctrine/doctrine-migrations-bundle": "^3.2",
-		"doctrine/orm": "^2.12",
-		"knplabs/knp-paginator-bundle": "~5.4",
-		"moment/moment": "~2.29",
-		"ramsey/uuid": "~4.1",
-		"ramsey/uuid-doctrine": "~1.6",
-		"sensio/framework-extra-bundle": "~6.1",
-		"shivas/versioning-bundle": "^4.0",
-		"symfony/console": "~5.2",
-		"symfony/dependency-injection": "~5.2",
-		"symfony/dotenv": "~5.2",
-		"symfony/flex": "~1.12",
-		"symfony/form": "~5.2",
-		"symfony/framework-bundle": "~5.2",
-		"symfony/http-foundation": "~5.2",
-		"symfony/intl": "~5.2",
-		"symfony/mailer": "~5.2",
-		"symfony/mime": "~5.2",
-		"symfony/monolog-bundle": "^3.7",
-		"symfony/proxy-manager-bridge": "~5.2",
-		"symfony/security-bundle": "~5.2",
-		"symfony/security-core": "~5.2",
-		"symfony/security-csrf": "~5.2",
-		"symfony/security-guard": "~5.2",
-		"symfony/security-http": "~5.2",
-		"symfony/translation": "~5.2",
-		"symfony/twig-bundle": "~5.2",
-		"symfony/validator": "~5.2",
-		"symfony/webpack-encore-bundle": "~1.11",
-		"symfony/yaml": "~5.2",
-		"twig/extra-bundle": "^2.12|^3.0",
-		"twig/intl-extra": "~3.3",
-		"twig/twig": "^2.12|^3.0"
+		"php" : "~8.1",
+		"ext-ctype" : "*",
+		"ext-iconv" : "*",
+		"doctrine/doctrine-bundle" : "~2.6",
+		"doctrine/doctrine-migrations-bundle" : "~3.2",
+		"doctrine/orm" : "~2.12",
+		"knplabs/knp-paginator-bundle" : "~5.8",
+		"moment/moment" : "~2.29",
+		"ramsey/uuid" : "~4.3",
+		"ramsey/uuid-doctrine" : "~1.8",
+		"sensio/framework-extra-bundle" : "~6.2",
+		"shivas/versioning-bundle" : "~4.0",
+		"symfony/console" : "~6.1",
+		"symfony/dependency-injection" : "~6.1",
+		"symfony/dotenv" : "~6.1",
+		"symfony/flex" : "~2.2",
+		"symfony/form" : "~6.1",
+		"symfony/framework-bundle" : "~6.1",
+		"symfony/http-foundation" : "~6.1",
+		"symfony/intl" : "~6.1",
+		"symfony/mailer" : "~6.1",
+		"symfony/mime" : "~6.1",
+		"symfony/monolog-bundle" : "~3.8",
+		"symfony/proxy-manager-bridge" : "~6.1",
+		"symfony/security-bundle" : "~6.1",
+		"symfony/security-core" : "~6.1",
+		"symfony/security-csrf" : "~6.1",
+		"symfony/security-http" : "~6.1",
+		"symfony/translation" : "~6.1",
+		"symfony/twig-bundle" : "~6.1",
+		"symfony/validator" : "~6.1",
+		"symfony/webpack-encore-bundle" : "~1.14",
+		"symfony/yaml" : "~6.1",
+		"twig/extra-bundle" : "~3.4",
+		"twig/intl-extra" : "~3.4",
+		"twig/twig" : "~3.4"
 	},
 	"config" : {
 		"preferred-install" : {
 			"*" : "dist"
 		},
+		"platform" : {
+			"php" : "8.1.6"
+		},
 		"sort-packages" : true,
-		"allow-plugins": {
-			"composer/installers": true,
-			"oomphinc/composer-installers-extender": true,
-			"symfony/flex": true
+		"allow-plugins" : {
+			"composer/installers" : true,
+			"oomphinc/composer-installers-extender" : true,
+			"symfony/flex" : true
 		}
 	},
 	"autoload" : {
@@ -71,25 +73,25 @@
 		"symfony/polyfill-php56" : "*"
 	},
 	"conflict" : {
-		"symfony/symfony" : "~5.2"
+		"symfony/symfony" : "~6.1"
 	},
 	"extra" : {
 		"symfony" : {
 			"allow-contrib" : false,
-			"require" : "~5.2"
+			"require" : "~6.1"
 		}
 	},
 	"name" : "gztproject/bike-log",
 	"require-dev" : {
-		"doctrine/doctrine-fixtures-bundle": "~3.4",
-		"phpunit/phpunit": "^9.5",
-		"symfony/browser-kit": "~5.2",
-		"symfony/css-selector": "~5.2",
-		"symfony/debug-bundle": "~5.2",
-		"symfony/maker-bundle": "^1.33",
-		"symfony/phpunit-bridge": "~5.2",
-		"symfony/stopwatch": "~5.2",
-		"symfony/web-profiler-bundle": "~5.2"
+		"doctrine/doctrine-fixtures-bundle" : "~3.4",
+		"phpunit/phpunit" : "~9.5",
+		"symfony/browser-kit" : "~6.1",
+		"symfony/css-selector" : "~6.1",
+		"symfony/debug-bundle" : "~6.1",
+		"symfony/maker-bundle" : "~1.43",
+		"symfony/phpunit-bridge" : "~6.1",
+		"symfony/stopwatch" : "~6.1",
+		"symfony/web-profiler-bundle" : "~6.1"
 	},
 	"support" : {
 		"email" : "gasper.doljak@gmail.com",
@@ -101,7 +103,7 @@
 	"homepage" : "https://github.com/gztproject/BikeLog",
 	"authors" : [{
 			"name" : "GaŠper Doljak",
-			"email" : "gasper.doljak@gmail.com",
+			"email" : "gasper@gzt.si",
 			"homepage" : "https://www.gzt.si",
 			"role" : "Author"
 		}
