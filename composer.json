@@ -13,7 +13,7 @@
 		"ramsey/uuid": "~4.3",
 		"ramsey/uuid-doctrine": "~1.8",
 		"sensio/framework-extra-bundle": "~6.2",
-		"shivas/versioning-bundle": "~4.0",
+		"shivas/versioning-bundle": "^4.0",
 		"symfony/console": "~6.1",
 		"symfony/dependency-injection": "~6.1",
 		"symfony/dotenv": "~6.1",
