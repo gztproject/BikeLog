@@ -21,6 +21,11 @@ class MaintenanceRepository extends ServiceEntityRepository
     	parent::__construct($registry, Maintenance::class);
     }
     
+    public function getAllMaintenances(User $user): QueryBuilder
+    {
+        return $this->getFilteredQuery(null, null, null, $user);
+    }
+    
     public function getFilteredQuery($from, $to, $bikeId, User $user, $order = "DESC"): QueryBuilder
     {
         $qb = $this

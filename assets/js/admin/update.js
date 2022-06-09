@@ -1,5 +1,5 @@
 // Handling the update modal.
-$('#btn-check-updates').on('click', function (event) {
+$('#btn-check-updates').on('click', function(event) {
     $confirm = $('#updateModal');
 
     $('.modal-body').html("Checking for updates...");
@@ -9,22 +9,22 @@ $('#btn-check-updates').on('click', function (event) {
 
 });
 
-$('#btn-do-update').on('click', function (event) {
+$('#btn-do-update').on('click', function(event) {
     $version = $('#btn-do-update').attr('data-version');
-    $.get("update/do?version=" + $version, function (data) {
+    $.get("update/do?version=" + $version, function(data) {
         $('.modal-body').html = data.response;
         CheckUpdates();
     });
 });
 
 function CheckUpdates() {
-    $.get('https://api.github.com/repos/gztproject/BikeLog/releases/latest', function (data) {
+    $.get('https://api.github.com/repos/gztproject/BikeLog/releases/latest', function(data) {
         $newVersion = data.tag_name;
         $newUrl = data.html_url;
         checkDone();
     });
 
-    $.get("update/check", function (data) {
+    $.get("update/check", function(data) {
         $currentVersion = data.current_version;
         checkDone();
     });
@@ -34,7 +34,13 @@ function CheckUpdates() {
             $('#currentA').html($currentVersion);
             $('#newA').html($newVersion);
             $('#newA').prop('href', $newUrl);
-            if (IsNewer($currentVersion, $newVersion)) {
+            if(isDev())
+            {
+                 $('#btn-do-update').attr('disabled', true);
+                 $('#btn-do-update').attr('data-toggle', "tooltip");
+                 $('#btn-do-update').attr('title', "Can\'t update in DEV env.");
+            }
+            else if (IsNewer($currentVersion, $newVersion)) {
                 $('#btn-do-update').attr('disabled', false);
                 $('#btn-do-update').attr('data-version', $newVersion);
             }
@@ -57,5 +63,18 @@ function IsNewer($current, $new) {
     else if ($newVer[2] > $curVer[2])
         return true;
 
+    return false;
+}
+
+function isDev() {
+    // Get class list string
+    var classList = $("header").attr("class");
+    //alert(classList);
+    // Creating class array by splitting class list string
+    var classArr = classList.split(/\s+/);
+    if(classArr.includes("dev"))
+    {
+        return true;
+    }
     return false;
 }

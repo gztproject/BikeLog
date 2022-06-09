@@ -13,9 +13,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\Bike\Bike;
 use App\Entity\Maintenance\CreateMaintenanceCommand;
 use App\Form\Maintenance\MaintenanceType;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class MaintenanceCommandController extends AbstractController {
 
+    /**
+     *
+     * @Route("/dashboard/maintenance/new", methods={"GET", "POST"}, name="maintenance_new")
+     */
+    public function new(Request $request): Response {
+        throw new BadRequestHttpException("Maintenance has to be on a specific bike.");
+    }
+    
 	/**
 	 *
 	 * @Route("/dashboard/maintenance/new/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}", methods={"GET", "POST"}, name="maintenance_new_id")
