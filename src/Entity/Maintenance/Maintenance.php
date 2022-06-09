@@ -173,23 +173,24 @@ class Maintenance extends AggregateBaseWithComment
     {
         $dscs = [];
         $description = "";
+        $tasks = $this->getMaintenanceTasks();
 
-        foreach ($this->getMaintenanceTasks() as $mt) {
+        foreach ($tasks as $mt) {
             array_push($dscs, $mt->getDescription());
         }
 
-        if ($maxLen > 3) {
+        if ($maxLen > 7) {
             if (count($dscs) < 2) {
                 $description = $dscs[0];
                 if (strlen($description) > $maxLen) {
-                    $description = "...";
+                    $description = "+ 1 ... ⌄";
                 }
             } else {
                 while (strlen(implode(", ", $dscs)) > $maxLen) {
                     array_pop($dscs);
-                }
-                array_push($dscs, "...");
+                }                
                 $description = implode(", ", $dscs);
+                $description .= " + ". count($tasks) - 1 ." ... ⌄";
             }
         } else
             $description = implode(", ", $dscs);

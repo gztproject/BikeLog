@@ -57,6 +57,7 @@ jQuery(document).ready(function() {
 
 
 function addMaintenanceTaskForm($collectionHolder, $addRemoveMaintenanceTaskButtons, $number) {
+    console.log("Adding new maintenance row.");
     for(var i=0; i<$number;i++){
         // Get the data-prototype explained earlier
         var prototype = $collectionHolder.data('prototype');
@@ -78,7 +79,7 @@ function addMaintenanceTaskForm($collectionHolder, $addRemoveMaintenanceTaskButt
         var $newFormLi = $('<tr class="maintenance-task-tr-' + index + '">'+
         '<td class="taskInput">' + $('#maintenance_maintenanceTaskCommands_' + index + '_task', newForm).parent().html() + '</td>'+
         '<td class="costInput" data-item-index="' + index + '">' + $('#maintenance_maintenanceTaskCommands_' + index + '_cost' ,newForm).parent().html() + '</td>'+        
-        '<td class="removeBtn"><a id="remove-invoice-item-'+ index +'" class="btn btn-sm btn-block btn-danger removeBtn"><i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>');        
+        '<td class="removeBtn"><a id="remove-maintenance-task-'+ index +'" class="btn btn-sm btn-block btn-danger removeBtn"><i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>');        
         
         $collectionHolder.append($newFormLi);
         $collectionHolder.append($addRemoveMaintenanceTaskButtons);
@@ -90,12 +91,12 @@ function addMaintenanceTaskForm($collectionHolder, $addRemoveMaintenanceTaskButt
 }
 
 function removeMaintenanceTaskForm($collectionHolder, index) {
+    console.log("Removing maintenance row #"+index+".");
     if(index < 1)
     {
         alert("Can't delete last item!");
         return;
     }
     $collectionHolder.data('index', index);
-    $('.maintenance-task-tr-' + index, $collectionHolder).remove()
-    
+    $('.maintenance-task-tr-' + index, $collectionHolder).remove();    
 }

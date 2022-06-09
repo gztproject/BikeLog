@@ -26,7 +26,9 @@
 			{% for m in maintenances %}
 			{% set midx = loop.index0 %}
 			<tr class="table-primary" data-toggle="collapse"
-				data-target=".maintenance-{{ midx }}" aria-expanded="false">
+				{% if m.maintenanceTasks.count > 1%}
+				data-target=".maintenance-{{ midx }}" aria-expanded="false"
+				{% endif %}>
 				<td>{{ m.dateString }}</td>
 				<td>{{ m.workshop.name }}</td>
 				<td>{{ m.odometer|number_format }} km</td>
@@ -50,7 +52,7 @@
 			{% endfor %}
 			{% else %}
 			<tr class="table-warning">
-				<td colspan="6" align="center">{{ 'label.noneFound.refuelings'|trans }}</td>
+				<td colspan="6" align="center">{{ 'label.noneFound.maintenances'|trans }}</td>
 			</tr>
 			{% endfor %}
 		</tbody>

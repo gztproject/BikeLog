@@ -1,27 +1,27 @@
 {% extends 'dashboard/layout.html.twig' %}
 
-{% block body_id 'refueling_index' %}
+{% block body_id 'maintenance_index' %}
 
 {% block main %}
 <h1>
-	{{ 'title.refueling'|trans }}
+	{{ 'title.maintenance'|trans }}
 </h1>
 <div class="bs-component">
-	{{ include('dashboard/refueling/_table.html.twig', {
-                refuelings : refuelings,
+	{{ include('dashboard/maintenance/_table.html.twig', {
+                maintenances : maintenances,
                 bike : bike ?? null
             }, with_context = false) }}
 </div>
-{{ knp_pagination_render(refuelings) }}
+{{ knp_pagination_render(maintenances) }}
 {% endblock %}
 
 {% block sidebar %}
 
 {{ parent() }}
 <a
-	href="{{  bike ? path('refueling_new_id', { 'id': bike.id }) : path('refueling_new') }}"
+	href="{{  bike ? path('maintenance_new_id', { 'id': bike.id }) : path('maintenance_new') }}"
 	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-	aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
+	aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
 </a>
 
 {{ include('common/filters/_dateBikeYearFilter.html.twig') }}
