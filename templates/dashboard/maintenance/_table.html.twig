@@ -25,7 +25,7 @@
 		<tbody>
 			{% for m in maintenances %}
 			{% set midx = loop.index0 %}
-			<tr class="table-primary" data-toggle="collapse"
+			<tr class="table-primary maintenance-main collapsed" data-toggle="collapse"
 				{% if m.maintenanceTasks.count > 1%}
 				data-target=".maintenance-{{ midx }}" aria-expanded="false"
 				{% endif %}>
@@ -33,7 +33,7 @@
 				<td>{{ m.workshop.name }}</td>
 				<td>{{ m.odometer|number_format }} km</td>
 				<td>{{ m.spentTime }} h</td>
-				<td>{{ m.description(30) }}</td>
+				<td>{{ m.description(30) }}{% if m.maintenanceTasks.count > 1 %}<i id="caret-{{ midx }}" class="arrow fa fa-caret-down" aria-hidden="true"></i>{% endif %}</td>
 				<td>{{ m.totalCost|number_format(2) }} €</td>
 				<td>{{ m.comment }}</td>
 			</tr>
@@ -58,3 +58,7 @@
 		</tbody>
 	</table>
 </div>
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('js/maintenance/table') }}  
+{% endblock %}

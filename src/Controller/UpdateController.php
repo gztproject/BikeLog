@@ -22,8 +22,7 @@ class UpdateController extends AbstractController
      * @Route("/admin/update/check", methods={"GET"}, name="admin_update_check")
      */
     public function checkForUpdates(VersionManagerInterface $manager)
-    {  
-        
+    {          
         $currentVersion = $manager->getVersion();
         
         return $this->json(['current_version' => $currentVersion]);
@@ -35,6 +34,7 @@ class UpdateController extends AbstractController
     public function doUpdate(Request $request, VersionManagerInterface $manager)
     {
         $version = $request->query->get('version');
+        $matches = [];
         preg_match('/^(\d+)\.(\d+)\.(\d+)/', $version, $matches);
         
         $version = $matches[0];

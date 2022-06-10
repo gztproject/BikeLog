@@ -183,14 +183,14 @@ class Maintenance extends AggregateBaseWithComment
             if (count($dscs) < 2) {
                 $description = $dscs[0];
                 if (strlen($description) > $maxLen) {
-                    $description = "+ 1 ... ⌄";
+                    $description = "+ 1";
                 }
             } else {
                 while (strlen(implode(", ", $dscs)) > $maxLen) {
                     array_pop($dscs);
                 }                
                 $description = implode(", ", $dscs);
-                $description .= " + ". count($tasks) - 1 ." ... ⌄";
+                $description .= " + ". count($tasks) - 1;
             }
         } else
             $description = implode(", ", $dscs);
