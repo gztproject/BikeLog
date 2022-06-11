@@ -21,11 +21,12 @@ function CheckUpdates() {
     $.get('https://api.github.com/repos/gztproject/BikeLog/releases/latest', function(data) {
         $newVersion = data.tag_name;
         $newUrl = data.html_url;
+        $changes = data.body;
         checkDone();
     });
 
     $.get("update/check", function(data) {
-        $currentVersion = data.current_version;
+        $currentVersion = data.current_version;        
         checkDone();
     });
 
@@ -34,11 +35,11 @@ function CheckUpdates() {
             $('#currentA').html($currentVersion);
             $('#newA').html($newVersion);
             $('#newA').prop('href', $newUrl);
-            if(isDev())
-            {
-                 $('#btn-do-update').attr('disabled', true);
-                 $('#btn-do-update').attr('data-toggle', "tooltip");
-                 $('#btn-do-update').attr('title', "Can\'t update in DEV env.");
+            $('#changes').html($changes.replaceAll("\n", "<br>"));
+            if (isDev()) {
+                $('#btn-do-update').attr('disabled', true);
+                $('#btn-do-update').attr('data-toggle', "tooltip");
+                $('#btn-do-update').attr('title', "Can\'t update in DEV env.");
             }
             else if (IsNewer($currentVersion, $newVersion)) {
                 $('#btn-do-update').attr('disabled', false);
@@ -49,8 +50,9 @@ function CheckUpdates() {
         }
     }
 
-    $(".modal-body").html("Current version: <span id=\"currentA\"></span>" +
-        "</br> New verion: <a href=\"#\" target=\"_blank\" id=\"newA\"></a>");
+    $(".modal-body").html("<h4>Current version:</h4> <span id=\"currentA\"></span>" +
+        "</br><h4>New verion:</h4> <a href=\"#\" target=\"_blank\" id=\"newA\"></a>" + 
+        "</br></br><h4>Changes:</h4> <span id=\"changes\"></span>");
 }
 
 function IsNewer($current, $new) {
@@ -72,8 +74,7 @@ function isDev() {
     //alert(classList);
     // Creating class array by splitting class list string
     var classArr = classList.split(/\s+/);
-    if(classArr.includes("dev"))
-    {
+    if (classArr.includes("dev")) {
         return true;
     }
     return false;

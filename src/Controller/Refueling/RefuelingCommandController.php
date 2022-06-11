@@ -9,29 +9,30 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Bike\Bike;
 use App\Entity\Refueling\CreateRefuelingCommand;
 use App\Form\Refueling\RefuelingType;
+use Doctrine\Persistence\ManagerRegistry;
 
 class RefuelingCommandController extends AbstractController {
 	/**
 	 *
 	 * @Route("/dashboard/refueling/new", methods={"GET", "POST"}, name="refueling_new")
 	 */
-	public function new(Request $request): Response {
+    public function new(Request $request, ManagerRegistry $doctrine): Response {
 		$crc = new CreateRefuelingCommand ();
-		return $this->compileForm ( $crc, $request );
+		return $this->compileForm ( $crc, $request, $doctrine );
 	}
 
 	/**
 	 *
 	 * @Route("/dashboard/refueling/new/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}", methods={"GET", "POST"}, name="refueling_new_id")
 	 */
-	public function new_with_id(Request $request, Bike $bike): Response {
+	public function new_with_id(Request $request, Bike $bike, ManagerRegistry $doctrine): Response {
 		if ($bike->getOwner () != $this->getUser ())
 			throw new SecurityError ( "Bikes can only be shown to their owners." );
 
 		$crc = new CreateRefuelingCommand ();
 		$crc->bike = $bike;
 
-		return $this->compileForm ( $crc, $request );
+		return $this->compileForm ( $crc, $request, $doctrine );
 	}
 
 	/**
@@ -40,7 +41,7 @@ class RefuelingCommandController extends AbstractController {
 	 * @param Request $request
 	 * @return Response
 	 */
-	private function compileForm(CreateRefuelingCommand $crc, Request $request): Response {
+	private function compileForm(CreateRefuelingCommand $crc, Request $request, ManagerRegistry $doctrine): Response {
 		$crc->isTankFull = true;
 		$crc->isNotBreakingContinuum = true;
 
@@ -50,13 +51,13 @@ class RefuelingCommandController extends AbstractController {
 
 		if ($form->isSubmitted () && $form->isValid ()) {
 
-			$bike = $this->getDoctrine ()->getRepository ( Bike::class )->findOneBy ( [ 
+			$bike = $doctrine->getRepository ( Bike::class )->findOneBy ( [ 
 					'id' => $crc->bike->getId ()
 			] );
 
 			$refueling = $bike->createRefueling ( $crc, $this->getUser () );
 
-			$em = $this->getDoctrine ()->getManager ();
+			$em = $doctrine->getManager ();
 
 			// If it's older we should find where it belongs and check the odometer
 			if ($bike->getLastRefueling() != null && $refueling->getDate () < $bike->getLastRefueling ()->getDate ()) {
@@ -96,7 +97,7 @@ class RefuelingCommandController extends AbstractController {
 			}
 			$em->flush ();
 
-			return $this->redirectToRoute ( 'refueling_index' );
+			return $this->redirectToRoute ( 'refueling_index', ["bike"=>$bike->getId()] );
 		}
 
 		return $this->render ( 'dashboard/refueling/new.html.twig', [ 

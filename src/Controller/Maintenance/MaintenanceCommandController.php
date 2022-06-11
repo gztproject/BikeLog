@@ -14,6 +14,7 @@ use App\Entity\Bike\Bike;
 use App\Entity\Maintenance\CreateMaintenanceCommand;
 use App\Form\Maintenance\MaintenanceType;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Doctrine\Persistence\ManagerRegistry;
 
 class MaintenanceCommandController extends AbstractController {
 
@@ -29,14 +30,14 @@ class MaintenanceCommandController extends AbstractController {
 	 *
 	 * @Route("/dashboard/maintenance/new/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}", methods={"GET", "POST"}, name="maintenance_new_id")
 	 */
-	public function new_with_id(Request $request, Bike $bike): Response {
+    public function new_with_id(Request $request, Bike $bike, ManagerRegistry $doctrine): Response {
 		if ($bike->getOwner () != $this->getUser ())
 			throw new SecurityError ( "Bikes can only be shown to their owners." );
 
 		$cmc = new CreateMaintenanceCommand ();
 		$cmc->bike = $bike;
 
-		return $this->compileForm ( $cmc, $request );
+		return $this->compileForm ( $cmc, $request, $doctrine );
 	}
 
 	/**
@@ -45,7 +46,7 @@ class MaintenanceCommandController extends AbstractController {
 	 * @param Request $request
 	 * @return Response
 	 */
-	private function compileForm(CreateMaintenanceCommand $cmc, Request $request): Response {	    
+	private function compileForm(CreateMaintenanceCommand $cmc, Request $request, ManagerRegistry $doctrine): Response {	    
 		$form = $this->createForm ( MaintenanceType::class, $cmc, [ 
 				'user' => $this->getUser(),
 				'bike' => $cmc->bike,
@@ -56,13 +57,13 @@ class MaintenanceCommandController extends AbstractController {
 
 		if ($form->isSubmitted () && $form->isValid ()) {
 
-			$bike = $this->getDoctrine ()->getRepository ( Bike::class )->findOneBy ( [ 
+			$bike = $doctrine->getRepository ( Bike::class )->findOneBy ( [ 
 					'id' => $cmc->bike->getId ()
 			] );
 
 			$maintenance = $bike->createMaintenance ( $cmc, $this->getUser () );
 
-			$em = $this->getDoctrine ()->getManager ();
+			$em = $doctrine->getManager ();
 
 			foreach ( $cmc->maintenanceTaskCommands as $cmtc ) {
 				$mt = $maintenance->createMaintenanceTask ( $cmtc, $this->getUser () );

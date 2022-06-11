@@ -43,7 +43,7 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 						{% if bikesDropDown.getList is not empty %}
 						<li class="nav-item dropdown"><a
 							class="nav-link dropdown-toggle" data-toggle="dropdown"
-							href="{{ path('dashboard_index') }}"> <i class="fa fa-lock"
+							href="{{ path('dashboard_index') }}"> <i class="fa fa-motorcycle"
 								aria-hidden="true"></i> {{ 'menu.bikes'|trans }}
 						</a>
 							<div class="dropdown-menu" aria-labelledby="admin">
@@ -56,7 +56,7 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 						{% if workshopsDropDown.getList is not empty or workshopsDropDown.getMyList is not empty%}
 						<li class="nav-item dropdown"><a
 							class="nav-link dropdown-toggle" data-toggle="dropdown"
-							href="{{ path('dashboard_index') }}"> <i class="fa fa-lock"
+							href="{{ path('dashboard_index') }}"> <i class="fa fa-wrench"
 								aria-hidden="true"></i> {{ 'menu.workshops'|trans }}
 						</a>
 							<div class="dropdown-menu" aria-labelledby="workshops">
@@ -82,7 +82,7 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 						{% if is_granted('ROLE_ADMIN') %}
 						<li class="nav-item dropdown"><a
 							class="nav-link dropdown-toggle" data-toggle="dropdown"
-							href="{{ path('admin_index') }}"> <i class="fa fa-lock"
+							href="{{ path('admin_index') }}"> <i class="fa fa-id-badge"
 								aria-hidden="true"></i> {{ 'menu.admin'|trans }}
 						</a>
 							<div class="dropdown-menu" aria-labelledby="admin">
@@ -98,7 +98,7 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 						{% if app.user %}
 						<li class="nav-item dropdown"><a
 							class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
-							aria-expanded="false"> <i class="fa fa-user"
+							aria-expanded="false"> <i class="fa fa-flask"
 								aria-hidden="true"></i> {{ 'menu.POC'|trans }}
 						</a>
 							<ul class="dropdown-menu poc" role="menu" aria-labelledby="poc">
