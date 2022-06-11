@@ -38,9 +38,9 @@ class UpdateController extends AbstractController
         preg_match('/^(\d+)\.(\d+)\.(\d+)/', $version, $matches);
         
         $version = $matches[0];
-        $maj = $matches[1];
-        $min = $matches[2];
-        $rev = $matches[3];
+//         $maj = $matches[1];
+//         $min = $matches[2];
+//         $rev = $matches[3];
         
         $out = shell_exec("./../Scripts/update.sh -v $version");
         return $this->json(['result' => $out]);

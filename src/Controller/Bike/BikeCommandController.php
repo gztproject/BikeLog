@@ -9,13 +9,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\Persistence\ManagerRegistry;
 
 class BikeCommandController extends AbstractController {
 	/**
 	 *
 	 * @Route("/dashboard/bike/new", methods={"GET", "POST"}, name="bike_new")
 	 */
-	public function new(Request $request): Response {
+    public function new(Request $request, ManagerRegistry $doctrine): Response {
 		$cbc = new CreateBikeCommand ();
 		$cbc->owner = $this->getUser ();
 		$form = $this->createForm ( BikeType::class, $cbc );
@@ -47,7 +48,7 @@ class BikeCommandController extends AbstractController {
 
 			$bike = $this->getUser ()->createBike ( $cbc );
 
-			$em = $this->getDoctrine ()->getManager ();
+			$em = $doctrine->getManager ();
 
 			$em->persist ( $bike );
 			$em->flush ();

@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Twig\Sandbox\SecurityError;
 use App\Entity\User\User;
+use Doctrine\Persistence\ManagerRegistry;
 
 class WorkshopCommandController extends AbstractController
 {
@@ -18,14 +19,14 @@ class WorkshopCommandController extends AbstractController
      *
      * @Route("/{area}/workshop/addUser", methods={"POST"}, name="addWorkshopUser")
      */
-    public function addUser(User $client, Workshop $workshop, $area = "dashboard"): Response
+    public function addUser(User $client, Workshop $workshop, ManagerRegistry $doctrine, $area = "dashboard"): Response
     {
         $user = $this->getUser();
         if ($workshop->getOwner() != $user && ! $user->isAdmin())
             throw new SecurityError("Workshops can only be managed by their owners.");
 
         $workshop->addClient($client, $user);
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->persist($workshop);
         $em->flush();
         return $this->render('dashboard/workshop/show.html.twig', [
