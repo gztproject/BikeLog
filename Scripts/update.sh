@@ -47,6 +47,23 @@ load_state() {
     RELEASE_SOURCE="${RELEASE_SOURCE:-}"
 }
 
+normalize_state() {
+    if (( LAST_COMPLETED_STEP >= 25 && LAST_COMPLETED_STEP < 35 )) && [[ ! -f "$ARCHIVE_FILE" ]]; then
+        log "Saved update state points to a missing release archive; restarting from the download step."
+        LAST_COMPLETED_STEP=15
+        RELEASE_SOURCE=""
+        write_state
+        return
+    fi
+
+    if (( LAST_COMPLETED_STEP >= 35 && LAST_COMPLETED_STEP < 93 )) && [[ ! -d "$RELEASE_DIR" ]]; then
+        log "Saved update state points to a missing extracted release; restarting from the download step."
+        LAST_COMPLETED_STEP=15
+        RELEASE_SOURCE=""
+        write_state
+    fi
+}
+
 mark_step() {
     LAST_COMPLETED_STEP="$1"
     write_state
@@ -196,6 +213,7 @@ RELEASE_ASSET_URL="https://github.com/gztproject/BikeLog/releases/download/$VER/
 SOURCE_ARCHIVE_URL="https://github.com/gztproject/BikeLog/archive/refs/tags/$VER.tar.gz"
 
 load_state
+normalize_state
 
 cd "$PROJECT_DIR"
 
