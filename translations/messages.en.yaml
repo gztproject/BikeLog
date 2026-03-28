@@ -20,6 +20,9 @@ title:
   statistics: Statistics
   upcomingEvents: Upcoming events
   alerts: Alerts
+  parts: Parts
+  servicePlan: Service plan
+  bikeOverrides: Bike overrides
   
 
 label:
@@ -46,7 +49,17 @@ label:
   themeDark: Dark
   themeSystem: System
   task: Task
+  manufacturer: Manufacturer
+  part: Part
+  existingTask: Existing task
+  createNewTask: Create a new task
+  selectPart: Select a part
+  selectTask: Select a task
+  searchParts: Search parts
+  noMatchingParts: No matching parts
+  taskName: Task name
   interval: Interval
+  intervalType: Interval type
   remaining: Remaining
   range: Range
   location: Location
@@ -64,8 +77,31 @@ label:
   dueAt: Due at
   dueOn: Due on
   lastServiceEntry: Last service
+  lastService: Last service
   purchaseBaseline: Using purchase entry as baseline
   trackedTasks: tracked tasks
+  servicesRecorded: services recorded
+  serviceHistory: Service history
+  expectedInterval: Expected interval
+  actualInterval: Actual interval
+  avgIntervalDistance: Avg. service gap
+  avgIntervalTime: Avg. time gap
+  source: Source
+  modelDefault: Model default
+  bikeOverride: Bike override
+  notEnoughHistory: Not enough history
+  notTracked: Not tracked
+  general: General
+  intervalDistanceAbsolute: Absolute distance
+  intervalDistanceRelative: Relative distance
+  performanceOver: Overperforming
+  performanceUnder: Underperforming
+  performance:
+    overperforming: Overperforming
+    underperforming: Underperforming
+    on_target: On target
+    not_enough_history: Not enough history
+    not_tracked: Not tracked
   units:
     bikes: bikes
     services: services
@@ -118,6 +154,7 @@ action:
     refueling: Add refueling
     user: Add user
     task: Add task
+    part: Add part
   delete:
     user: Delete user
   show: Show
@@ -126,6 +163,9 @@ action:
   login: Log in
   save: Save
   locate: Refresh location
+  manageBikePlan: Bike service plan
+  manageModelPlan: Model service plan
+  addBikeOverride: Add bike override
   backToList: Back to list
   back_to_list: Back to list
   cancel: Cancel
@@ -145,6 +185,8 @@ body:
   bikeShow:
     summary: A workshop-ready bike file with fuel, maintenance, and service timing in one place.
     statistics: Key running costs, refueling sample quality, and tracked service items.
+    parts: Part-by-part service history, interval adherence, and current performance against the service plan.
+    partSelector: Focus one part at a time to review its service trend, interval fit, and history.
     upcoming: The next service events sorted by urgency, including due mileage and dates.
     alerts: Overdue work and weak fuel statistics that need attention first.
     serviceIntervals: Current service intervals with history pulled from recent maintenance entries.
@@ -158,8 +200,31 @@ body:
     refuelingPending: Fuel averages need a full refueling of at least %threshold% l before they become reliable.
     refuelingSingleSample: Fuel averages are currently based on a single qualified full refueling.
     refuelingFiltered: "%count% small or partial refuelings were excluded from the fuel averages."
+    noPartStats: No part-level service history is available yet.
+    noPartHistory: No maintenance entries have been recorded for this part yet.
+  servicePlan:
+    bike: Review the effective service plan for this bike and add bike-specific interval overrides where needed.
+    bikeCurrent: Model defaults and bike-specific overrides combined for this machine.
+    model: Maintain the reusable service plan for this model, including parts, tasks, and default intervals.
+    modelCurrent: Current model-level tasks and service intervals grouped by part.
+    modelSwitch: Choose a manufacturer and model here. Existing-task suggestions stay limited to the selected model plus universal tasks.
+    override: Add or override an interval for one task on this bike without changing the model defaults.
+    existingTaskModelScoped: Reuse tasks already tracked on this model. Partless tasks are treated as universal and can be reused across models.
+    partOptional: Leave the part empty to create a general task that can also be reused across other models.
+    partEditor: Register a new part for this manufacturer so tasks can be attached to it.
+    taskEditor: Reuse an existing task or create a new one, then attach a default model interval.
+    empty: No service-plan entries are configured yet.
   delete:
     userModal: Do you really want to delete the user?
+
+flash:
+  servicePlan:
+    bikeTaskExists: This bike already has a custom interval for that task.
+    bikeOverrideCreated: Bike-specific service interval saved.
+    partExists: That part already exists for this manufacturer.
+    partCreated: Part added to the manufacturer catalog.
+    modelTaskExists: This model already tracks that task.
+    taskCreated: Task and interval saved to the model service plan.
 
 status:
   ok: On schedule

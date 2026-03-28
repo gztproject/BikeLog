@@ -1,23 +1,72 @@
-name: PHP Composer
+name: CI
 
-on: [push]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  build:
-
+  backend:
+    name: Backend
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+          tools: composer:v2
+          extensions: intl
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
+      - name: Validate composer.json and composer.lock
+        run: composer validate --no-check-publish
 
-    # - name: Run test suite
-    #   run: composer run-script test
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Lint Twig templates
+        run: php bin/console lint:twig templates/dashboard/bike/show.html.twig templates/dashboard/refueling/index.html.twig templates/dashboard/maintenance/index.html.twig templates/admin/servicePlan/model.html.twig
+
+      - name: Lint YAML config
+        run: php bin/console lint:yaml translations/messages.en.yaml translations/messages.sl.yaml config/packages config/routes
+
+      - name: Run PHPUnit
+        run: php bin/phpunit
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run frontend tests
+        run: npm test
+
+      - name: Build frontend assets
+        run: npm run build

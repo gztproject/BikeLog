@@ -4,12 +4,17 @@ namespace App\Tests\Entity;
 
 use App\Entity\Bike\Bike;
 use App\Entity\Bike\CreateBikeCommand;
+use App\Entity\Maintenance\CreateMaintenanceCommand;
+use App\Entity\MaintenanceTask\CreateMaintenanceTaskCommand;
 use App\Entity\Model\Model;
+use App\Entity\Part\CreatePartCommand;
+use App\Entity\Part\Part;
 use App\Entity\Refueling\CreateRefuelingCommand;
 use App\Entity\ServiceInterval\CreateServiceIntervalCommand;
 use App\Entity\Task\CreateTaskCommand;
 use App\Entity\Task\Task;
 use App\Entity\User\User;
+use App\Entity\Workshop\Workshop;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 
@@ -51,6 +56,42 @@ class BikeStatisticsTest extends TestCase
             (new \DateTimeImmutable('today'))->diff($alerts[0]['dueDate'])->format('%r%a'),
             (string) $alerts[0]['remainingDays']
         );
+    }
+
+    public function testPartStatisticsGroupServiceHistoryAndPerformanceAgainstIntervals(): void
+    {
+        $bike = $this->createBike([], new \DateTime('2025-01-01'));
+        $oilPart = $this->createPart('Oil system');
+        $chainPart = $this->createPart('Chain drive');
+        $oilTask = $this->createTask('Oil change', 'Replace oil and filter', $oilPart);
+        $chainTask = $this->createTask('Chain adjustment', 'Adjust chain slack', $chainPart);
+
+        $this->attachServiceInterval($bike, $oilTask, 5000, 10);
+        $this->attachServiceInterval($bike, $chainTask, 1000, 10);
+
+        $this->addMaintenance($bike, '2025-03-01', 14000, [[$chainTask, 15.0]]);
+        $this->addMaintenance($bike, '2025-06-01', 15000, [[$oilTask, 75.0]]);
+        $this->addMaintenance($bike, '2025-04-01', 14700, [[$chainTask, 15.0]]);
+        $this->addMaintenance($bike, '2025-05-01', 15400, [[$chainTask, 15.0]]);
+        $this->addMaintenance($bike, '2025-11-01', 19800, [[$oilTask, 82.0]]);
+
+        $partStatistics = $bike->getPartStatistics();
+        $oilStatistics = $this->findPartStatistics($partStatistics, 'Oil system');
+        $chainStatistics = $this->findPartStatistics($partStatistics, 'Chain drive');
+
+        self::assertSame(1, $oilStatistics['trackedTaskCount']);
+        self::assertSame(2, $oilStatistics['servicesRecorded']);
+        self::assertSame(4800.0, $oilStatistics['averageDistanceBetweenServices']);
+        self::assertSame('on_target', $oilStatistics['taskStats'][0]['performanceKey']);
+        self::assertSame(19800, $oilStatistics['lastServiceOdometer']);
+
+        self::assertSame(1, $chainStatistics['trackedTaskCount']);
+        self::assertSame(3, $chainStatistics['servicesRecorded']);
+        self::assertSame(700.0, $chainStatistics['averageDistanceBetweenServices']);
+        self::assertSame(1, $chainStatistics['underperformerCount']);
+        self::assertSame('underperforming', $chainStatistics['taskStats'][0]['performanceKey']);
+        self::assertSame('warning', $chainStatistics['status']);
+        self::assertSame('overdue', $chainStatistics['taskStats'][0]['serviceStatus']['status']);
     }
 
     private function createBike(array $serviceIntervals = [], ?\DateTimeInterface $purchaseDate = null): Bike
@@ -101,15 +142,60 @@ class BikeStatisticsTest extends TestCase
         $bike->createServiceInterval($command, $this->createUserMock());
     }
 
-    private function createTask(string $name, string $description): Task
+    private function createTask(string $name, string $description, ?Part $part = null): Task
     {
         $command = new CreateTaskCommand();
         $command->name = $name;
         $command->description = $description;
-        $command->part = null;
+        $command->part = $part;
         $command->comment = '';
 
         return new Task($command, $this->createUserMock());
+    }
+
+    private function createPart(string $name): Part
+    {
+        $command = new CreatePartCommand();
+        $command->name = $name;
+
+        $manufacturer = $this->getMockBuilder(\App\Entity\Manufacturer\Manufacturer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return new Part($command, $manufacturer, $this->createUserMock());
+    }
+
+    private function addMaintenance(Bike $bike, string $date, int $odometer, array $tasks): void
+    {
+        $command = new CreateMaintenanceCommand();
+        $command->bike = $bike;
+        $command->workshop = $this->createWorkshopMock();
+        $command->date = new \DateTimeImmutable($date);
+        $command->odometer = $odometer;
+        $command->spentTime = 1.0;
+        $command->unspecifiedCosts = 0.0;
+
+        $maintenance = $bike->createMaintenance($command, $this->createUserMock());
+
+        foreach ($tasks as [$task, $cost]) {
+            $taskCommand = new CreateMaintenanceTaskCommand();
+            $taskCommand->task = $task;
+            $taskCommand->cost = $cost;
+            $taskCommand->comment = '';
+
+            $maintenance->createMaintenanceTask($taskCommand, $this->createUserMock());
+        }
+    }
+
+    private function findPartStatistics(array $partStatistics, string $partName): array
+    {
+        foreach ($partStatistics as $partStatistic) {
+            if ($partStatistic['name'] === $partName) {
+                return $partStatistic;
+            }
+        }
+
+        self::fail(sprintf('Unable to find part statistics for "%s".', $partName));
     }
 
     private function createModelMock(array $serviceIntervals = []): Model
@@ -133,5 +219,17 @@ class BikeStatisticsTest extends TestCase
         return $this->getMockBuilder(User::class)
             ->disableOriginalConstructor()
             ->getMock();
+    }
+
+    private function createWorkshopMock(): Workshop
+    {
+        $workshop = $this->getMockBuilder(Workshop::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getName'])
+            ->getMock();
+
+        $workshop->method('getName')->willReturn('Workshop');
+
+        return $workshop;
     }
 }

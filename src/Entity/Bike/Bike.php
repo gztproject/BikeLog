@@ -39,6 +39,10 @@ class Bike extends AggregateBase implements iHasServiceIntervals
 
     private const UPCOMING_SERVICE_LIMIT = 5;
 
+    private const PERFORMANCE_UNDER_THRESHOLD = 0.85;
+
+    private const PERFORMANCE_OVER_THRESHOLD = 1.15;
+
     /**
      *
      * @ORM\ManyToOne(targetEntity="App\Entity\User\User", inversedBy="bikes")
@@ -632,6 +636,105 @@ class Bike extends AggregateBase implements iHasServiceIntervals
 
         return array_values($alerts);
     }
+
+    /**
+     *
+     * @return array
+     */
+    public function getPartStatistics(): array
+    {
+        $serviceIntervalsByTaskId = [];
+        foreach ($this->getServiceIntervals() as $serviceInterval) {
+            $serviceIntervalsByTaskId[$serviceInterval->getTask()->getId()->toString()] = $serviceInterval;
+        }
+
+        $serviceStatusesByTaskId = [];
+        foreach ($this->getServiceIntervalStatuses() as $status) {
+            $serviceStatusesByTaskId[$status['task']->getId()->toString()] = $status;
+        }
+
+        $parts = [];
+        foreach ($this->getRelevantPartTasks() as $task) {
+            $part = $task->getPart();
+
+            if ($part == null) {
+                continue;
+            }
+
+            $partId = $part->getId()->toString();
+            if (! array_key_exists($partId, $parts)) {
+                $parts[$partId] = [
+                    'part' => $part,
+                    'name' => $part->getName(),
+                    'taskStats' => [],
+                ];
+            }
+
+            $taskId = $task->getId()->toString();
+            $parts[$partId]['taskStats'][] = $this->buildPartTaskStatistic(
+                $task,
+                $serviceIntervalsByTaskId[$taskId] ?? null,
+                $serviceStatusesByTaskId[$taskId] ?? null
+            );
+        }
+
+        foreach ($parts as $partId => $partStatistics) {
+            $history = $this->getPartMaintenanceHistory($partStatistics['part']);
+            $historyForAverage = $history;
+            usort($historyForAverage, [$this, 'compareMaintenanceHistoryAscending']);
+
+            $trackedTaskCount = 0;
+            $alertCount = 0;
+            $underperformerCount = 0;
+            $overperformerCount = 0;
+            $onTargetCount = 0;
+
+            foreach ($partStatistics['taskStats'] as $taskStat) {
+                if ($taskStat['serviceInterval'] != null) {
+                    $trackedTaskCount++;
+                }
+
+                if (($taskStat['serviceStatus']['status'] ?? 'ok') !== 'ok') {
+                    $alertCount++;
+                }
+
+                switch ($taskStat['performanceKey']) {
+                    case 'underperforming':
+                        $underperformerCount++;
+                        break;
+                    case 'overperforming':
+                        $overperformerCount++;
+                        break;
+                    case 'on_target':
+                        $onTargetCount++;
+                        break;
+                }
+            }
+
+            usort($partStatistics['taskStats'], [$this, 'comparePartTaskStatistics']);
+
+            $lastService = $history[0] ?? null;
+            $parts[$partId] = array_merge($partStatistics, [
+                'serviceHistory' => $history,
+                'servicesRecorded' => count($history),
+                'trackedTaskCount' => $trackedTaskCount,
+                'alertCount' => $alertCount,
+                'underperformerCount' => $underperformerCount,
+                'overperformerCount' => $overperformerCount,
+                'onTargetCount' => $onTargetCount,
+                'lastServiceDate' => $lastService['date'] ?? null,
+                'lastServiceOdometer' => $lastService['odometer'] ?? null,
+                'averageDistanceBetweenServices' => $this->calculateAverageDistanceBetweenEvents($historyForAverage),
+                'averageDaysBetweenServices' => $this->calculateAverageDaysBetweenEvents($historyForAverage),
+                'status' => $this->resolvePartStatus($alertCount, $underperformerCount, $trackedTaskCount),
+            ]);
+        }
+
+        $partStatistics = array_values($parts);
+        usort($partStatistics, [$this, 'comparePartStatistics']);
+
+        return $partStatistics;
+    }
     
     
 
@@ -869,6 +972,423 @@ class Bike extends AggregateBase implements iHasServiceIntervals
         }
 
         return strcmp($left['task']->getName(), $right['task']->getName());
+    }
+
+    /**
+     *
+     * @return array
+     */
+    private function getRelevantPartTasks(): array
+    {
+        $tasks = [];
+
+        foreach ($this->getServiceIntervals() as $serviceInterval) {
+            $task = $serviceInterval->getTask();
+            if ($task->getPart() == null) {
+                continue;
+            }
+
+            $tasks[$task->getId()->toString()] = $task;
+        }
+
+        foreach ($this->maintenances as $maintenance) {
+            foreach ($maintenance->getMaintenanceTasks() as $maintenanceTask) {
+                $task = $maintenanceTask->getTask();
+                if ($task->getPart() == null) {
+                    continue;
+                }
+
+                $tasks[$task->getId()->toString()] = $task;
+            }
+        }
+
+        $taskList = array_values($tasks);
+        usort($taskList, static function (Task $left, Task $right): int {
+            $leftPart = $left->getPart()?->getName() ?? '';
+            $rightPart = $right->getPart()?->getName() ?? '';
+
+            if ($leftPart !== $rightPart) {
+                return strcmp($leftPart, $rightPart);
+            }
+
+            return strcmp($left->getName(), $right->getName());
+        });
+
+        return $taskList;
+    }
+
+    /**
+     *
+     * @param Task $task
+     * @param ServiceInterval|null $serviceInterval
+     * @param array|null $serviceStatus
+     * @return array
+     */
+    private function buildPartTaskStatistic(Task $task, ?ServiceInterval $serviceInterval, ?array $serviceStatus): array
+    {
+        $history = $this->getTaskMaintenanceHistory($task);
+        $averageDistance = $this->calculateAverageDistanceBetweenEvents($history);
+        $averageDays = $this->calculateAverageDaysBetweenEvents($history);
+        $performance = $this->resolveTaskPerformance($serviceInterval, $averageDistance, $averageDays);
+        $lastService = empty($history) ? null : $history[count($history) - 1];
+
+        return [
+            'task' => $task,
+            'serviceInterval' => $serviceInterval,
+            'serviceStatus' => $serviceStatus,
+            'servicesRecorded' => count($history),
+            'lastServiceDate' => $lastService['date'] ?? null,
+            'lastServiceOdometer' => $lastService['odometer'] ?? null,
+            'averageDistanceBetweenServices' => $averageDistance,
+            'averageDaysBetweenServices' => $averageDays,
+            'performanceKey' => $performance['key'],
+            'performanceTone' => $performance['tone'],
+            'performanceRatio' => $performance['ratio'],
+            'actualIntervalValue' => $performance['actualValue'],
+            'actualIntervalUnit' => $performance['actualUnit'],
+        ];
+    }
+
+    /**
+     *
+     * @param Task $task
+     * @return array
+     */
+    private function getTaskMaintenanceHistory(Task $task): array
+    {
+        $history = [];
+
+        foreach ($this->maintenances as $maintenance) {
+            $matched = false;
+            $taskCost = 0.0;
+
+            foreach ($maintenance->getMaintenanceTasks() as $maintenanceTask) {
+                if ($maintenanceTask->getTask() != $task) {
+                    continue;
+                }
+
+                $matched = true;
+                $taskCost += $maintenanceTask->getCost();
+            }
+
+            if (! $matched) {
+                continue;
+            }
+
+            $history[] = [
+                'maintenance' => $maintenance,
+                'date' => DateTimeImmutable::createFromInterface($maintenance->getDate()),
+                'odometer' => $maintenance->getOdometer(),
+                'cost' => $taskCost,
+            ];
+        }
+
+        usort($history, [$this, 'compareMaintenanceHistoryAscending']);
+
+        return $history;
+    }
+
+    /**
+     *
+     * @param Part $part
+     * @return array
+     */
+    private function getPartMaintenanceHistory(Part $part): array
+    {
+        $history = [];
+
+        foreach ($this->maintenances as $maintenance) {
+            $taskNames = [];
+            $taskCost = 0.0;
+
+            foreach ($maintenance->getMaintenanceTasks() as $maintenanceTask) {
+                $task = $maintenanceTask->getTask();
+                if ($task->getPart() != $part) {
+                    continue;
+                }
+
+                $taskNames[$task->getId()->toString()] = $task->getName();
+                $taskCost += $maintenanceTask->getCost();
+            }
+
+            if (empty($taskNames)) {
+                continue;
+            }
+
+            $history[] = [
+                'maintenance' => $maintenance,
+                'date' => DateTimeImmutable::createFromInterface($maintenance->getDate()),
+                'dateString' => $maintenance->getDateString(),
+                'odometer' => $maintenance->getOdometer(),
+                'tasks' => array_values($taskNames),
+                'taskCost' => $taskCost,
+                'workshop' => $maintenance->getWorkshop()->getName(),
+            ];
+        }
+
+        usort($history, [$this, 'compareMaintenanceHistoryDescending']);
+
+        return $history;
+    }
+
+    /**
+     *
+     * @param array $events
+     * @return float|null
+     */
+    private function calculateAverageDistanceBetweenEvents(array $events): ?float
+    {
+        if (count($events) < 2) {
+            return null;
+        }
+
+        $distanceAccumulator = 0;
+        $intervalCount = 0;
+        $previousEvent = null;
+
+        foreach ($events as $event) {
+            if ($previousEvent != null) {
+                $distanceAccumulator += max(0, $event['odometer'] - $previousEvent['odometer']);
+                $intervalCount++;
+            }
+
+            $previousEvent = $event;
+        }
+
+        if ($intervalCount === 0) {
+            return null;
+        }
+
+        return $distanceAccumulator / $intervalCount;
+    }
+
+    /**
+     *
+     * @param array $events
+     * @return int|null
+     */
+    private function calculateAverageDaysBetweenEvents(array $events): ?int
+    {
+        if (count($events) < 2) {
+            return null;
+        }
+
+        $daysAccumulator = 0;
+        $intervalCount = 0;
+        $previousEvent = null;
+
+        foreach ($events as $event) {
+            if ($previousEvent != null) {
+                $daysAccumulator += (int) $previousEvent['date']->diff($event['date'])->format('%a');
+                $intervalCount++;
+            }
+
+            $previousEvent = $event;
+        }
+
+        if ($intervalCount === 0) {
+            return null;
+        }
+
+        return (int) round($daysAccumulator / $intervalCount);
+    }
+
+    /**
+     *
+     * @param ServiceInterval|null $serviceInterval
+     * @param float|null $averageDistance
+     * @param int|null $averageDays
+     * @return array
+     */
+    private function resolveTaskPerformance(?ServiceInterval $serviceInterval, ?float $averageDistance, ?int $averageDays): array
+    {
+        if ($serviceInterval == null) {
+            return [
+                'key' => 'not_tracked',
+                'tone' => 'info',
+                'ratio' => null,
+                'actualValue' => null,
+                'actualUnit' => null,
+            ];
+        }
+
+        $intervalType = $serviceInterval->getIntervalType();
+        $expectedValue = $this->isDistanceIntervalType($intervalType)
+            ? $serviceInterval->getInterval()
+            : $this->normalizeIntervalToDays($intervalType, $serviceInterval->getInterval());
+        $actualValue = $this->isDistanceIntervalType($intervalType) ? $averageDistance : $averageDays;
+        $actualUnit = $this->isDistanceIntervalType($intervalType) ? 'km' : 'days';
+
+        if ($actualValue == null || $expectedValue <= 0) {
+            return [
+                'key' => 'not_enough_history',
+                'tone' => 'info',
+                'ratio' => null,
+                'actualValue' => $actualValue,
+                'actualUnit' => $actualUnit,
+            ];
+        }
+
+        $ratio = $actualValue / $expectedValue;
+        if ($ratio < self::PERFORMANCE_UNDER_THRESHOLD) {
+            return [
+                'key' => 'underperforming',
+                'tone' => 'warning',
+                'ratio' => $ratio,
+                'actualValue' => $actualValue,
+                'actualUnit' => $actualUnit,
+            ];
+        }
+
+        if ($ratio > self::PERFORMANCE_OVER_THRESHOLD) {
+            return [
+                'key' => 'overperforming',
+                'tone' => 'ok',
+                'ratio' => $ratio,
+                'actualValue' => $actualValue,
+                'actualUnit' => $actualUnit,
+            ];
+        }
+
+        return [
+            'key' => 'on_target',
+            'tone' => 'info',
+            'ratio' => $ratio,
+            'actualValue' => $actualValue,
+            'actualUnit' => $actualUnit,
+        ];
+    }
+
+    /**
+     *
+     * @param int $intervalType
+     * @return bool
+     */
+    private function isDistanceIntervalType(int $intervalType): bool
+    {
+        return in_array($intervalType, [ServiceInterval::ABSOLUTE_DISTANCE, ServiceInterval::RELATIVE_DISTANCE], true);
+    }
+
+    /**
+     *
+     * @param int $intervalType
+     * @param int $interval
+     * @return int
+     */
+    private function normalizeIntervalToDays(int $intervalType, int $interval): int
+    {
+        return match ($intervalType) {
+            ServiceInterval::DAYS => $interval,
+            ServiceInterval::MONTHS => $interval * 30,
+            ServiceInterval::YEARS => $interval * 365,
+            default => $interval,
+        };
+    }
+
+    /**
+     *
+     * @param int $alertCount
+     * @param int $underperformerCount
+     * @param int $trackedTaskCount
+     * @return string
+     */
+    private function resolvePartStatus(int $alertCount, int $underperformerCount, int $trackedTaskCount): string
+    {
+        if ($alertCount > 0) {
+            return 'warning';
+        }
+
+        if ($underperformerCount > 0) {
+            return 'warning';
+        }
+
+        if ($trackedTaskCount === 0) {
+            return 'info';
+        }
+
+        return 'ok';
+    }
+
+    /**
+     *
+     * @param array $left
+     * @param array $right
+     * @return int
+     */
+    private function comparePartStatistics(array $left, array $right): int
+    {
+        $priority = [
+            'warning' => 0,
+            'info' => 1,
+            'ok' => 2,
+        ];
+
+        $leftPriority = $priority[$left['status']] ?? 99;
+        $rightPriority = $priority[$right['status']] ?? 99;
+
+        if ($leftPriority !== $rightPriority) {
+            return $leftPriority <=> $rightPriority;
+        }
+
+        if ($left['alertCount'] !== $right['alertCount']) {
+            return $right['alertCount'] <=> $left['alertCount'];
+        }
+
+        return strcmp($left['name'], $right['name']);
+    }
+
+    /**
+     *
+     * @param array $left
+     * @param array $right
+     * @return int
+     */
+    private function comparePartTaskStatistics(array $left, array $right): int
+    {
+        $leftStatus = $left['serviceStatus']['status'] ?? 'ok';
+        $rightStatus = $right['serviceStatus']['status'] ?? 'ok';
+
+        if ($leftStatus !== $rightStatus) {
+            $priority = [
+                'overdue' => 0,
+                'warning' => 1,
+                'ok' => 2,
+            ];
+
+            return ($priority[$leftStatus] ?? 99) <=> ($priority[$rightStatus] ?? 99);
+        }
+
+        return strcmp($left['task']->getName(), $right['task']->getName());
+    }
+
+    /**
+     *
+     * @param array $left
+     * @param array $right
+     * @return int
+     */
+    private function compareMaintenanceHistoryAscending(array $left, array $right): int
+    {
+        if ($left['odometer'] !== $right['odometer']) {
+            return $left['odometer'] <=> $right['odometer'];
+        }
+
+        return $left['date']->getTimestamp() <=> $right['date']->getTimestamp();
+    }
+
+    /**
+     *
+     * @param array $left
+     * @param array $right
+     * @return int
+     */
+    private function compareMaintenanceHistoryDescending(array $left, array $right): int
+    {
+        if ($left['odometer'] !== $right['odometer']) {
+            return $right['odometer'] <=> $left['odometer'];
+        }
+
+        return $right['date']->getTimestamp() <=> $left['date']->getTimestamp();
     }
 
     /**

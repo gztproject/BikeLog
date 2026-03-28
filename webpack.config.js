@@ -32,6 +32,10 @@ Encore
 
     //Bike
     .addEntry('js/bike/new', './assets/js/bike/new.js')
+    .addEntry('js/bike/show', './assets/js/bike/show.js')
+
+    //Service plan
+    .addEntry('js/servicePlan/editor', './assets/js/servicePlan/editor.js')
 
     //Styles
     .addStyleEntry('css/app', ['./assets/scss/app.scss'])

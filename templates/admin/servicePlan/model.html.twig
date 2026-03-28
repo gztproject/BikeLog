@@ -1,0 +1,141 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'admin_model_service_plan' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('js/servicePlan/editor') }}
+{% endblock %}
+
+{% block main %}
+<section class="page-shell service-plan-page">
+    <div class="dashboard-page__header">
+        <div>
+            <span class="dashboard-page__eyebrow">{{ model.manufacturer.name }}</span>
+            <h1 class="page-shell__title">{{ model.name }} {{ model.alterName }} · {{ 'title.servicePlan'|trans }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.servicePlan.model'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <div class="service-plan-selector-stack">
+                <div class="service-plan-model-switcher">
+                    <label for="service-plan-manufacturer-selector">{{ 'label.manufacturer'|trans }}</label>
+                    <select
+                        id="service-plan-manufacturer-selector"
+                        class="form-control"
+                        data-service-plan-manufacturer-selector="true"
+                        aria-label="{{ 'label.manufacturer'|trans }}"
+                    >
+                        {% for availableManufacturer in availableManufacturers %}
+                            <option
+                                value="{{ availableManufacturer.id }}"
+                                {% if availableManufacturer.id == model.manufacturer.id %}selected{% endif %}
+                            >
+                                {{ availableManufacturer.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="service-plan-model-switcher">
+                    <label for="service-plan-model-selector">{{ 'label.model'|trans }}</label>
+                    <select
+                        id="service-plan-model-selector"
+                        class="form-control"
+                        data-service-plan-model-selector="true"
+                        aria-label="{{ 'label.model'|trans }}"
+                    >
+                        {% for availableModel in availableModels %}
+                            <option
+                                value="{{ path('admin_model_service_plan', {id: availableModel.id}) }}"
+                                data-manufacturer-id="{{ availableModel.manufacturer.id }}"
+                                {% if availableModel.id == model.id %}selected{% endif %}
+                            >
+                                {{ availableModel.name }} {{ availableModel.alterName }}{% if availableModel.yearFrom %} ({{ availableModel.yearFrom }}{% if availableModel.yearTo != availableModel.yearFrom %} - {{ availableModel.yearTo }}{% endif %}){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">{{ 'body.servicePlan.modelSwitch'|trans }}</small>
+                </div>
+            </div>
+            <a href="{{ path('admin_index') }}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ 'menu.admin'|trans }}
+            </a>
+        </div>
+    </div>
+
+    <div class="service-plan-page__grid">
+        <section class="inventory-panel service-plan-page__main">
+            <div class="inventory-panel__header">
+                <div>
+                    <h2 class="inventory-panel__title">{{ 'title.servicePlan'|trans }}</h2>
+                    <p class="inventory-panel__subtitle">{{ 'body.servicePlan.modelCurrent'|trans }}</p>
+                </div>
+                <span class="inventory-panel__badge">{{ model.serviceIntervals|length|number_format }} {{ 'label.trackedTasks'|trans }}</span>
+            </div>
+
+            {{ include('servicePlan/_groups.html.twig', {
+                servicePlanGroups: servicePlanGroups,
+                show_source: false,
+                show_status: false,
+            }, with_context = false) }}
+        </section>
+
+        <div class="service-plan-page__sidebar">
+            <section class="inventory-panel">
+                <div class="inventory-panel__header">
+                    <div>
+                        <h2 class="inventory-panel__title">{{ 'action.add.part'|trans }}</h2>
+                        <p class="inventory-panel__subtitle">{{ 'body.servicePlan.partEditor'|trans }}</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    {{ form_start(partForm, {'attr': {'class': 'service-plan-form'}}) }}
+                    {{ form_row(partForm.name) }}
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-plus" aria-hidden="true"></i> {{ 'action.add.part'|trans }}
+                        </button>
+                    </div>
+                    {{ form_end(partForm) }}
+                </div>
+            </section>
+
+            <section class="inventory-panel">
+                <div class="inventory-panel__header">
+                    <div>
+                        <h2 class="inventory-panel__title">{{ 'action.add.task'|trans }}</h2>
+                        <p class="inventory-panel__subtitle">{{ 'body.servicePlan.taskEditor'|trans }}</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    {{ form_start(taskForm, {'attr': {'class': 'service-plan-form'}}) }}
+                    {{ form_row(taskForm.existingTask) }}
+                    <div class="form-group">
+                        {{ form_label(taskForm.part) }}
+                        {{ form_widget(taskForm.part, {
+                            attr: {
+                                'data-searchable-select': 'true',
+                                'data-search-placeholder': 'label.searchParts'|trans,
+                                'data-search-empty': 'label.noMatchingParts'|trans
+                            }
+                        }) }}
+                        {{ form_help(taskForm.part) }}
+                        {{ form_errors(taskForm.part) }}
+                    </div>
+                    {{ form_row(taskForm.name) }}
+                    {{ form_row(taskForm.description) }}
+                    {{ form_row(taskForm.interval) }}
+                    {{ form_row(taskForm.intervalType) }}
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-plus" aria-hidden="true"></i> {{ 'action.add.task'|trans }}
+                        </button>
+                    </div>
+                    {{ form_end(taskForm) }}
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

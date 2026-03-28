@@ -8,83 +8,106 @@
 {% set monthIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::MONTHS') %}
 {% set yearIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::YEARS') %}
 
-<div class="table-responsive-xl">
-	<table class="table table-hover table-bordered maintenance-table service-interval-table">
+<div class="table-responsive-xl inventory-panel__table-scroll">
+	<table class="table table-hover table-bordered workshop-table service-interval-table">
 		<thead class="thead-dark">
 			<tr>
 				<th scope="col">{{ 'label.task'|trans }}</th>
 				<th scope="col">{{ 'label.interval'|trans }}</th>
 				<th scope="col">{{ 'label.remaining'|trans }}</th>
-				{% for maintenance in recentMaintenances %}
-				<th>{{ maintenance.dateString }}</th>
-				{% endfor %}
+				<th scope="col">{{ 'label.lastService'|trans }}</th>
+				<th scope="col">{{ 'label.serviceHistory'|trans }}</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for status in serviceStatuses %}
-			<tr class="{% if status.status == 'overdue' %}table-danger{% elseif status.status == 'warning' %}table-warning{% else %}table-success{% endif %}">
+            {% set taskMaintenances = recentMaintenances|filter(maintenance => maintenance.hasTask(status.task)) %}
+			<tr>
 				<th scope="row">
 					<div class="service-interval-table__task">
 						<strong>{{ status.task.name }}</strong>
+                        {% if status.task.description is not empty %}
+                            <small class="d-block text-muted">{{ status.task.description }}</small>
+                        {% endif %}
 						<span class="status-pill status-pill--{{ status.status }}">{{ ('status.' ~ status.status)|trans }}</span>
 					</div>
 				</th>
 				<td>
-					{{ status.interval|number_format }}
-					{% if status.intervalType in distanceIntervalTypes %}
-						km
-					{% elseif status.intervalType == dayIntervalType %}
-						{{ 'label.days'|trans }}
-					{% elseif status.intervalType == monthIntervalType %}
-						{{ 'label.months'|trans }}
-					{% elseif status.intervalType == yearIntervalType %}
-						{{ 'label.years'|trans }}
-					{% endif %}
+                    <div class="workshop-table__stack">
+                        <strong>
+    						{{ status.interval|number_format }}
+    						{% if status.intervalType in distanceIntervalTypes %}
+    							km
+    						{% elseif status.intervalType == dayIntervalType %}
+    							{{ 'label.days'|trans }}
+    						{% elseif status.intervalType == monthIntervalType %}
+    							{{ 'label.months'|trans }}
+    						{% elseif status.intervalType == yearIntervalType %}
+    							{{ 'label.years'|trans }}
+    						{% endif %}
+                        </strong>
+                        <small class="text-muted">{{ status.usesPurchaseBaseline ? ('label.purchaseBaseline'|trans) : ('label.trackedTasks'|trans) }}</small>
+                    </div>
 				</td>
 				<td>
-					{% if status.remainingDistance is not null %}
-						{% if status.remainingDistance >= 0 %}
-							{{ status.remainingDistance|number_format }} km
-						{% else %}
-							{{ 'label.overdueBy'|trans }} {{ (status.remainingDistance * -1)|number_format }} km
-						{% endif %}
-						<small class="d-block text-muted">{{ 'label.dueAt'|trans }} {{ status.dueOdometer|number_format }} km</small>
-					{% else %}
-						{% if status.remainingDays >= 0 %}
-							{{ status.remainingDays|number_format }} {{ 'label.days'|trans }}
-						{% else %}
-							{{ 'label.overdueBy'|trans }} {{ (status.remainingDays * -1)|number_format }} {{ 'label.days'|trans }}
-						{% endif %}
-						<small class="d-block text-muted">{{ 'label.dueOn'|trans }} {{ status.dueDate|date('Y-m-d') }}</small>
-					{% endif %}
-					<small class="d-block text-muted">
-						{% if status.hasRecordedService %}
-							{{ 'label.lastServiceEntry'|trans }}
-							{% if status.remainingDistance is not null %}
-								{{ status.lastServiceOdometer|number_format }} km
-							{% else %}
-								{{ status.lastServiceDate|date('Y-m-d') }}
-							{% endif %}
-						{% else %}
-							{{ 'label.purchaseBaseline'|trans }}
-						{% endif %}
-					</small>
+                    <div class="workshop-table__stack">
+    					{% if status.remainingDistance is not null %}
+    						<strong>
+        						{% if status.remainingDistance >= 0 %}
+        							{{ status.remainingDistance|number_format }} km
+        						{% else %}
+        							{{ 'label.overdueBy'|trans }} {{ (status.remainingDistance * -1)|number_format }} km
+        						{% endif %}
+                            </strong>
+    						<small class="text-muted">{{ 'label.dueAt'|trans }} {{ status.dueOdometer|number_format }} km</small>
+    					{% else %}
+                            <strong>
+        						{% if status.remainingDays >= 0 %}
+        							{{ status.remainingDays|number_format }} {{ 'label.days'|trans }}
+        						{% else %}
+        							{{ 'label.overdueBy'|trans }} {{ (status.remainingDays * -1)|number_format }} {{ 'label.days'|trans }}
+        						{% endif %}
+                            </strong>
+    						<small class="text-muted">{{ 'label.dueOn'|trans }} {{ status.dueDate|date('Y-m-d') }}</small>
+    					{% endif %}
+                    </div>
 				</td>
-				{% for maintenance in recentMaintenances %}
 				<td>
-					{% if maintenance.hasTask(status.task) %}
-						{% if status.intervalType in distanceIntervalTypes %}
-							{{ maintenance.odometer|number_format }} km
-						{% else %}
-							{{ maintenance.dateString }}
-						{% endif %}
-					{% endif %}
-				</td>
-				{% endfor %}
+                    <div class="workshop-table__stack">
+    					{% if status.hasRecordedService %}
+                            <strong>
+        						{% if status.remainingDistance is not null %}
+        							{{ status.lastServiceOdometer|number_format }} km
+        						{% else %}
+        							{{ status.lastServiceDate|date('Y-m-d') }}
+        						{% endif %}
+                            </strong>
+                            <small class="text-muted">{{ 'label.lastServiceEntry'|trans }}</small>
+    					{% else %}
+                            <strong>{{ 'label.notRecorded'|trans }}</strong>
+                            <small class="text-muted">{{ 'label.purchaseBaseline'|trans }}</small>
+    					{% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="workshop-table__history">
+                        {% for maintenance in taskMaintenances %}
+                            <span class="workshop-table__history-item">
+                                {% if status.intervalType in distanceIntervalTypes %}
+                                    {{ maintenance.odometer|number_format }} km
+                                {% else %}
+                                    {{ maintenance.dateString }}
+                                {% endif %}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">{{ 'label.notRecorded'|trans }}</span>
+                        {% endfor %}
+                    </div>
+                </td>
 			</tr>
 			{% else %}
 			<tr class="table-warning">
-				<td colspan="{{ 3 + recentMaintenances|length }}" align="center">{{ 'body.bikeShow.noUpcomingEvents'|trans }}</td>
+				<td colspan="5" align="center">{{ 'body.bikeShow.noUpcomingEvents'|trans }}</td>
 			</tr>
 			{% endfor %}
 		</tbody>

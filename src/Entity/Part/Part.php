@@ -12,7 +12,7 @@ use App\Entity\User\User;
 
 /**
  *
- * @ORM\Entity(repositoryClass="App\Repository\Part\TaskRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Part\PartRepository")
  */
 class Part extends AggregateBase {
 
@@ -41,8 +41,9 @@ class Part extends AggregateBase {
 			throw new \Exception ( "Can't create entity without a command." );
 
 		parent::__construct ( $user );
+		$this->manufacturers = new ArrayCollection ();
 		$this->name = $c->name;
-		$this->manufacturer = $manufacturer;
+		$this->manufacturers->add ( $manufacturer );
 	}
 
 	/**
@@ -64,11 +65,12 @@ class Part extends AggregateBase {
 	 * @param User $user
 	 * @return Part
 	 */
-	public function addManufacturer(Manufacturer $manufacturer, User $user): Manufacturer {
+	public function addManufacturer(Manufacturer $manufacturer, User $user): Part {
 		if($this->manufacturers->contains($manufacturer))
-			return $manufacturer;
+			return $this;
 		parent::updateBase ( $user );
-		return $manufacturer;
+		$this->manufacturers->add ( $manufacturer );
+		return $this;
 	}
 
 	/**

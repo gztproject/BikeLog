@@ -10,3 +10,11 @@ refueling:
   fuel_quantity_positive: Količina goriva mora biti večja od nič.
   price_required: Vnesite skupno ceno.
   price_non_negative: Cena ne sme biti negativna.
+servicePlan:
+  task_required: Izberite opravilo.
+  part_required: Izberite del ali uporabite obstoječe opravilo.
+  name_required: Ob ustvarjanju novega opravila vnesite naziv.
+  description_required: Ob ustvarjanju novega opravila vnesite opis.
+  interval_required: Vnesite servisni interval.
+  interval_positive: Servisni interval mora biti večji od nič.
+  interval_type_required: Izberite vrsto intervala.
