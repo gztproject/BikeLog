@@ -1,0 +1,65 @@
+{% extends 'dashboard/layout.html.twig' %}
+
+{% block body_id 'bike_service_plan' %}
+
+{% block main %}
+<section class="page-shell service-plan-page">
+    <div class="dashboard-page__header">
+        <div>
+            <span class="dashboard-page__eyebrow">{{ bike.model.manufacturer.name }} · {{ bike.year }}</span>
+            <h1 class="page-shell__title">{{ bike.name }} · {{ 'title.servicePlan'|trans }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.servicePlan.bike'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_model_service_plan', {id: bike.model.id}) }}" class="btn btn-outline-secondary">
+                    <i class="fa fa-cogs" aria-hidden="true"></i> {{ 'action.manageModelPlan'|trans }}
+                </a>
+            {% endif %}
+            <a href="{{ path('bike_show', {id: bike.id}) }}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+            </a>
+        </div>
+    </div>
+
+    <div class="service-plan-page__grid">
+        <section class="inventory-panel">
+            <div class="inventory-panel__header">
+                <div>
+                    <h2 class="inventory-panel__title">{{ 'title.servicePlan'|trans }}</h2>
+                    <p class="inventory-panel__subtitle">{{ 'body.servicePlan.bikeCurrent'|trans }}</p>
+                </div>
+                <span class="inventory-panel__badge">{{ bike.serviceIntervals|length|number_format }} {{ 'label.trackedTasks'|trans }}</span>
+            </div>
+
+            {{ include('servicePlan/_groups.html.twig', {
+                servicePlanGroups: servicePlanGroups,
+                show_source: true,
+                show_status: true,
+            }, with_context = false) }}
+        </section>
+
+        <section class="inventory-panel">
+            <div class="inventory-panel__header">
+                <div>
+                    <h2 class="inventory-panel__title">{{ 'title.bikeOverrides'|trans }}</h2>
+                    <p class="inventory-panel__subtitle">{{ 'body.servicePlan.override'|trans }}</p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                {{ form_start(overrideForm, {'attr': {'class': 'service-plan-form'}}) }}
+                {{ form_row(overrideForm.task) }}
+                {{ form_row(overrideForm.interval) }}
+                {{ form_row(overrideForm.intervalType) }}
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-plus" aria-hidden="true"></i> {{ 'action.addBikeOverride'|trans }}
+                    </button>
+                </div>
+                {{ form_end(overrideForm) }}
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}

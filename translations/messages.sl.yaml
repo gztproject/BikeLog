@@ -17,15 +17,44 @@ title:
   update: Posodobitve
   updater: Posodabljanje
   serviceIntervals: Servisni intervali
+  statistics: Statistika
+  upcomingEvents: Prihajajoči dogodki
+  alerts: Opozorila
+  parts: Deli
+  servicePlan: Servisni plan
+  bikeOverrides: Prilagoditve motorja
   
 
 label:
   update:
     bike: Posodobi motor
     refueling: Posodobi točenje
+  workshopProfile: Profil delavnice
+  workshopActions: Dejanja delavnice
+  inventoryCount: Prikazani motorji
+  visibleOnThisPage: Trenutna stran
+  totalOdometer: Skupni števec
+  totalDistance: Zabeležena razdalja
+  totalMaintenanceCosts: Stroški servisov
+  totalFuelCosts: Stroški goriva
+  totalSpend: Skupni strošek
+  bikeOverview: Pregled motorjev
+  costsToDate: Skupni stroški
+  lastRefueling: Zadnje točenje
+  lastMaintenance: Zadnji servis
+  alertsOpen: Odprta opozorila
+  notRecorded: Ni zabeleženo
+  theme: Tema
+  themeLight: Svetla
+  themeDark: Temna
+  themeSystem: Sistem
+  units:
+    bikes: motorjev
+    services: servisov
   noneFound:
     users: Ne najdem nobenega uporabnika
     refuelings: Ne najdem nobenega točenja.
+    maintenances: Ne najdem nobenih servisov.
   save:
     maintenance: Shrani servis
   create:
@@ -43,6 +72,7 @@ label:
   dateTo: Do  
   odometer: Števec
   distance: Razdalja
+  relativeMileage: Relativna kilometrina
   fuelQuantity: Količina goriva
   price: Cena
   consumption: Poraba
@@ -50,10 +80,12 @@ label:
   comment: Komentar
   nickname: Vzdevek
   vin: VIN
+  purchaseDate: Datum nakupa
   purchasePrice: Nakupna cena
   purchaseOdometer: Nakupna kilometrina
   model: Model
   picture: Slika
+  fuelTankSize: Velikost rezervoarja
   isTankFull: Polno točenje
   isNotBreakingContinuum: Ni izpuščenih točenj
   email: E-mail
@@ -63,8 +95,19 @@ label:
   mobile: GSM
   profilePicture: Avatar
   isRoleAdmin: Administrator
+  currentVersion: Trenutna različica
   task: Opravilo
+  manufacturer: Proizvajalec
+  part: Del
+  existingTask: Obstoječe opravilo
+  createNewTask: Ustvari novo opravilo
+  selectPart: Izberite del
+  selectTask: Izberite opravilo
+  searchParts: Išči dele
+  noMatchingParts: Ni ustreznih delov
+  taskName: Naziv opravila
   interval: Interval
+  intervalType: Vrsta intervala
   remaining: Do nasl. servisa
   spentTime: Porabljen čas
   unspecifiedCosts: Neopredeljeni stroški
@@ -86,6 +129,39 @@ label:
   cancel: Prekliči
   do-update: Posodobi
   description: Opis
+  qualifiedSamples: Upoštevani vzorci
+  excludedSamples: Izločeni vzorci
+  sampleThreshold: Prag vzorca
+  dueIn: Zapade čez
+  overdueBy: Prekoračeno za
+  dueAt: Zapade pri
+  dueOn: Zapade dne
+  lastServiceEntry: Zadnji servis
+  lastService: Zadnji servis
+  purchaseBaseline: Osnova je nakup
+  trackedTasks: spremljanih opravil
+  servicesRecorded: zabeleženih servisov
+  serviceHistory: Zgodovina servisov
+  expectedInterval: Predviden interval
+  actualInterval: Dejanski interval
+  avgIntervalDistance: Povp. servisni razmik
+  avgIntervalTime: Povp. časovni razmik
+  source: Vir
+  modelDefault: Modelski privzeto
+  bikeOverride: Prilagoditev motorja
+  notEnoughHistory: Premalo zgodovine
+  notTracked: Ni spremljano
+  general: Splošno
+  intervalDistanceAbsolute: Absolutna razdalja
+  intervalDistanceRelative: Relativna razdalja
+  performanceOver: Nad pričakovanji
+  performanceUnder: Pod pričakovanji
+  performance:
+    overperforming: Nad pričakovanji
+    underperforming: Pod pričakovanji
+    on_target: V okviru plana
+    not_enough_history: Premalo zgodovine
+    not_tracked: Ni spremljano
 
 
 action:
@@ -94,6 +170,8 @@ action:
     refueling: Dodaj točenje
     user: Dodaj uporabnika
     maintenance: Dodaj servis
+    task: Dodaj opravilo
+    part: Dodaj del
   delete:
     user: Izbriši uporabnika
   show: Pokaži
@@ -101,6 +179,10 @@ action:
   sign_in: Prijava
   login: Prijava
   save: Shrani
+  locate: Osveži lokacijo
+  manageBikePlan: Servisni plan motorja
+  manageModelPlan: Servisni plan modela
+  addBikeOverride: Dodaj prilagoditev motorja
   backToList: Nazaj na seznam
   cancel: Prekliči
   back_to_list: Nazaj na seznam
@@ -109,8 +191,63 @@ action:
     check: Preveri posodobitve
   
 body:
+  dashboard:
+    summary: Pregleden delavniški prikaz motorjev, servisne zgodovine in vsakodnevnih opravil.
+    inventory: Trenutni motorji v evidenci, pripravljeni za pregled in nadaljnje delo.
+    sidebar: Dodajte nov motor in ohranite delavniško evidenco ažurno.
+  bikeIndex:
+    summary: Delavniški register motorjev s pregledom kilometrov, goriva in servisov na enem mestu.
+    inventory: Preglejte posamezen motor, odprite podrobnosti ali takoj vnesite točenje oziroma servis.
+    sidebar: Ustvarite nov zapis motorja ali dodajte naslednje točenje kar iz nadzorne plošče.
+    empty: Začnite evidenco z vašim prvim motorjem in njegovim delavniškim zapisom.
+  bikeShow:
+    summary: Delavniški karton motorja z gorivom, servisi in časovnico opravil na enem mestu.
+    statistics: Ključni stroški, kakovost vzorca točenj in spremljani servisni intervali.
+    parts: Zgodovina servisov po delih, primerjava z intervali in trenutna uspešnost posameznih delov.
+    partSelector: Osredotočite se na en del naenkrat in preglejte njegov servisni trend, skladnost z intervali in zgodovino.
+    upcoming: Naslednji servisni dogodki, urejeni po nujnosti, z datumom ali kilometrino zapadlosti.
+    alerts: Najprej izpostavljena zapadla opravila in nezanesljiva statistika točenj.
+    serviceIntervals: Trenutni servisni intervali z zgodovino iz zadnjih zabeleženih servisov.
+    refueling: Zgodovina točenj z izračuni, ki ignorirajo drobna ali delna točenja.
+    maintenance: Zgodovina delavnice, porabljen čas in stroški za ta motor.
+    sidebar: Dodajte točenje, servis ali skočite neposredno na servisni plan.
+    noAlerts: Ni aktivnih opozoril. Motor je trenutno v planu.
+    noUpcomingEvents: Za ta motor ni nastavljenih servisnih intervalov.
+    usingPurchaseBaseline: Če opravilo še ni bilo zabeleženo, se kot izhodišče uporabi datum ali kilometrina nakupa.
+    refuelingThreshold: Povprečja goriva ignorirajo delna ali zelo majhna točenja pod %threshold% l.
+    refuelingPending: Za zanesljivo statistiko potrebujete polno točenje vsaj %threshold% l.
+    refuelingSingleSample: Povprečja goriva trenutno temeljijo le na enem ustreznem polnem točenju.
+    refuelingFiltered: "Iz povprečij goriva je bilo izločenih %count% majhnih ali delnih točenj."
+    noPartStats: Podatki za statistiko delov še niso na voljo.
+    noPartHistory: Za ta del še ni zabeleženih servisnih vnosov.
+  servicePlan:
+    bike: Preglejte veljavni servisni plan za ta motor in po potrebi dodajte prilagoditve intervalov samo za ta motor.
+    bikeCurrent: Združeni modelski privzeti intervali in prilagoditve za ta motor.
+    model: Urejajte ponovljivo servisno shemo modela, vključno z deli, opravili in privzetimi intervali.
+    modelCurrent: Trenutna modelska opravila in servisni intervali, razvrščeni po delih.
+    modelSwitch: Tukaj izberite proizvajalca in model. Predlogi obstoječih opravil ostanejo omejeni na izbrani model in univerzalna opravila.
+    override: Dodajte ali prilagodite interval posameznega opravila za ta motor, brez spremembe modelskih privzetih nastavitev.
+    existingTaskModelScoped: Ponovno uporabite opravila, ki jih ta model že spremlja. Opravila brez dela se obravnavajo kot univerzalna in jih lahko uporabite na več modelih.
+    partOptional: Polje za del pustite prazno, če želite ustvariti splošno opravilo, ki ga lahko uporabite tudi na drugih modelih.
+    partEditor: Dodajte nov del za tega proizvajalca, da lahko nanj vežete opravila.
+    taskEditor: Uporabite obstoječe opravilo ali ustvarite novo ter mu nastavite privzeti modelski interval.
+    empty: Za ta servisni plan še ni nastavljenih vnosov.
   delete:
     userModal: Ali ste prepričani da želite izbrisati uporabnika?
+
+flash:
+  servicePlan:
+    bikeTaskExists: Ta motor že ima prilagojen interval za izbrano opravilo.
+    bikeOverrideCreated: Servisni interval za ta motor je shranjen.
+    partExists: Ta del za tega proizvajalca že obstaja.
+    partCreated: Del je dodan v katalog proizvajalca.
+    modelTaskExists: Ta model že spremlja izbrano opravilo.
+    taskCreated: Opravilo in interval sta shranjena v servisni plan modela.
+
+status:
+  ok: V planu
+  warning: Kmalu zapade
+  overdue: Zapadlo
 
 user:
   updated_successfuly: Spremembe uspešno shranjene.
@@ -128,5 +265,23 @@ menu:
 
 help:
  login: Prijava
+ formInvalidTitle: Popravite označena polja in poskusite znova.
+ locationPending: Poskušam pridobiti trenutno lokacijo.
+ locationReady: Trenutna lokacija je dodana.
+ locationUnavailable: Trenutna lokacija ni na voljo.
+ locationUnsupported: Brskalnik ne podpira dostopa do lokacije.
+ refuelingSelectBike: Izberite motor za sprotni pomočnik pri kilometrini.
+ refuelingCurrentOdometer: Trenutno zabeležen števec
+ refuelingRelativeBaseline: Izhodišče relativne kilometrine
+ refuelingBaselineLastRefueling: zadnje točenje
+ refuelingBaselinePurchase: kilometrina ob nakupu
+ refuelingRelativeReady: Relativna kilometrina se prišteje k
+ refuelingRelativeDisabled: Relativna kilometrina je na voljo le za vnose na ali po zadnjem točenju.
+ refuelingRelativeDisabledContinuum: Relativna kilometrina je izključena, ko dopuščate izpuščena točenja.
+ refuelingOdometerMinimum: Najmanjši števec za ta vnos
+ refuelingOdometerValid: Števec je v veljavnem območju. Najmanj pričakovana vrednost
+ refuelingOdometerTooLow: Števec je prenizek za ta motor. Najmanj pričakovana vrednost
+ refuelingTankFull: Pustite označeno pri polnem točenju, da ostane statistika porabe zanesljiva.
+ refuelingContinuum: Pustite kontinuiteto vključeno, ko točenje neposredno sledi prejšnjemu vnosu.
 
 Save: Shrani

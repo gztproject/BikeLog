@@ -1,152 +1,113 @@
 import 'eonasdan-bootstrap-datetimepicker';
 import moment from 'moment';
-import withQuery from 'with-query';
-import queryString from 'query-string';
+const { createDateTimePickerOptions } = require('../dateTimePickerOptions');
+const { buildFilterUrl, parseFilterState } = require('./dateBikeFilterState');
 
-$(function() {
-
-    $('#dateFieldYear').datetimepicker({
-        format: 'YYYY',
-        icons: {
-            time: "fa fa-clock",
-            date: "fa fa-calendar",
-            up: "fa fa-arrow-up",
-            down: "fa fa-arrow-down",
-            previous: "fa fa-arrow-left",
-            next: "fa fa-arrow-right",
-            today:"fa fa-calendar-day",
-            clear:"fa fa-backspace",
-            close:"fa fa-times"
-        },
-        showClear: true,
-        locale:'sl',   
+function redirectWithFilters(updates) {
+    document.location = buildFilterUrl(document.location.href, {
+        ...updates,
+        page: undefined,
     });
+}
 
-    $('#dateFieldFrom').datetimepicker({
-        format: 'DD. MM. YYYY',
-        icons: {
-            time: "fa fa-clock",
-            date: "fa fa-calendar",
-            up: "fa fa-arrow-up",
-            down: "fa fa-arrow-down",
-            previous: "fa fa-arrow-left",
-            next: "fa fa-arrow-right",
-            today:"fa fa-calendar-day",
-            clear:"fa fa-backspace",
-            close:"fa fa-times"
-        },
-        showTodayButton: true,
-        showClear: true,
-        locale:'sl',
-        //defaultDate: moment().startOf('month'),
+$(function () {
+    const initialState = parseFilterState(window.location.search);
 
-    });
+    if ($('#dateFieldYear').length) {
+        $('#dateFieldYear').datetimepicker(
+            createDateTimePickerOptions({
+                format: 'YYYY',
+                showClear: true,
+            })
+        );
+    }
 
-    $('#dateFieldTo').datetimepicker({
-        format: 'DD. MM. YYYY',
-        icons: {
-            time: "fa fa-clock",
-            date: "fa fa-calendar",
-            up: "fa fa-arrow-up",
-            down: "fa fa-arrow-down",
-            previous: "fa fa-arrow-left",
-            next: "fa fa-arrow-right",
-            today:"fa fa-calendar-day",
-            clear:"fa fa-backspace",
-            close:"fa fa-times"
-        },
-        showTodayButton: true,
-        showClear: true,
-        locale:'sl',
-        useCurrent: false //Important! See issue #1075   
-    });    
-    
-    $("#dateFieldFrom").on("dp.change", function (e) {
+    $('#dateFieldFrom').datetimepicker(
+        createDateTimePickerOptions({
+            format: 'DD. MM. YYYY',
+            showTodayButton: true,
+            showClear: true,
+        })
+    );
+
+    $('#dateFieldTo').datetimepicker(
+        createDateTimePickerOptions({
+            format: 'DD. MM. YYYY',
+            showTodayButton: true,
+            showClear: true,
+            useCurrent: false,
+        })
+    );
+
+    $('#dateFieldFrom').on('dp.change', function onDateFromChange(e) {
         $('#dateFieldTo').data("DateTimePicker").minDate(e.date);
-    });    
+    });
 
-    if(typeof queryString.parse(location.search)['year'] !== 'undefined')
-        $('#dateFieldYear').data("DateTimePicker").date(moment.year = (queryString.parse(location.search)['year']));
-    if(typeof queryString.parse(location.search)['dateFrom'] !== 'undefined')
-        $('#dateFieldFrom').data("DateTimePicker").date(moment.unix(queryString.parse(location.search)['dateFrom']));
-    if(typeof queryString.parse(location.search)['dateTo'] !== 'undefined')
-        $('#dateFieldTo').data("DateTimePicker").date(moment.unix(queryString.parse(location.search)['dateTo']));
+    if (initialState.year && $('#dateFieldYear').length) {
+        $('#dateFieldYear').data('DateTimePicker').date(moment(initialState.year, 'YYYY'));
+    }
+    if (initialState.dateFrom !== undefined) {
+        $('#dateFieldFrom').data('DateTimePicker').date(moment.unix(initialState.dateFrom));
+    }
+    if (initialState.dateTo !== undefined) {
+        $('#dateFieldTo').data('DateTimePicker').date(moment.unix(initialState.dateTo));
+    }
 
-    $.getJSON("/dashboard/bike/list", function(data, status){
+    $.getJSON('/dashboard/bike/list', function onBikeListLoaded(data) {
         $("#bikePicker").append($('<option>', {
-            value: "",
+            value: '',
             text: "*",
         }));
-        data[0].data.bikes.forEach(function(el){
+        data[0].data.bikes.forEach(function addBikeOption(el) {
             $("#bikePicker").append($('<option>', {
                 value: el.id,
                 text: el.name,
             }));
         });
-        console.log("Loaded bikes"); 
-        var orgId = queryString.parse(location.search)['bike'];
-        var select = $('#bikePicker');
-        if(typeof orgId !== 'undefined')
-        {
-            $('#bikePicker').val(orgId);
-            console.log("Selected bike " + orgId);
-        }  
+
+        if (initialState.bike) {
+            $('#bikePicker').val(initialState.bike);
+        }
     });
-      
-  
 });
 
-$( document ).ready(function(){    
-    
-    console.log("Binding event"); 
-    $('#bikePicker').on('change', function() {
-        var url = withQuery(document.location.href,
-        {
-            bike: $('#bikePicker').find(":selected").val(),
-            page: undefined                
+$(document).ready(function () {
+    $('#bikePicker').on('change', function onBikeChange() {
+        redirectWithFilters({
+            bike: $('#bikePicker').find(':selected').val() || undefined,
         });        
-        document.location = url;        
     });
 
-    $("#dateFieldYear").on("dp.change", function (e) {        
-        if(e.oldDate){
-            var url = withQuery(document.location.href,{
-                dateFrom: e.date.isValid?moment(e.date).startOf('year').format('X'):undefined,
-                dateTo: e.date.isValid?moment(e.date).endOf('year').format('X'):undefined,
-                year: e.date.isValid?moment(e.date).format('YYYY'):undefined,
-                page: undefined
-            });        
-            document.location = url;
+    $('#dateFieldYear').on('dp.change', function onYearChange(e) {
+        if (e.oldDate || e.date) {
+            redirectWithFilters({
+                dateFrom: e.date && e.date.isValid() ? moment(e.date).startOf('year').format('X') : undefined,
+                dateTo: e.date && e.date.isValid() ? moment(e.date).endOf('year').format('X') : undefined,
+                year: e.date && e.date.isValid() ? moment(e.date).format('YYYY') : undefined,
+            });
         }
     });
 
-    $('#dateFieldFrom').on('dp.change', function(e){
-        if(e.oldDate){
-            var url = withQuery(document.location.href,{
-                dateFrom: e.date.isValid?moment(e.date).startOf('day').format('X'):undefined, 
-                year: undefined,               
-                page: undefined
-            });        
-            document.location = url;
-        }
-
-    });
-
-    $('#dateFieldTo').on('dp.change', function(e){
-        if(e.oldDate){
-            var url = withQuery(document.location.href,{
-                dateTo: e.date.isValid?moment(e.date).endOf('day').format('X'):undefined,
+    $('#dateFieldFrom').on('dp.change', function onFilterFromChange(e) {
+        if (e.oldDate || e.date) {
+            redirectWithFilters({
+                dateFrom: e.date && e.date.isValid() ? moment(e.date).startOf('day').format('X') : undefined,
                 year: undefined,
-                page: undefined
-            });        
-            document.location = url;
+            });
         }
     });
-    
 
-    $('#clearFilterBtn').on('click', function(e){
-        var url = location.href.replace(location.search, "");
+    $('#dateFieldTo').on('dp.change', function onFilterToChange(e) {
+        if (e.oldDate || e.date) {
+            redirectWithFilters({
+                dateTo: e.date && e.date.isValid() ? moment(e.date).endOf('day').format('X') : undefined,
+                year: undefined,
+            });
+        }
+    });
+
+    $('#clearFilterBtn').on('click', function onClearFilters() {
+        const url = location.href.replace(location.search, '');
         document.location = url;
     });
 });
-

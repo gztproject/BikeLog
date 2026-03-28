@@ -7,7 +7,33 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
 <title>{% block title %}GZT Bike Log{% endblock %}</title>
+<script>
+    (function () {
+        var key = 'bikelog-theme';
+        var preference = 'system';
+
+        try {
+            preference = localStorage.getItem(key) || 'system';
+        } catch (error) {
+            preference = 'system';
+        }
+
+        if (['light', 'dark', 'system'].indexOf(preference) === -1) {
+            preference = 'system';
+        }
+
+        var resolved = preference;
+
+        if (preference === 'system') {
+            resolved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        document.documentElement.dataset.themePreference = preference;
+        document.documentElement.dataset.theme = resolved;
+    })();
+</script>
 
 {% block stylesheets %}
 
@@ -95,6 +121,22 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 						{% endblock %}
 					</ul>
 					<ul class="navbar-nav navbar-right">
+						<li class="nav-item theme-nav-item">
+							<div class="theme-switch" data-theme-switcher role="group" aria-label="{{ 'label.theme'|trans }}">
+								<button type="button" class="theme-switch__button" data-theme-mode="light" title="{{ 'label.themeLight'|trans }}" aria-label="{{ 'label.themeLight'|trans }}">
+									<i class="fa fa-sun" aria-hidden="true"></i>
+									<span class="theme-switch__label">{{ 'label.themeLight'|trans }}</span>
+								</button>
+								<button type="button" class="theme-switch__button" data-theme-mode="system" title="{{ 'label.themeSystem'|trans }}" aria-label="{{ 'label.themeSystem'|trans }}">
+									<i class="fa fa-desktop" aria-hidden="true"></i>
+									<span class="theme-switch__label">{{ 'label.themeSystem'|trans }}</span>
+								</button>
+								<button type="button" class="theme-switch__button" data-theme-mode="dark" title="{{ 'label.themeDark'|trans }}" aria-label="{{ 'label.themeDark'|trans }}">
+									<i class="fa fa-moon" aria-hidden="true"></i>
+									<span class="theme-switch__label">{{ 'label.themeDark'|trans }}</span>
+								</button>
+							</div>
+						</li>
 						{% if app.user %}
 						<li class="nav-item dropdown"><a
 							class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"

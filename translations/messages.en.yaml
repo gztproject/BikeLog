@@ -3,6 +3,7 @@ title:
     bike: New bike
     refueling: New refueling
     user: New user
+    maintenance: New maintenance
   list:
     users: User list
   delete:
@@ -11,15 +12,103 @@ title:
   homepage: BikeLog 
   myBikes: My bikes
   refueling: Refueling
+  maintenance: Maintenance
+  workshop: Workshop
+  update: Updates
+  updater: Update process
+  serviceIntervals: Service intervals
+  statistics: Statistics
+  upcomingEvents: Upcoming events
+  alerts: Alerts
+  parts: Parts
+  servicePlan: Service plan
+  bikeOverrides: Bike overrides
   
 
 label:
   update:
     bike: Update bike
     refueling: Update refueling
+  workshopProfile: Workshop profile
+  workshopActions: Workshop actions
+  inventoryCount: Bikes shown
+  visibleOnThisPage: Current page
+  totalOdometer: Fleet odometer
+  totalDistance: Logged distance
+  totalMaintenanceCosts: Maintenance spend
+  totalFuelCosts: Fuel spend
+  totalSpend: Total spend
+  bikeOverview: Bike overview
+  costsToDate: Total spend
+  lastRefueling: Last refueling
+  lastMaintenance: Last maintenance
+  alertsOpen: Open alerts
+  notRecorded: Not recorded
+  theme: Theme
+  themeLight: Light
+  themeDark: Dark
+  themeSystem: System
+  task: Task
+  manufacturer: Manufacturer
+  part: Part
+  existingTask: Existing task
+  createNewTask: Create a new task
+  selectPart: Select a part
+  selectTask: Select a task
+  searchParts: Search parts
+  noMatchingParts: No matching parts
+  taskName: Task name
+  interval: Interval
+  intervalType: Interval type
+  remaining: Remaining
+  range: Range
+  location: Location
+  spentTime: Time spent
+  description: Description
+  cost: Cost
+  years: years
+  months: months
+  days: days
+  qualifiedSamples: Qualified samples
+  excludedSamples: Excluded samples
+  sampleThreshold: Sample threshold
+  dueIn: Due in
+  overdueBy: Overdue by
+  dueAt: Due at
+  dueOn: Due on
+  lastServiceEntry: Last service
+  lastService: Last service
+  purchaseBaseline: Using purchase entry as baseline
+  trackedTasks: tracked tasks
+  servicesRecorded: services recorded
+  serviceHistory: Service history
+  expectedInterval: Expected interval
+  actualInterval: Actual interval
+  avgIntervalDistance: Avg. service gap
+  avgIntervalTime: Avg. time gap
+  source: Source
+  modelDefault: Model default
+  bikeOverride: Bike override
+  notEnoughHistory: Not enough history
+  notTracked: Not tracked
+  general: General
+  intervalDistanceAbsolute: Absolute distance
+  intervalDistanceRelative: Relative distance
+  performanceOver: Overperforming
+  performanceUnder: Underperforming
+  performance:
+    overperforming: Overperforming
+    underperforming: Underperforming
+    on_target: On target
+    not_enough_history: Not enough history
+    not_tracked: Not tracked
+  units:
+    bikes: bikes
+    services: services
   noneFound:
     users: Can't find any users.
     refuelings: Can't find any refuelings
+    maintenances: Can't find any maintenance entries.
   username: Username
   password: Password
   repeatPassword: Repeat password
@@ -32,16 +121,19 @@ label:
   dateTo: To  
   odometer: Odometer
   distance: Distance
+  relativeMileage: Relative mileage
   fuelQuantity: fuel quantity
   price: Price
   consumption: Consumption
   comment: Comment
   nickname: Nickname
   vin: VIN
+  purchaseDate: Purchase date
   purchasePrice: Purchase price
   purchaseOdometer: Purchase odometer
   model: Model
   picture: Picture
+  fuelTankSize: Tank size
   isTankFull: Full tank
   isNotBreakingContinuum: No skipped refuelings 
   email: E-mail
@@ -51,6 +143,9 @@ label:
   mobile: Mobile
   profilePicture: Profile picture
   isRoleAdmin: Administrator
+  currentVersion: Current version
+  cancel: Cancel
+  do-update: Update
 
 
 action:
@@ -58,6 +153,8 @@ action:
     bike: Add bike
     refueling: Add refueling
     user: Add user
+    task: Add task
+    part: Add part
   delete:
     user: Delete user
   show: Show
@@ -65,12 +162,74 @@ action:
   sign_in: Sign in
   login: Log in
   save: Save
+  locate: Refresh location
+  manageBikePlan: Bike service plan
+  manageModelPlan: Model service plan
+  addBikeOverride: Add bike override
   backToList: Back to list
+  back_to_list: Back to list
   cancel: Cancel
+  update:
+    check: Check for updates
   
 body:
+  dashboard:
+    summary: A clear workshop-style view of your bikes, service history, and day-to-day activity.
+    inventory: Current motorcycles prepared for the shop floor and ready for inspection.
+    sidebar: Start a new bike record and keep the workshop inventory current.
+  bikeIndex:
+    summary: A workshop-style bike register with mileage, fuel, and service context available at a glance.
+    inventory: Review each bike, open its detail page, or jump straight into refueling and maintenance work.
+    sidebar: Create a bike or register the next fuel stop without leaving the dashboard.
+    empty: Start the inventory with your first motorcycle and its workshop record.
+  bikeShow:
+    summary: A workshop-ready bike file with fuel, maintenance, and service timing in one place.
+    statistics: Key running costs, refueling sample quality, and tracked service items.
+    parts: Part-by-part service history, interval adherence, and current performance against the service plan.
+    partSelector: Focus one part at a time to review its service trend, interval fit, and history.
+    upcoming: The next service events sorted by urgency, including due mileage and dates.
+    alerts: Overdue work and weak fuel statistics that need attention first.
+    serviceIntervals: Current service intervals with history pulled from recent maintenance entries.
+    refueling: Refueling history with averages based on full, meaningful samples instead of tiny top-ups.
+    maintenance: Workshop history, time spent, and costs recorded for this bike.
+    sidebar: Log fuel, add maintenance, or jump straight into the service schedule from here.
+    noAlerts: No active alerts. This bike is currently on schedule.
+    noUpcomingEvents: No service intervals are configured for this bike.
+    usingPurchaseBaseline: When a task has never been recorded, the purchase date or purchase odometer is used as the starting point.
+    refuelingThreshold: Fuel averages ignore partial or very small fills below %threshold% l.
+    refuelingPending: Fuel averages need a full refueling of at least %threshold% l before they become reliable.
+    refuelingSingleSample: Fuel averages are currently based on a single qualified full refueling.
+    refuelingFiltered: "%count% small or partial refuelings were excluded from the fuel averages."
+    noPartStats: No part-level service history is available yet.
+    noPartHistory: No maintenance entries have been recorded for this part yet.
+  servicePlan:
+    bike: Review the effective service plan for this bike and add bike-specific interval overrides where needed.
+    bikeCurrent: Model defaults and bike-specific overrides combined for this machine.
+    model: Maintain the reusable service plan for this model, including parts, tasks, and default intervals.
+    modelCurrent: Current model-level tasks and service intervals grouped by part.
+    modelSwitch: Choose a manufacturer and model here. Existing-task suggestions stay limited to the selected model plus universal tasks.
+    override: Add or override an interval for one task on this bike without changing the model defaults.
+    existingTaskModelScoped: Reuse tasks already tracked on this model. Partless tasks are treated as universal and can be reused across models.
+    partOptional: Leave the part empty to create a general task that can also be reused across other models.
+    partEditor: Register a new part for this manufacturer so tasks can be attached to it.
+    taskEditor: Reuse an existing task or create a new one, then attach a default model interval.
+    empty: No service-plan entries are configured yet.
   delete:
     userModal: Do you really want to delete the user?
+
+flash:
+  servicePlan:
+    bikeTaskExists: This bike already has a custom interval for that task.
+    bikeOverrideCreated: Bike-specific service interval saved.
+    partExists: That part already exists for this manufacturer.
+    partCreated: Part added to the manufacturer catalog.
+    modelTaskExists: This model already tracks that task.
+    taskCreated: Task and interval saved to the model service plan.
+
+status:
+  ok: On schedule
+  warning: Due soon
+  overdue: Overdue
 
 
   
@@ -81,8 +240,28 @@ menu:
   user: User
   logout: Logout
   users: Users
+  bikes: Bikes
+  updater: Updates
 
 help:
  login: Login
+ formInvalidTitle: Fix the highlighted fields and try again.
+ locationPending: Trying to attach your current location.
+ locationReady: Current location attached.
+ locationUnavailable: Current location is unavailable.
+ locationUnsupported: Browser location is not available.
+ refuelingSelectBike: Select a bike to enable live mileage assistance.
+ refuelingCurrentOdometer: Current recorded odometer
+ refuelingRelativeBaseline: Relative mileage baseline
+ refuelingBaselineLastRefueling: last refueling
+ refuelingBaselinePurchase: purchase odometer
+ refuelingRelativeReady: Relative mileage adds to
+ refuelingRelativeDisabled: Relative mileage is only available for entries on or after the latest refueling.
+ refuelingRelativeDisabledContinuum: Relative mileage is disabled while skipped refuelings are allowed.
+ refuelingOdometerMinimum: Minimum odometer for this entry
+ refuelingOdometerValid: Odometer is in range. Minimum expected value
+ refuelingOdometerTooLow: Odometer is too low for this bike. Minimum expected value
+ refuelingTankFull: Keep this checked for full-tank entries so fuel averages stay reliable.
+ refuelingContinuum: Keep continuity enabled when this entry belongs directly after the previous refueling.
 
 Save: Save

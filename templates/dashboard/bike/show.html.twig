@@ -7,81 +7,459 @@
 {{ encore_entry_link_tags('css/maintenance') }}
 {% endblock %}
 
-{% block main %}
-<div class="row">
-	<h1>
-		{{ bike.name }}
-	</h1>
-</div>
-<div class="row">
-	<div class="col-sm-12">
-		<img src="{{ asset(bike.pictureFilename) }}"
-			style="height: 20rem; object-fit: cover;" class="img-fluid"
-			alt="Bike picture" width="100%">
-	</div>
-</div>
-<div class="row">
-	<div class="col-sm-12">
-		<h1>
-			{{ 'title.serviceIntervals'|trans }}
-		</h1>
-	</div>
-</div>
-<div class="row">
-	<div class="col-sm-12">
-		<div class="bs-component">
-			{{ include('dashboard/serviceInterval/_table.html.twig', {
-                bike : bike       
-            }, with_context = false) }}
-		</div>
-	</div>
-</div>
-<div class="row">
-	<div class="col-sm-12">
-		<h1>
-			{{ 'title.refueling'|trans }}
-		</h1>
+{% block javascripts %}
+{{ parent() }}
+{{ encore_entry_script_tags('js/bike/show') }}
+{{ encore_entry_script_tags('js/maintenance/table') }}
+{% endblock %}
 
-	</div>
-</div>
-<div class="row">
-	<div class="col-sm-12">
-		<div class="bs-component">
-			{{ include('dashboard/refueling/_table.html.twig', {
-                bike : bike,
-                refuelings : refuelings        
-            }, with_context = false) }}			
-		</div>
-	</div>
-</div>
-<div class="row">
-    <div class="col-sm-12">
-        <h1>
-            {{ 'title.maintenance'|trans }}
-        </h1>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-12">
-        <div class="bs-component">
-            {{ include('dashboard/maintenance/_table.html.twig', {
-                bike : bike,
-                maintenances : maintenances       
-            }, with_context = false) }}
+{% set refuelingStats = bike.refuelingStatistics %}
+{% set partStatistics = bike.partStatistics %}
+{% set upcomingServiceEvents = bike.upcomingServiceEvents %}
+{% set serviceAlerts = bike.serviceAlerts %}
+{% set totalSpend = bike.totalFuelPrice + bike.totalMaintenanceCosts %}
+{% set distanceIntervalTypes = [
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::ABSOLUTE_DISTANCE'),
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::RELATIVE_DISTANCE')
+] %}
+{% set dayIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::DAYS') %}
+{% set monthIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::MONTHS') %}
+{% set yearIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::YEARS') %}
+{% set hasFuelAlerts = refuelingStats.qualifiedRefuelings < 2 %}
+{% set fuelAlertCount = refuelingStats.qualifiedRefuelings < 2 ? 1 : 0 %}
+{% set totalAlertCount = serviceAlerts|length + fuelAlertCount %}
+
+{% block main %}
+<section class="page-shell bike-detail-page">
+    <div class="dashboard-page__header">
+        <div>
+            <span class="dashboard-page__eyebrow">{{ bike.model.manufacturer.name }} · {{ bike.year }}</span>
+            <h1 class="page-shell__title">{{ bike.name }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.bikeShow.summary'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <a href="{{ path('refueling_new_id', { 'id': bike.id }) }}" class="btn btn-success dashboard-page__primary-action">
+                <i class="fa fa-gas-pump" aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
+            </a>
+            <a href="{{ path('maintenance_new_id', { 'id': bike.id }) }}" class="btn btn-outline-secondary">
+                <i class="fa fa-wrench" aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
+            </a>
+            <a href="{{ path('bike_index') }}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+            </a>
         </div>
     </div>
-</div>
 
+    <nav class="bike-detail__quick-nav">
+        <a href="#bike-overview" class="bike-detail__quick-link">
+            <span>{{ 'title.statistics'|trans }}</span>
+            <strong>{{ bike.serviceIntervals|length|number_format }}</strong>
+        </a>
+        <a href="#bike-alerts" class="bike-detail__quick-link">
+            <span>{{ 'title.alerts'|trans }}</span>
+            <strong>{{ totalAlertCount|number_format }}</strong>
+        </a>
+        <a href="#bike-upcoming" class="bike-detail__quick-link">
+            <span>{{ 'title.upcomingEvents'|trans }}</span>
+            <strong>{{ upcomingServiceEvents|length|number_format }}</strong>
+        </a>
+        <a href="#bike-parts" class="bike-detail__quick-link">
+            <span>{{ 'title.parts'|trans }}</span>
+            <strong>{{ partStatistics|length|number_format }}</strong>
+        </a>
+        <a href="#bike-service-intervals" class="bike-detail__quick-link">
+            <span>{{ 'title.serviceIntervals'|trans }}</span>
+            <strong>{{ bike.serviceIntervals|length|number_format }}</strong>
+        </a>
+        <a href="#bike-refuelings" class="bike-detail__quick-link">
+            <span>{{ 'title.refueling'|trans }}</span>
+            <strong>{{ bike.numberOfRefuelings|number_format }}</strong>
+        </a>
+        <a href="#bike-maintenance" class="bike-detail__quick-link">
+            <span>{{ 'title.maintenance'|trans }}</span>
+            <strong>{{ bike.numberOfMaintenances|number_format }}</strong>
+        </a>
+    </nav>
+
+    <div id="bike-overview" class="bike-detail__hero">
+        <div class="bike-detail__media">
+            <img
+                class="bike-detail__image"
+                src="{{ asset(bike.pictureFilename) }}"
+                alt="{{ bike.name }}"
+            >
+        </div>
+        <div class="bike-detail__summary">
+            <div class="bike-detail__meta-grid">
+                <article class="bike-detail__meta-card">
+                    <span class="bike-detail__meta-label">{{ 'label.model'|trans }}</span>
+                    <strong class="bike-detail__meta-value">{{ bike.model.manufacturer.name }} {{ bike.model.name }} {{ bike.model.alterName }}</strong>
+                </article>
+                <article class="bike-detail__meta-card">
+                    <span class="bike-detail__meta-label">{{ 'label.vin'|trans }}</span>
+                    <strong class="bike-detail__meta-value">{{ bike.vin is not empty ? bike.vin : ('label.notRecorded'|trans) }}</strong>
+                </article>
+                <article class="bike-detail__meta-card">
+                    <span class="bike-detail__meta-label">{{ 'label.purchaseDate'|trans }}</span>
+                    <strong class="bike-detail__meta-value">{{ bike.purchaseDate|date('Y-m-d') }}</strong>
+                </article>
+                <article class="bike-detail__meta-card">
+                    <span class="bike-detail__meta-label">{{ 'label.purchasePrice'|trans }}</span>
+                    <strong class="bike-detail__meta-value">{{ bike.purchasePrice|number_format(2) }} EUR</strong>
+                </article>
+                <article class="bike-detail__meta-card">
+                    <span class="bike-detail__meta-label">{{ 'label.fuelTankSize'|trans }}</span>
+                    <strong class="bike-detail__meta-value">{{ bike.fuelTankSize|number_format(1) }} l</strong>
+                </article>
+                <article class="bike-detail__meta-card">
+                    <span class="bike-detail__meta-label">{{ 'label.purchaseOdometer'|trans }}</span>
+                    <strong class="bike-detail__meta-value">{{ bike.purchaseOdometer|number_format }} km</strong>
+                </article>
+            </div>
+
+            <div class="bike-detail__timeline">
+                <div class="bike-detail__timeline-item">
+                    <span>{{ 'label.lastRefueling'|trans }}</span>
+                    <strong>
+                        {% if bike.lastRefueling %}
+                            {{ bike.lastRefueling.dateString }}
+                        {% else %}
+                            {{ 'label.notRecorded'|trans }}
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="bike-detail__timeline-item">
+                    <span>{{ 'label.lastMaintenance'|trans }}</span>
+                    <strong>
+                        {% if bike.lastMaintenance %}
+                            {{ bike.lastMaintenance.dateString }}
+                        {% else %}
+                            {{ 'label.notRecorded'|trans }}
+                        {% endif %}
+                    </strong>
+                </div>
+                <div class="bike-detail__timeline-item">
+                    <span>{{ 'label.alertsOpen'|trans }}</span>
+                    <strong>{{ totalAlertCount|number_format }}</strong>
+                </div>
+            </div>
+
+            <div class="bike-detail__status-strip">
+                <span class="status-pill status-pill--{{ totalAlertCount > 0 ? 'warning' : 'ok' }}">
+                    {{ totalAlertCount|number_format }} {{ 'label.alertsOpen'|trans }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-stat-strip bike-detail__stat-strip">
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.odometer'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ bike.odometer|number_format }}</strong>
+            <span class="dashboard-stat-card__meta">km</span>
+        </article>
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.distance'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ bike.totalDistance|number_format }}</strong>
+            <span class="dashboard-stat-card__meta">km</span>
+        </article>
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.consumption'|trans }}</span>
+            <strong class="dashboard-stat-card__value">
+                {% if refuelingStats.qualifiedRefuelings > 0 %}
+                    {{ refuelingStats.averageConsumption|number_format(2) }}
+                {% else %}
+                    --
+                {% endif %}
+            </strong>
+            <span class="dashboard-stat-card__meta">
+                {% if refuelingStats.qualifiedRefuelings > 0 %}
+                    l/100km
+                {% else %}
+                    {{ 'label.notRecorded'|trans }}
+                {% endif %}
+            </span>
+        </article>
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.range'|trans }}</span>
+            <strong class="dashboard-stat-card__value">
+                {% if refuelingStats.qualifiedRefuelings > 0 %}
+                    {{ refuelingStats.averageRange|number_format(0) }}
+                {% else %}
+                    --
+                {% endif %}
+            </strong>
+            <span class="dashboard-stat-card__meta">
+                {% if refuelingStats.qualifiedRefuelings > 0 %}
+                    km
+                {% else %}
+                    {{ 'label.notRecorded'|trans }}
+                {% endif %}
+            </span>
+        </article>
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.totalSpend'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ totalSpend|number_format(2) }}</strong>
+            <span class="dashboard-stat-card__meta">EUR</span>
+        </article>
+    </div>
+
+    <div class="bike-detail__section-grid">
+        <article class="bike-detail__panel bike-detail__panel--wide">
+            <div class="bike-detail__panel-header">
+                <div>
+                    <h2 class="inventory-panel__title">{{ 'title.statistics'|trans }}</h2>
+                    <p class="inventory-panel__subtitle">{{ 'body.bikeShow.statistics'|trans }}</p>
+                </div>
+                <span class="inventory-panel__badge">{{ bike.serviceIntervals|length|number_format }} {{ 'label.trackedTasks'|trans }}</span>
+            </div>
+
+            <div class="bike-detail__facts-grid">
+                <div class="bike-detail__fact">
+                    <span>{{ 'label.totalFuelCosts'|trans }}</span>
+                    <strong>{{ bike.totalFuelPrice|number_format(2) }} EUR</strong>
+                </div>
+                <div class="bike-detail__fact">
+                    <span>{{ 'label.totalMaintenanceCosts'|trans }}</span>
+                    <strong>{{ bike.totalMaintenanceCosts|number_format(2) }} EUR</strong>
+                </div>
+                <div class="bike-detail__fact">
+                    <span>{{ 'title.refueling'|trans }}</span>
+                    <strong>{{ bike.numberOfRefuelings|number_format }}</strong>
+                </div>
+                <div class="bike-detail__fact">
+                    <span>{{ 'title.maintenance'|trans }}</span>
+                    <strong>{{ bike.numberOfMaintenances|number_format }}</strong>
+                </div>
+            </div>
+        </article>
+
+        <article id="bike-alerts" class="bike-detail__panel">
+            <div class="bike-detail__panel-header">
+                <div>
+                    <h2 class="inventory-panel__title">{{ 'title.alerts'|trans }}</h2>
+                    <p class="inventory-panel__subtitle">{{ 'body.bikeShow.alerts'|trans }}</p>
+                </div>
+                <span class="inventory-panel__badge">{{ totalAlertCount|number_format }}</span>
+            </div>
+
+            {% if serviceAlerts is not empty or hasFuelAlerts %}
+                <ul class="service-event-list service-event-list--compact">
+                    {% for alert in serviceAlerts %}
+                        <li class="service-event-list__item">
+                            <div class="service-event-list__title-row">
+                                <strong>{{ alert.task.name }}</strong>
+                                <span class="status-pill status-pill--{{ alert.status }}">{{ ('status.' ~ alert.status)|trans }}</span>
+                            </div>
+                            <div class="service-event-list__meta">
+                                {% if alert.remainingDistance is not null %}
+                                    {% if alert.remainingDistance >= 0 %}
+                                        {{ 'label.dueIn'|trans }} {{ alert.remainingDistance|number_format }} km
+                                    {% else %}
+                                        {{ 'label.overdueBy'|trans }} {{ (alert.remainingDistance * -1)|number_format }} km
+                                    {% endif %}
+                                {% else %}
+                                    {% if alert.remainingDays >= 0 %}
+                                        {{ 'label.dueIn'|trans }} {{ alert.remainingDays|number_format }} {{ 'label.days'|trans }}
+                                    {% else %}
+                                        {{ 'label.overdueBy'|trans }} {{ (alert.remainingDays * -1)|number_format }} {{ 'label.days'|trans }}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+
+                    {% if refuelingStats.qualifiedRefuelings == 0 %}
+                        <li class="service-event-list__item service-event-list__item--info">
+                            <div class="service-event-list__title-row">
+                                <strong>{{ 'title.refueling'|trans }}</strong>
+                                <span class="status-pill status-pill--info">{{ 'status.warning'|trans }}</span>
+                            </div>
+                            <div class="service-event-list__meta">{{ 'body.bikeShow.refuelingPending'|trans({'%threshold%': refuelingStats.minimumFuelQuantity|number_format(2)}) }}</div>
+                        </li>
+                    {% elseif refuelingStats.qualifiedRefuelings == 1 %}
+                        <li class="service-event-list__item service-event-list__item--info">
+                            <div class="service-event-list__title-row">
+                                <strong>{{ 'title.refueling'|trans }}</strong>
+                                <span class="status-pill status-pill--info">{{ 'status.warning'|trans }}</span>
+                            </div>
+                            <div class="service-event-list__meta">{{ 'body.bikeShow.refuelingSingleSample'|trans }}</div>
+                        </li>
+                    {% endif %}
+                </ul>
+            {% else %}
+                <p class="bike-detail__empty">{{ 'body.bikeShow.noAlerts'|trans }}</p>
+            {% endif %}
+        </article>
+
+        <article id="bike-upcoming" class="bike-detail__panel bike-detail__panel--wide">
+            <div class="bike-detail__panel-header">
+                <div>
+                    <h2 class="inventory-panel__title">{{ 'title.upcomingEvents'|trans }}</h2>
+                    <p class="inventory-panel__subtitle">{{ 'body.bikeShow.upcoming'|trans }}</p>
+                </div>
+                <span class="inventory-panel__badge">{{ upcomingServiceEvents|length|number_format }}</span>
+            </div>
+
+            {% if upcomingServiceEvents is not empty %}
+                <ul class="service-event-list">
+                    {% for event in upcomingServiceEvents %}
+                        <li class="service-event-list__item">
+                            <div class="service-event-list__title-row">
+                                <strong>{{ event.task.name }}</strong>
+                                <span class="status-pill status-pill--{{ event.status }}">{{ ('status.' ~ event.status)|trans }}</span>
+                            </div>
+                            <div class="service-event-list__meta">
+                                {% if event.remainingDistance is not null %}
+                                    {% if event.remainingDistance >= 0 %}
+                                        {{ 'label.dueIn'|trans }} {{ event.remainingDistance|number_format }} km
+                                    {% else %}
+                                        {{ 'label.overdueBy'|trans }} {{ (event.remainingDistance * -1)|number_format }} km
+                                    {% endif %}
+                                    <span>{{ 'label.dueAt'|trans }} {{ event.dueOdometer|number_format }} km</span>
+                                {% else %}
+                                    {% if event.remainingDays >= 0 %}
+                                        {{ 'label.dueIn'|trans }} {{ event.remainingDays|number_format }} {{ 'label.days'|trans }}
+                                    {% else %}
+                                        {{ 'label.overdueBy'|trans }} {{ (event.remainingDays * -1)|number_format }} {{ 'label.days'|trans }}
+                                    {% endif %}
+                                    <span>{{ 'label.dueOn'|trans }} {{ event.dueDate|date('Y-m-d') }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="service-event-list__meta">
+                                <span>{{ 'label.interval'|trans }} {{ event.interval|number_format }}
+                                    {% if event.intervalType in distanceIntervalTypes %}
+                                        km
+                                    {% elseif event.intervalType == dayIntervalType %}
+                                        {{ 'label.days'|trans }}
+                                    {% elseif event.intervalType == monthIntervalType %}
+                                        {{ 'label.months'|trans }}
+                                    {% elseif event.intervalType == yearIntervalType %}
+                                        {{ 'label.years'|trans }}
+                                    {% endif %}
+                                </span>
+                                {% if event.hasRecordedService %}
+                                    <span>
+                                        {{ 'label.lastServiceEntry'|trans }}
+                                        {% if event.remainingDistance is not null %}
+                                            {{ event.lastServiceOdometer|number_format }} km
+                                        {% else %}
+                                            {{ event.lastServiceDate|date('Y-m-d') }}
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span>{{ 'label.purchaseBaseline'|trans }}</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="bike-detail__empty">{{ 'body.bikeShow.noUpcomingEvents'|trans }}</p>
+            {% endif %}
+        </article>
+    </div>
+
+    <section id="bike-parts" class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'title.parts'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.bikeShow.parts'|trans }}</p>
+            </div>
+            <span class="inventory-panel__badge">{{ partStatistics|length|number_format }} {{ 'title.parts'|trans|lower }}</span>
+        </div>
+
+        {{ include('dashboard/bike/_parts.html.twig', {
+            partStatistics: partStatistics
+        }, with_context = false) }}
+    </section>
+
+    <section id="bike-service-intervals" class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'title.serviceIntervals'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.bikeShow.serviceIntervals'|trans }}</p>
+            </div>
+            <span class="inventory-panel__badge">{{ bike.serviceIntervals|length|number_format }} {{ 'label.trackedTasks'|trans }}</span>
+        </div>
+
+        {{ include('dashboard/serviceInterval/_table.html.twig', {
+            bike: bike
+        }, with_context = false) }}
+    </section>
+
+    <section id="bike-refuelings" class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'title.refueling'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.bikeShow.refueling'|trans }}</p>
+            </div>
+            <span class="inventory-panel__badge">{{ refuelingStats.qualifiedRefuelings|number_format }} / {{ bike.numberOfRefuelings|number_format }} {{ 'label.qualifiedSamples'|trans }}</span>
+        </div>
+
+        {{ include('dashboard/refueling/_table.html.twig', {
+            bike: bike,
+            refuelings: refuelings,
+            scrollable: true
+        }, with_context = false) }}
+    </section>
+
+    <section id="bike-maintenance" class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'title.maintenance'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.bikeShow.maintenance'|trans }}</p>
+            </div>
+            <span class="inventory-panel__badge">{{ bike.numberOfMaintenances|number_format }} {{ 'label.units.services'|trans }}</span>
+        </div>
+
+        {{ include('dashboard/maintenance/_table.html.twig', {
+            bike: bike,
+            maintenances: maintenances,
+            scrollable: true
+        }, with_context = false) }}
+    </section>
+</section>
 {% endblock %}
 
 {% block sidebar %}
 {{ parent() }}
-<a href="{{ path('refueling_new_id', { 'id': bike.id } ) }}"
-	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-	aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
-</a>
-<a href="{{ path('maintenance_new_id', { 'id': bike.id }) }}"
-	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-	aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
-</a>
+<section class="sidebar-card">
+    <h2 class="sidebar-card__title">{{ 'label.workshopActions'|trans }}</h2>
+    <p class="sidebar-card__text">{{ 'body.bikeShow.sidebar'|trans }}</p>
+    <a href="{{ path('refueling_new_id', { 'id': bike.id }) }}" class="btn btn-success btn-block">
+        <i class="fa fa-gas-pump" aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
+    </a>
+    <a href="{{ path('maintenance_new_id', { 'id': bike.id }) }}" class="btn btn-outline-secondary btn-block">
+        <i class="fa fa-wrench" aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
+    </a>
+    <a href="{{ path('bike_service_plan', { 'id': bike.id }) }}" class="btn btn-outline-secondary btn-block">
+        <i class="fa fa-list" aria-hidden="true"></i> {{ 'action.manageBikePlan'|trans }}
+    </a>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('admin_model_service_plan', { 'id': bike.model.id }) }}" class="btn btn-outline-secondary btn-block">
+            <i class="fa fa-cogs" aria-hidden="true"></i> {{ 'action.manageModelPlan'|trans }}
+        </a>
+    {% endif %}
+</section>
+
+<section class="sidebar-card">
+    <h2 class="sidebar-card__title">{{ 'title.alerts'|trans }}</h2>
+    <p class="sidebar-card__text">
+        {% if totalAlertCount > 0 %}
+            {{ totalAlertCount|number_format }} {{ 'label.alertsOpen'|trans }}
+        {% elseif refuelingStats.qualifiedRefuelings == 0 %}
+            {{ 'body.bikeShow.refuelingPending'|trans({'%threshold%': refuelingStats.minimumFuelQuantity|number_format(2)}) }}
+        {% elseif refuelingStats.qualifiedRefuelings == 1 %}
+            {{ 'body.bikeShow.refuelingSingleSample'|trans }}
+        {% elseif hasFuelAlerts %}
+            {{ 'body.bikeShow.alerts'|trans }}
+        {% else %}
+            {{ 'body.bikeShow.noAlerts'|trans }}
+        {% endif %}
+    </p>
+    <a href="#bike-service-intervals" class="btn btn-outline-secondary btn-block">
+        <i class="fa fa-list" aria-hidden="true"></i> {{ 'title.serviceIntervals'|trans }}
+    </a>
+</section>
 {% endblock %}

@@ -70,9 +70,9 @@ class User extends AggregateBase implements UserInterface, PasswordAuthenticated
 	/**
 	 *
 	 * @ORM\Column(type="string", length=255)
-	 * @Assert\NotBlank()
-	 * @Assert\Email()
 	 */
+	#[Assert\NotBlank]
+	#[Assert\Email]
 	private $email;
 
 	/**
@@ -306,7 +306,7 @@ class User extends AggregateBase implements UserInterface, PasswordAuthenticated
 			);
 		return $this->roles;
 	}
-	public function isEnabled() {
+	public function isEnabled(): bool {
 		return $this->isActive;
 	}
 	public function isAdmin(): bool {
@@ -349,11 +349,10 @@ class User extends AggregateBase implements UserInterface, PasswordAuthenticated
 	 * ********************************************************************
 	 */
 	
-	public function eraseCredentials() {
-		return;
+	public function eraseCredentials(): void {
 	}
-	public function getSalt() {
-		return;
+	public function getSalt(): ?string {
+		return null;
 	}
 	/**
 	 * Returns the identifier for this user (e.g. its username or email address).

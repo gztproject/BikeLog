@@ -1,3 +1,116 @@
 // assets/scss/admin.scss
 
+.update-page-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.2rem;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: 0.9rem;
+}
 
+.update-page-card__version {
+    display: flex;
+    flex-direction: column;
+}
+
+.update-page-card__label {
+    margin-bottom: 0.2rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--theme-muted);
+}
+
+.update-modal__state {
+    display: flex;
+    align-items: center;
+    color: var(--theme-muted);
+}
+
+.update-modal__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.update-modal__placeholder {
+    color: var(--theme-muted);
+}
+
+.update-modal__metric {
+    padding: 0.9rem 1rem;
+    background: var(--theme-surface-soft);
+    border: 1px solid var(--theme-border);
+    border-radius: 0.8rem;
+}
+
+.update-modal__label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--theme-muted);
+}
+
+.update-modal__progress-shell {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--theme-surface-soft);
+    border: 1px solid var(--theme-border);
+    border-radius: 0.8rem;
+}
+
+.update-modal__progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: var(--theme-muted);
+}
+
+.update-modal__progress-label {
+    margin-top: 0.75rem;
+    color: var(--theme-muted);
+}
+
+.update-modal__release-notes {
+    max-height: 18rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    overflow: auto;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: 0.8rem;
+}
+
+.update-modal__release-notes h4 {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.update-modal__log-shell h4 {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.update-modal__log {
+    max-height: 18rem;
+    margin-bottom: 0;
+    padding: 1rem;
+    overflow: auto;
+    color: var(--theme-primary-contrast);
+    background: var(--theme-surface-strong);
+    border-radius: 0.8rem;
+}
+
+@media (max-width: 767.98px) {
+    .update-page-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

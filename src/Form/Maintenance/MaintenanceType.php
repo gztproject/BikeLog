@@ -57,21 +57,37 @@ class MaintenanceType extends AbstractType {
 				'widget' => 'single_text',
 				'format' => 'dd. MM. yyyy',
 				// prevents rendering it as type="date", to avoid HTML5 date pickers
-				'html5' => false
+				'html5' => false,
+				'attr' => [
+						'placeholder' => 'DD. MM. YYYY',
+						'autocomplete' => 'off'
+				]
 		] )->add ( 'odometer', NumberType::class, [ 
 				'label' => 'label.odometer',
 				'attr' => [ 
-						'class' => 'odometerInput'
+						'class' => 'odometerInput',
+						'min' => 0,
+						'step' => 1,
+						'inputmode' => 'numeric',
+						'placeholder' => '0'
 				]
 		] )->add ( 'spentTime', NumberType::class, [ 
 				'label' => 'label.spentTime',
 				'attr' => [ 
-						'class' => 'spentTimeInput'
+						'class' => 'spentTimeInput',
+						'min' => 0,
+						'step' => '0.25',
+						'inputmode' => 'decimal',
+						'placeholder' => '0.00'
 				]
 		] )->add ( 'unspecifiedCosts', NumberType::class, [ 
 				'label' => 'label.unspecifiedCosts',
 				'attr' => [ 
-						'class' => 'unspecifiedCostsInput'
+						'class' => 'unspecifiedCostsInput',
+						'min' => 0,
+						'step' => '0.01',
+						'inputmode' => 'decimal',
+						'placeholder' => '0.00'
 				]
 		] )->add ( 'maintenanceTaskCommands', CollectionType::class, [ 
 				'entry_type' => MaintenanceTaskType::class,

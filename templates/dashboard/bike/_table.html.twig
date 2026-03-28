@@ -1,37 +1,105 @@
-<div class="row">
-	{% for bike in bikes %}
-	<div class="col-md-3">
-		<a href={{ path('bike_show', { 'id': bike.id } )}}>
-			<div class="card" style="width: 18rem;">
-				<img class="card-img-top"
-				    style="height: 14rem; object-fit: cover;"
-					src="{{ asset(bike.pictureFilename) }}"
-					alt={{ bike.name }}>
-				<div class="card-body">
-					<h5 class="card-title">
-                        '{{ bike.year|slice(2,3) }} {{ bike.name }}
-					</h5>
-					<p class="card-text">
-						{{ bike.odometer }} km
-					</p>
-				</div>
-			</div>
-		</a>
-	</div>
-	{% else %}
-	<a href={{ path('bike_new')}}>
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top"
-                    src="{{ asset('img/plus.png') }}"
-                    alt={{ 'action.add_bike'|trans }}>
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {{ 'action.add_bike'|trans }}
-                    </h5>                    
+<div class="inventory-grid">
+    {% for bike in bikes %}
+        <article class="bike-card">
+            <a class="bike-card__media-link" href="{{ path('bike_show', { 'id': bike.id }) }}">
+                <img
+                    class="bike-card__image"
+                    src="{{ asset(bike.pictureFilename) }}"
+                    alt="{{ bike.name }}"
+                >
+            </a>
+            <div class="bike-card__body">
+                <div class="bike-card__header">
+                    <div>
+                        <span class="bike-card__eyebrow">{{ bike.year }} {{ 'label.model'|trans }}</span>
+                        <h3 class="bike-card__title">
+                            <a href="{{ path('bike_show', { 'id': bike.id }) }}">{{ bike.name }}</a>
+                        </h3>
+                    </div>
+                    <span class="bike-card__pill">{{ bike.numberOfMaintenances|number_format }} {{ 'label.units.services'|trans }}</span>
+                </div>
+
+                <dl class="bike-card__facts">
+                    <div class="bike-card__fact">
+                        <dt>{{ 'label.odometer'|trans }}</dt>
+                        <dd>{{ bike.odometer|number_format }} km</dd>
+                    </div>
+                    <div class="bike-card__fact">
+                        <dt>{{ 'label.distance'|trans }}</dt>
+                        <dd>{{ bike.totalDistance|number_format }} km</dd>
+                    </div>
+                    <div class="bike-card__fact">
+                        <dt>{{ 'label.fuelTankSize'|trans }}</dt>
+                        <dd>{{ bike.fuelTankSize|number_format(1) }} l</dd>
+                    </div>
+                    <div class="bike-card__fact">
+                        <dt>{{ 'label.vin'|trans }}</dt>
+                        <dd>{{ bike.vin|default('N/A') }}</dd>
+                    </div>
+                </dl>
+
+                <div class="bike-card__metrics">
+                    <div class="bike-card__metric">
+                        <span>{{ 'label.consumption'|trans }}</span>
+                        <strong>{{ bike.averageConsumption|number_format(2) }} l/100km</strong>
+                    </div>
+                    <div class="bike-card__metric">
+                        <span>{{ 'label.range'|trans }}</span>
+                        <strong>{{ bike.averageRange|number_format(0) }} km</strong>
+                    </div>
+                    <div class="bike-card__metric">
+                        <span>{{ 'label.costsToDate'|trans }}</span>
+                        <strong>{{ (bike.totalFuelPrice + bike.totalMaintenanceCosts)|number_format(2) }} EUR</strong>
+                    </div>
+                </div>
+
+                <div class="bike-card__timeline">
+                    <div class="bike-card__timeline-item">
+                        <span>{{ 'label.lastRefueling'|trans }}</span>
+                        <strong>
+                            {% if bike.lastRefueling %}
+                                {{ bike.lastRefueling.dateString }}
+                            {% else %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="bike-card__timeline-item">
+                        <span>{{ 'label.lastMaintenance'|trans }}</span>
+                        <strong>
+                            {% if bike.lastMaintenance %}
+                                {{ bike.lastMaintenance.dateString }}
+                            {% else %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="bike-card__timeline-item">
+                        <span>{{ 'label.purchaseDate'|trans }}</span>
+                        <strong>{{ bike.purchaseDate|date('Y-m-d') }}</strong>
+                    </div>
+                </div>
+
+                <div class="bike-card__actions">
+                    <a href="{{ path('bike_show', { 'id': bike.id }) }}" class="btn btn-primary btn-sm">
+                        <i class="fa fa-eye" aria-hidden="true"></i> {{ 'action.show'|trans }}
+                    </a>
+                    <a href="{{ path('refueling_new_id', { 'id': bike.id }) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa fa-gas-pump" aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
+                    </a>
+                    <a href="{{ path('maintenance_new_id', { 'id': bike.id }) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa fa-wrench" aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
+                    </a>
                 </div>
             </div>
+        </article>
+    {% else %}
+        <a href="{{ path('bike_new') }}" class="empty-bike-card">
+            <div class="empty-bike-card__icon">
+                <img src="{{ asset('img/plus.png') }}" alt="{{ 'action.add.bike'|trans }}">
+            </div>
+            <h3>{{ 'action.add.bike'|trans }}</h3>
+            <p>{{ 'body.bikeIndex.empty'|trans }}</p>
         </a>
-	{% endfor %}
-
-
+    {% endfor %}
 </div>

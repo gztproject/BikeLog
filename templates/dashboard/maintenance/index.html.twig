@@ -2,28 +2,53 @@
 
 {% block body_id 'maintenance_index' %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('js/maintenance/table') }}
+{% endblock %}
+
 {% block main %}
-<h1>
-	{{ 'title.maintenance'|trans }}
-</h1>
-<div class="bs-component">
-	{{ include('dashboard/maintenance/_table.html.twig', {
-                maintenances : maintenances,
-                bike : bike ?? null
-            }, with_context = false) }}
-</div>
-{{ knp_pagination_render(maintenances) }}
+<section class="page-shell">
+    <div class="dashboard-page__header">
+        <div>
+            {% if bike %}
+                <span class="dashboard-page__eyebrow">{{ bike.model.manufacturer.name }} · {{ bike.year }}</span>
+            {% endif %}
+            <h1 class="page-shell__title">{{ 'title.maintenance'|trans }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.bikeShow.maintenance'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <a
+                href="{{ bike ? path('maintenance_new_id', { 'id': bike.id }) : path('maintenance_new') }}"
+                class="btn btn-success dashboard-page__primary-action"
+            >
+                <i class="fa fa-wrench" aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
+            </a>
+        </div>
+    </div>
+
+    <section class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'title.maintenance'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ bike ? bike.name : ('label.visibleOnThisPage'|trans) }}</p>
+            </div>
+            <span class="inventory-panel__badge">{{ maintenances|length|number_format }} {{ 'label.visibleOnThisPage'|trans|lower }}</span>
+        </div>
+
+        {{ include('dashboard/maintenance/_table.html.twig', {
+            maintenances : maintenances,
+            bike : bike ?? null
+        }, with_context = false) }}
+    </section>
+
+    {{ knp_pagination_render(maintenances) }}
+</section>
 {% endblock %}
 
 {% block sidebar %}
 
 {{ parent() }}
-<a
-	href="{{  bike ? path('maintenance_new_id', { 'id': bike.id }) : path('maintenance_new') }}"
-	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-	aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
-</a>
-
 {{ include('common/filters/_dateBikeYearFilter.html.twig') }}
 
 

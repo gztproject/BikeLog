@@ -28,13 +28,20 @@ class MaintenanceTaskType extends AbstractType {
 				'expanded' => false,
 				'multiple' => false,
 				'label' => false,
+				'attr' => [
+						'class' => 'form-control'
+				],
 		    'query_builder' => function (TaskRepository $repository) use ($options) {
 		    return $repository->getBikeTasksQuery($options["bike"]->getId(), $options["model"]->getId());
 				}
 		] )->add ( 'cost', NumberType::class, [ 
 				'label' => false,
 				'attr' => [ 
-						'class' => 'costInput'
+						'class' => 'costInput',
+						'min' => 0,
+						'step' => '0.01',
+						'inputmode' => 'decimal',
+						'placeholder' => '0.00'
 				]
 		] );
 	}

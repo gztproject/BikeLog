@@ -11,9 +11,8 @@
 namespace App\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Psr\Log\LoggerInterface;
 
@@ -26,13 +25,11 @@ use Psr\Log\LoggerInterface;
  * @author Oleg Voronkovich <oleg-voronkovich@yandex.ru>
  */
 class RedirectToPreferredLocaleSubscriber implements EventSubscriberInterface {
-	private $urlGenerator;
 	private $locales;
 	private $defaultLocale;
 	private $logger;
-	public function __construct(UrlGeneratorInterface $urlGenerator, string $locales, string $defaultLocale, LoggerInterface $logger) {
+	public function __construct(string $locales, string $defaultLocale, LoggerInterface $logger) {
 		$this->logger = $logger;
-		$this->urlGenerator = $urlGenerator;
 
 		$this->locales = explode ( '|', trim ( $locales ) );
 		if (empty ( $this->locales )) {
@@ -64,19 +61,36 @@ class RedirectToPreferredLocaleSubscriber implements EventSubscriberInterface {
 			return;
 		}
 
+		// Respect an explicit locale choice or a locale that is already persisted in the session.
+		if ($this->getRequestedLocale ( $request ) || ($request->hasSession () && $request->getSession ()->has ( '_locale' ))) {
+			return;
+		}
+
 		// Ignore requests from referrers with the same HTTP host in order to prevent
 		// changing language for users who possibly already selected it for this application.
-		if (0 === mb_stripos ( $request->headers->get ( 'referer' ), $request->getSchemeAndHttpHost () )) {
+		$referer = $request->headers->get ( 'referer' );
+		if ($referer && 0 === mb_stripos ( $referer, $request->getSchemeAndHttpHost () )) {
 			return;
 		}
 
 		$preferredLanguage = $request->getPreferredLanguage ( $this->locales );
 
-		if ($preferredLanguage !== $this->defaultLocale) {
-			$response = new RedirectResponse ( $this->urlGenerator->generate ( 'homepage', [ 
-					'_locale' => $preferredLanguage
-			] ) );
-			$event->setResponse ( $response );
+		if ($preferredLanguage && $preferredLanguage !== $this->defaultLocale) {
+			if ($request->hasSession ()) {
+				$request->getSession ()->set ( '_locale', $preferredLanguage );
+			}
+
+			$request->setLocale ( $preferredLanguage );
+			$this->logger->debug ( 'Using preferred browser locale for the homepage request.', [
+					'preferred_locale' => $preferredLanguage
+			] );
 		}
+	}
+
+	private function getRequestedLocale(Request $request): ?string
+	{
+		return $request->attributes->get ( '_locale' )
+			?? $request->query->get ( '_locale' )
+			?? $request->request->get ( '_locale' );
 	}
 }

@@ -1,5 +1,7 @@
-<div class="table-responsive-sm">
-	<table class="table table-hover table-striped">
+{% set hasBikeFuelBaseline = bike is not null and bike.qualifiedRefuelings > 0 %}
+
+<div class="table-responsive-xl {% if scrollable|default(false) %}inventory-panel__table-scroll{% else %}inventory-panel__table-shell{% endif %}">
+	<table class="table table-hover table-bordered workshop-table workshop-table--refueling">
 		<thead class="thead-dark">
 			<tr>
 				<th scope="col">{{ 'label.date'|trans }}</th>
@@ -12,19 +14,6 @@
                 <th scope="col">{{ 'label.location'|trans }}</th>
 				<th scope="col">{{ 'label.comment'|trans }}</th>
 			</tr>
-			{% if bike is not null%}
-			<tr>
-				<th>{{ bike.numberOfRefuelings|number_format }}</th>
-				<th></th>
-				<th>{{ bike.totalDistance|number_format }} km</th>
-				<th>{{ bike.totalFuelQuantity|number_format(2) }} l</th>
-				<th>{{ bike.totalFuelPrice|number_format(2) }} €</th>
-				<th>{{ bike.averageConsumption|number_format(2) }} l/100km</th>
-				<th>{{ bike.averageRange|number_format(2) }} km</th>
-				<th></th>
-				<th></th>
-			</tr>
-			{% endif %}
 		</thead>
 		<tbody>
 			{% for refueling in refuelings %}
@@ -34,17 +23,54 @@
 				<td>{{ refueling.distance|number_format }} km</td>
 				<td>{{ refueling.fuelQuantity|number_format(2) }} l</td>
 				<td>{{ refueling.price|number_format(2) }} €</td>
-				<td class={% if bike == null %}"table-primary"{% elseif refueling.consumption < bike.averageConsumption %}
-					"table-success"{% elseif refueling.consumption > bike.averageConsumption%}"table-danger"{% endif %}>{{ refueling.consumption|number_format(2) }}
-					l/100km</td>
-				<td class={% if bike == null %}"table-primary"{% elseif refueling.range > bike.averageRange %}
-                    "table-success"{% elseif refueling.range < bike.averageRange%}"table-danger"{% endif %}>{{ refueling.range|number_format(2) }} km</td>
-				<td><a href="https://www.openstreetmap.org/#map=19/{{ refueling.latitude }}/{{ refueling.longitude }}" target="blank">{{ refueling.latitude }}, {{ refueling.longitude }}</a></td>
+				<td>
+                    {% set consumptionTone = hasBikeFuelBaseline ? (refueling.consumption < bike.averageConsumption ? 'ok' : (refueling.consumption > bike.averageConsumption ? 'overdue' : 'info')) : 'info' %}
+                    <div class="workshop-table__stack">
+                        <strong>{{ refueling.consumption|number_format(2) }} l/100km</strong>
+                        <span class="status-pill status-pill--{{ consumptionTone }}">
+                            {% if not hasBikeFuelBaseline %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% elseif refueling.consumption < bike.averageConsumption %}
+                                {{ 'label.performanceOver'|trans }}
+                            {% elseif refueling.consumption > bike.averageConsumption %}
+                                {{ 'label.performanceUnder'|trans }}
+                            {% else %}
+                                {{ 'status.ok'|trans }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </td>
+				<td>
+                    {% set rangeTone = hasBikeFuelBaseline ? (refueling.range > bike.averageRange ? 'ok' : (refueling.range < bike.averageRange ? 'warning' : 'info')) : 'info' %}
+                    <div class="workshop-table__stack">
+                        <strong>{{ refueling.range|number_format(2) }} km</strong>
+                        <span class="status-pill status-pill--{{ rangeTone }}">
+                            {% if not hasBikeFuelBaseline %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% elseif refueling.range > bike.averageRange %}
+                                {{ 'label.performanceOver'|trans }}
+                            {% elseif refueling.range < bike.averageRange %}
+                                {{ 'label.performanceUnder'|trans }}
+                            {% else %}
+                                {{ 'status.ok'|trans }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </td>
+				<td>
+                    {% if refueling.latitude is not null and refueling.longitude is not null %}
+                        <a href="https://www.openstreetmap.org/#map=19/{{ refueling.latitude }}/{{ refueling.longitude }}" target="_blank" rel="noreferrer">
+                            {{ refueling.latitude }}, {{ refueling.longitude }}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">{{ 'label.notRecorded'|trans }}</span>
+                    {% endif %}
+                </td>
 				<td>{{ refueling.comment }}</td>
 			</tr>
 			{% else %}
 			<tr class="table-warning">
-				<td colspan="8" align="center">{{ 'label.noneFound.refuelings'|trans }}</td>
+				<td colspan="9" align="center">{{ 'label.noneFound.refuelings'|trans }}</td>
 			</tr>
 			{% endfor %}
 		</tbody>

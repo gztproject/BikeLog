@@ -3,15 +3,17 @@
 {% block body_id 'title.new.maintenance' %}
 
 {% block main %}
-    <h1>{{ 'title.new.maintenance'|trans }}</h1>
+    <section class="page-shell">
+        <h1 class="page-shell__title">{{ 'title.new.maintenance'|trans }}</h1>
 
-    {{ include('dashboard/maintenance/_form.html.twig', {
-        form: form,
-        showBikeSelecor: showBikeSelecor,
-        button_label: 'label.save.maintenance'|trans,
-        include_save_and_create_new: true,
-        include_back_to_home_link: true,        
-    }, with_context = false) }}
+        {{ include('dashboard/maintenance/_form.html.twig', {
+            form: form,
+            showBikeSelecor: showBikeSelecor,
+            button_label: 'label.save.maintenance'|trans,
+            include_save_and_create_new: true,
+            include_back_to_home_link: true,
+        }, with_context = false) }}
+    </section>
 
 {% endblock %}
 

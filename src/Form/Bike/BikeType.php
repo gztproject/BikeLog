@@ -29,30 +29,70 @@ class BikeType extends AbstractType {
 		$builder->add ( 'nickname', TextType::class, [ 
 				'label' => 'label.nickname'
 		] )->add ( 'purchaseDate', DateTimePickerType::class, [
-		    'label' => 'label.PurchaseDate',
-		    'widget' => 'single_text',
-		    'format' => 'dd. MM. yyyy',
-		    // prevents rendering it as type="date", to avoid HTML5 date pickers
-		    'html5' => false
+				'label' => 'label.purchaseDate',
+				'widget' => 'single_text',
+				'format' => 'dd. MM. yyyy',
+				// prevents rendering it as type="date", to avoid HTML5 date pickers
+				'html5' => false,
+				'attr' => [
+						'placeholder' => 'DD. MM. YYYY',
+						'autocomplete' => 'off'
+				]
 		] )->add ( 'vin', TextType::class, [ 
-				'label' => 'label.vin'
-		] )->add ( 'purchasePrice', TextType::class, [ 
-				'label' => 'label.purchasePrice'
+				'label' => 'label.vin',
+				'required' => false,
+				'attr' => [
+						'maxlength' => 17,
+						'placeholder' => 'JH2SC59A17M012345'
+				]
+		] )->add ( 'purchasePrice', NumberType::class, [
+				'label' => 'label.purchasePrice',
+				'attr' => [
+						'min' => 0,
+						'step' => '0.01',
+						'inputmode' => 'decimal',
+						'placeholder' => '0.00'
+				]
 		] )->add ( 'purchaseOdometer', NumberType::class, [
-				'label' => 'label.purchaseOdometer'
+				'label' => 'label.purchaseOdometer',
+				'attr' => [
+						'min' => 0,
+						'step' => 1,
+						'inputmode' => 'numeric',
+						'placeholder' => '0'
+				]
 		] )->add ( 'year', NumberType::class, [
-				'label' => 'label.year'
+				'label' => 'label.year',
+				'attr' => [
+						'min' => 1900,
+						'max' => (int) date('Y') + 1,
+						'step' => 1,
+						'inputmode' => 'numeric',
+						'placeholder' => date('Y')
+				]
 		] )->add ( 'model', EntityType::class, [ 
 				'label' => 'label.model',
 				'class' => Model::class,
 				'choice_label' => 'name',
 				'expanded' => false,
 				'multiple' => false
+		] )->add ( 'fuelTanksize', NumberType::class, [
+				'label' => 'label.fuelTankSize',
+				'required' => false,
+				'attr' => [
+						'min' => 0,
+						'step' => '0.1',
+						'inputmode' => 'decimal',
+						'placeholder' => '0.0'
+				]
 		] )
 		->add('picture', FileType::class, [
 				'label' => 'label.picture',
 				'mapped' => false,
 				'required' => false,
+				'attr' => [
+						'accept' => 'image/png,image/jpeg'
+				],
 				'constraints' => [
 						new File([
 								'maxSize' => '4M',

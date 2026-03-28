@@ -13,8 +13,8 @@ use App\Entity\Model\CreateModelCommand;
 use App\Entity\Model\Model;
 use App\Entity\Manufacturer\Manufacturer;
 use App\Entity\ServiceInterval\CreateServiceIntervalCommand;
+use App\Entity\ServiceInterval\ServiceInterval;
 use App\Entity\Task\CreateTaskCommand;
-use App\Entity\ServiceInterval\IntervalTypes;
 use App\Entity\Part\CreatePartCommand;
 
 class ModelsInitializer implements IEntityInitializer {
@@ -128,7 +128,7 @@ class ModelsInitializer implements IEntityInitializer {
 
 				$cic = new CreateServiceIntervalCommand ();
 				$cic->interval = $interval;
-				$cic->intervalType = IntervalTypes::relative;
+				$cic->intervalType = ServiceInterval::RELATIVE;
 				$cic->task = $task;
 				$this->logger->debug ( "Creating service interval: " . $task->getName () . " every " . $interval . " km." );
 				$serviceInterval = $model->createServiceInterval ( $cic, $migrator );

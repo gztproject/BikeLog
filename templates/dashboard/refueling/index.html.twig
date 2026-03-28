@@ -3,27 +3,47 @@
 {% block body_id 'refueling_index' %}
 
 {% block main %}
-<h1>
-	{{ 'title.refueling'|trans }}
-</h1>
-<div class="bs-component">
-	{{ include('dashboard/refueling/_table.html.twig', {
-                refuelings : refuelings,
-                bike : bike ?? null
-            }, with_context = false) }}
-</div>
-{{ knp_pagination_render(refuelings) }}
+<section class="page-shell">
+    <div class="dashboard-page__header">
+        <div>
+            {% if bike %}
+                <span class="dashboard-page__eyebrow">{{ bike.model.manufacturer.name }} · {{ bike.year }}</span>
+            {% endif %}
+            <h1 class="page-shell__title">{{ 'title.refueling'|trans }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.bikeShow.refueling'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <a
+                href="{{ bike ? path('refueling_new_id', { 'id': bike.id }) : path('refueling_new') }}"
+                class="btn btn-success dashboard-page__primary-action"
+            >
+                <i class="fa fa-gas-pump" aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
+            </a>
+        </div>
+    </div>
+
+    <section class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'title.refueling'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ bike ? bike.name : ('label.visibleOnThisPage'|trans) }}</p>
+            </div>
+            <span class="inventory-panel__badge">{{ refuelings|length|number_format }} {{ 'label.visibleOnThisPage'|trans|lower }}</span>
+        </div>
+
+        {{ include('dashboard/refueling/_table.html.twig', {
+            refuelings : refuelings,
+            bike : bike ?? null
+        }, with_context = false) }}
+    </section>
+
+    {{ knp_pagination_render(refuelings) }}
+</section>
 {% endblock %}
 
 {% block sidebar %}
 
 {{ parent() }}
-<a
-	href="{{  bike ? path('refueling_new_id', { 'id': bike.id }) : path('refueling_new') }}"
-	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-	aria-hidden="true"></i> {{ 'action.add.refueling'|trans }}
-</a>
-
 {{ include('common/filters/_dateBikeYearFilter.html.twig') }}
 
 

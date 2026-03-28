@@ -1,0 +1,20 @@
+refueling:
+  datetime_required: Choose the refueling date.
+  bike_required: Choose the bike for this entry.
+  odometer_required: Enter the odometer reading.
+  odometer_numeric: Odometer must be a number.
+  odometer_non_negative: Odometer cannot be negative.
+  odometer_below_latest: Odometer must be at least %minimum% km for entries after the latest refueling.
+  odometer_below_purchase: Odometer must be at least %minimum% km.
+  fuel_quantity_required: Enter the fuel quantity.
+  fuel_quantity_positive: Fuel quantity must be greater than zero.
+  price_required: Enter the total price.
+  price_non_negative: Price cannot be negative.
+servicePlan:
+  task_required: Select a task.
+  part_required: Select a part or reuse an existing task.
+  name_required: Enter a task name when creating a new task.
+  description_required: Enter a task description when creating a new task.
+  interval_required: Enter the service interval.
+  interval_positive: Service interval must be greater than zero.
+  interval_type_required: Select the interval type.
