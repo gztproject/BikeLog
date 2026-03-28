@@ -17,6 +17,19 @@ use App\Entity\Task\Task;
  */
 class ServiceInterval extends AggregateBase
 {
+    public const ABSOLUTE_DISTANCE = 00;
+
+    public const ABSOLUTE = self::ABSOLUTE_DISTANCE;
+
+    public const RELATIVE_DISTANCE = 10;
+
+    public const RELATIVE = self::RELATIVE_DISTANCE;
+
+    public const DAYS = 20;
+
+    public const MONTHS = 30;
+
+    public const YEARS = 40;
 
     /**
      *
@@ -140,21 +153,4 @@ class ServiceInterval extends AggregateBase
     {
         return $this->task;
     }
-}
-
-/**
- * 00-absolute, 10-relative
- */
-abstract class IntervalTypes
-{
-
-    const absoluteDistance = 00;
-
-    const relativeDistance = 10;
-
-    const days = 20;
-
-    const months = 30;
-
-    const years = 40;
 }

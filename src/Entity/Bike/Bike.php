@@ -21,7 +21,10 @@ use App\Entity\Refueling\Refueling;
 use App\Entity\ServiceInterval\CreateServiceIntervalCommand;
 use App\Entity\ServiceInterval\ServiceInterval;
 use App\Entity\ServiceInterval\iHasServiceIntervals;
+use DateInterval;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use App\Entity\Task\CreateTaskCommand;
 
 /**
@@ -30,6 +33,11 @@ use App\Entity\Task\CreateTaskCommand;
  */
 class Bike extends AggregateBase implements iHasServiceIntervals
 {
+    private const MINIMUM_REFUELING_SAMPLE_LITERS = 3.0;
+
+    private const MINIMUM_REFUELING_SAMPLE_RATIO = 0.18;
+
+    private const UPCOMING_SERVICE_LIMIT = 5;
 
     /**
      *
@@ -517,6 +525,42 @@ class Bike extends AggregateBase implements iHasServiceIntervals
     {
         return $this->calculateRefuelingStats()["averageRange"];
     }
+
+    /**
+     *
+     * @return int
+     */
+    public function getQualifiedRefuelings(): int
+    {
+        return $this->calculateRefuelingStats()["qualifiedRefuelings"];
+    }
+
+    /**
+     *
+     * @return int
+     */
+    public function getExcludedRefuelings(): int
+    {
+        return $this->calculateRefuelingStats()["excludedRefuelings"];
+    }
+
+    /**
+     *
+     * @return float
+     */
+    public function getRefuelingSampleThreshold(): float
+    {
+        return $this->calculateRefuelingStats()["minimumFuelQuantity"];
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getRefuelingStatistics(): array
+    {
+        return $this->calculateRefuelingStats();
+    }
     
     /**
      *
@@ -544,6 +588,50 @@ class Bike extends AggregateBase implements iHasServiceIntervals
     {
         return $this->calculateMaintenances()["totalCosts"];
     }
+
+    /**
+     *
+     * @return array
+     */
+    public function getServiceIntervalStatuses(): array
+    {
+        $statuses = [];
+        $referenceDate = new DateTimeImmutable('today');
+
+        foreach ($this->getServiceIntervals() as $interval) {
+            $statuses[] = $this->buildServiceIntervalStatus($interval, $referenceDate);
+        }
+
+        return $statuses;
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getUpcomingServiceEvents(): array
+    {
+        $statuses = $this->getServiceIntervalStatuses();
+        usort($statuses, [$this, 'compareServiceStatuses']);
+
+        return array_slice($statuses, 0, self::UPCOMING_SERVICE_LIMIT);
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getServiceAlerts(): array
+    {
+        $alerts = array_filter(
+            $this->getServiceIntervalStatuses(),
+            static fn (array $status): bool => $status['status'] !== 'ok'
+        );
+
+        usort($alerts, [$this, 'compareServiceStatuses']);
+
+        return array_values($alerts);
+    }
     
     
 
@@ -555,26 +643,34 @@ class Bike extends AggregateBase implements iHasServiceIntervals
     {
         $n = 0;
         $nValid = 0;
+        $nExcluded = 0;
         $consAccu = 0;
         $fuelAccu = 0;
         $priceAccu = 0;
+        $minimumFuelQuantity = $this->getMinimumUsefulRefuelingQuantity();
+
         foreach ($this->refuelings as $r) {
-            if ($r->isValid()) {
+            if ($r->isStatisticallyRelevant($minimumFuelQuantity)) {
                 $nValid ++;
-                $consAccu += $r->getConsumption();
+                $consAccu += $r->getConsumption() ?? 0;
+            } elseif ($r->isValid()) {
+                $nExcluded ++;
             }
             $n ++;
             $fuelAccu += $r->getFuelQuantity();
             $priceAccu += $r->getPrice();
         }
         $avgCons = $nValid > 0 ? ($consAccu / $nValid) : 0;
-        $range = $avgCons > 0 ? (($this->fuelTankSize / $avgCons) * 100) : 0;
+        $range = $avgCons > 0 ? (($this->getFuelTankSize() / $avgCons) * 100) : 0;
         return [
             "numberOfRefuelings" => $n,
             "totalFuelQuantity" => $fuelAccu,
             "totalFuelPrice" => $priceAccu,
             "averageConsumption" => $avgCons,
-            "averageRange" => $range
+            "averageRange" => $range,
+            "qualifiedRefuelings" => $nValid,
+            "excludedRefuelings" => $nExcluded,
+            "minimumFuelQuantity" => $minimumFuelQuantity,
         ];
         // $this->numberOfRefuelings = $n;
         // $this->totalFuelQuantity = $fuelAccu;
@@ -601,6 +697,178 @@ class Bike extends AggregateBase implements iHasServiceIntervals
             "totalTimeSpent" => $timeAccu,
             "totalCosts" => $costAccu,
         ];
+    }
+
+    /**
+     *
+     * @return float
+     */
+    private function getMinimumUsefulRefuelingQuantity(): float
+    {
+        $threshold = max(
+            self::MINIMUM_REFUELING_SAMPLE_LITERS,
+            $this->getFuelTankSize() * self::MINIMUM_REFUELING_SAMPLE_RATIO
+        );
+
+        return round($threshold, 2);
+    }
+
+    /**
+     *
+     * @param ServiceInterval $serviceInterval
+     * @param DateTimeImmutable $referenceDate
+     * @return array
+     */
+    private function buildServiceIntervalStatus(ServiceInterval $serviceInterval, DateTimeImmutable $referenceDate): array
+    {
+        $task = $serviceInterval->getTask();
+        $intervalType = $serviceInterval->getIntervalType();
+        $lastServiceDate = $this->resolveLastTaskDate($task);
+        $lastServiceOdometer = $this->getLastTaskOdometer($task);
+
+        if (in_array($intervalType, [ServiceInterval::ABSOLUTE_DISTANCE, ServiceInterval::RELATIVE_DISTANCE], true)) {
+            $baselineOdometer = $lastServiceOdometer > 0 ? $lastServiceOdometer : $this->getPurchaseOdometer();
+            $warningDistance = 500;
+            $dueOdometer = $baselineOdometer + $serviceInterval->getInterval();
+            $remainingDistance = $dueOdometer - $this->getOdometer();
+
+            return [
+                'task' => $task,
+                'interval' => $serviceInterval->getInterval(),
+                'intervalType' => $intervalType,
+                'status' => $this->resolveServiceStatus($remainingDistance, $warningDistance),
+                'remainingDistance' => $remainingDistance,
+                'remainingDays' => null,
+                'warningDistance' => $warningDistance,
+                'warningDays' => null,
+                'dueOdometer' => $dueOdometer,
+                'dueDate' => null,
+                'lastServiceDate' => $lastServiceDate,
+                'lastServiceOdometer' => $lastServiceOdometer > 0 ? $lastServiceOdometer : null,
+                'hasRecordedService' => $lastServiceOdometer > 0,
+                'usesPurchaseBaseline' => $lastServiceOdometer === 0,
+                'sortValue' => $remainingDistance,
+            ];
+        }
+
+        $baselineDate = $lastServiceDate ?? DateTimeImmutable::createFromInterface($this->getPurchaseDate())->setTime(0, 0);
+        $warningDays = $this->resolveServiceWarningThreshold($intervalType);
+        $dueDate = $this->calculateServiceDueDate($baselineDate, $intervalType, $serviceInterval->getInterval());
+        $remainingDays = (int) $referenceDate->diff($dueDate)->format('%r%a');
+
+        return [
+            'task' => $task,
+            'interval' => $serviceInterval->getInterval(),
+            'intervalType' => $intervalType,
+            'status' => $this->resolveServiceStatus($remainingDays, $warningDays),
+            'remainingDistance' => null,
+            'remainingDays' => $remainingDays,
+            'warningDistance' => null,
+            'warningDays' => $warningDays,
+            'dueOdometer' => null,
+            'dueDate' => $dueDate,
+            'lastServiceDate' => $lastServiceDate,
+            'lastServiceOdometer' => $lastServiceOdometer > 0 ? $lastServiceOdometer : null,
+            'hasRecordedService' => $lastServiceDate !== null,
+            'usesPurchaseBaseline' => $lastServiceDate === null,
+            'sortValue' => $remainingDays,
+        ];
+    }
+
+    /**
+     *
+     * @param Task $task
+     * @return DateTimeInterface|null
+     */
+    private function resolveLastTaskDate(Task $task): ?DateTimeInterface
+    {
+        $lastTaskTimestamp = $this->getLastTaskDate($task);
+
+        if ($lastTaskTimestamp <= 0) {
+            return null;
+        }
+
+        return (new DateTimeImmutable())->setTimestamp($lastTaskTimestamp);
+    }
+
+    /**
+     *
+     * @param DateTimeImmutable $baselineDate
+     * @param int $intervalType
+     * @param int $interval
+     * @return DateTimeImmutable
+     */
+    private function calculateServiceDueDate(DateTimeImmutable $baselineDate, int $intervalType, int $interval): DateTimeImmutable
+    {
+        return match ($intervalType) {
+            ServiceInterval::DAYS => $baselineDate->add(new DateInterval('P' . $interval . 'D')),
+            ServiceInterval::MONTHS => $baselineDate->add(new DateInterval('P' . $interval . 'M')),
+            ServiceInterval::YEARS => $baselineDate->add(new DateInterval('P' . $interval . 'Y')),
+            default => $baselineDate,
+        };
+    }
+
+    /**
+     *
+     * @param int $intervalType
+     * @return int
+     */
+    private function resolveServiceWarningThreshold(int $intervalType): int
+    {
+        return match ($intervalType) {
+            ServiceInterval::ABSOLUTE_DISTANCE, ServiceInterval::RELATIVE_DISTANCE => 500,
+            ServiceInterval::DAYS => 7,
+            ServiceInterval::MONTHS => 14,
+            ServiceInterval::YEARS => 30,
+            default => 0,
+        };
+    }
+
+    /**
+     *
+     * @param int $remaining
+     * @param int $warningThreshold
+     * @return string
+     */
+    private function resolveServiceStatus(int $remaining, int $warningThreshold): string
+    {
+        if ($remaining < 0) {
+            return 'overdue';
+        }
+
+        if ($remaining <= $warningThreshold) {
+            return 'warning';
+        }
+
+        return 'ok';
+    }
+
+    /**
+     *
+     * @param array $left
+     * @param array $right
+     * @return int
+     */
+    private function compareServiceStatuses(array $left, array $right): int
+    {
+        $priority = [
+            'overdue' => 0,
+            'warning' => 1,
+            'ok' => 2,
+        ];
+
+        $leftPriority = $priority[$left['status']] ?? 99;
+        $rightPriority = $priority[$right['status']] ?? 99;
+
+        if ($leftPriority !== $rightPriority) {
+            return $leftPriority <=> $rightPriority;
+        }
+
+        if ($left['sortValue'] !== $right['sortValue']) {
+            return $left['sortValue'] <=> $right['sortValue'];
+        }
+
+        return strcmp($left['task']->getName(), $right['task']->getName());
     }
 
     /**

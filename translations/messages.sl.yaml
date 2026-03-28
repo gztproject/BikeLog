@@ -17,15 +17,41 @@ title:
   update: Posodobitve
   updater: Posodabljanje
   serviceIntervals: Servisni intervali
+  statistics: Statistika
+  upcomingEvents: Prihajajoči dogodki
+  alerts: Opozorila
   
 
 label:
   update:
     bike: Posodobi motor
     refueling: Posodobi točenje
+  workshopProfile: Profil delavnice
+  workshopActions: Dejanja delavnice
+  inventoryCount: Prikazani motorji
+  visibleOnThisPage: Trenutna stran
+  totalOdometer: Skupni števec
+  totalDistance: Zabeležena razdalja
+  totalMaintenanceCosts: Stroški servisov
+  totalFuelCosts: Stroški goriva
+  totalSpend: Skupni strošek
+  bikeOverview: Pregled motorjev
+  costsToDate: Skupni stroški
+  lastRefueling: Zadnje točenje
+  lastMaintenance: Zadnji servis
+  alertsOpen: Odprta opozorila
+  notRecorded: Ni zabeleženo
+  theme: Tema
+  themeLight: Svetla
+  themeDark: Temna
+  themeSystem: Sistem
+  units:
+    bikes: motorjev
+    services: servisov
   noneFound:
     users: Ne najdem nobenega uporabnika
     refuelings: Ne najdem nobenega točenja.
+    maintenances: Ne najdem nobenih servisov.
   save:
     maintenance: Shrani servis
   create:
@@ -89,6 +115,16 @@ label:
   cancel: Prekliči
   do-update: Posodobi
   description: Opis
+  qualifiedSamples: Upoštevani vzorci
+  excludedSamples: Izločeni vzorci
+  sampleThreshold: Prag vzorca
+  dueIn: Zapade čez
+  overdueBy: Prekoračeno za
+  dueAt: Zapade pri
+  dueOn: Zapade dne
+  lastServiceEntry: Zadnji servis
+  purchaseBaseline: Osnova je nakup
+  trackedTasks: spremljanih opravil
 
 
 action:
@@ -114,8 +150,38 @@ action:
     check: Preveri posodobitve
   
 body:
+  dashboard:
+    summary: Pregleden delavniški prikaz motorjev, servisne zgodovine in vsakodnevnih opravil.
+    inventory: Trenutni motorji v evidenci, pripravljeni za pregled in nadaljnje delo.
+    sidebar: Dodajte nov motor in ohranite delavniško evidenco ažurno.
+  bikeIndex:
+    summary: Delavniški register motorjev s pregledom kilometrov, goriva in servisov na enem mestu.
+    inventory: Preglejte posamezen motor, odprite podrobnosti ali takoj vnesite točenje oziroma servis.
+    sidebar: Ustvarite nov zapis motorja ali dodajte naslednje točenje kar iz nadzorne plošče.
+    empty: Začnite evidenco z vašim prvim motorjem in njegovim delavniškim zapisom.
+  bikeShow:
+    summary: Delavniški karton motorja z gorivom, servisi in časovnico opravil na enem mestu.
+    statistics: Ključni stroški, kakovost vzorca točenj in spremljani servisni intervali.
+    upcoming: Naslednji servisni dogodki, urejeni po nujnosti, z datumom ali kilometrino zapadlosti.
+    alerts: Najprej izpostavljena zapadla opravila in nezanesljiva statistika točenj.
+    serviceIntervals: Trenutni servisni intervali z zgodovino iz zadnjih zabeleženih servisov.
+    refueling: Zgodovina točenj z izračuni, ki ignorirajo drobna ali delna točenja.
+    maintenance: Zgodovina delavnice, porabljen čas in stroški za ta motor.
+    sidebar: Dodajte točenje, servis ali skočite neposredno na servisni plan.
+    noAlerts: Ni aktivnih opozoril. Motor je trenutno v planu.
+    noUpcomingEvents: Za ta motor ni nastavljenih servisnih intervalov.
+    usingPurchaseBaseline: Če opravilo še ni bilo zabeleženo, se kot izhodišče uporabi datum ali kilometrina nakupa.
+    refuelingThreshold: Povprečja goriva ignorirajo delna ali zelo majhna točenja pod %threshold% l.
+    refuelingPending: Za zanesljivo statistiko potrebujete polno točenje vsaj %threshold% l.
+    refuelingSingleSample: Povprečja goriva trenutno temeljijo le na enem ustreznem polnem točenju.
+    refuelingFiltered: "Iz povprečij goriva je bilo izločenih %count% majhnih ali delnih točenj."
   delete:
     userModal: Ali ste prepričani da želite izbrisati uporabnika?
+
+status:
+  ok: V planu
+  warning: Kmalu zapade
+  overdue: Zapadlo
 
 user:
   updated_successfuly: Spremembe uspešno shranjene.

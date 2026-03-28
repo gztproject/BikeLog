@@ -3,6 +3,7 @@ title:
     bike: New bike
     refueling: New refueling
     user: New user
+    maintenance: New maintenance
   list:
     users: User list
   delete:
@@ -11,17 +12,67 @@ title:
   homepage: BikeLog 
   myBikes: My bikes
   refueling: Refueling
+  maintenance: Maintenance
+  workshop: Workshop
   update: Updates
   updater: Update process
+  serviceIntervals: Service intervals
+  statistics: Statistics
+  upcomingEvents: Upcoming events
+  alerts: Alerts
   
 
 label:
   update:
     bike: Update bike
     refueling: Update refueling
+  workshopProfile: Workshop profile
+  workshopActions: Workshop actions
+  inventoryCount: Bikes shown
+  visibleOnThisPage: Current page
+  totalOdometer: Fleet odometer
+  totalDistance: Logged distance
+  totalMaintenanceCosts: Maintenance spend
+  totalFuelCosts: Fuel spend
+  totalSpend: Total spend
+  bikeOverview: Bike overview
+  costsToDate: Total spend
+  lastRefueling: Last refueling
+  lastMaintenance: Last maintenance
+  alertsOpen: Open alerts
+  notRecorded: Not recorded
+  theme: Theme
+  themeLight: Light
+  themeDark: Dark
+  themeSystem: System
+  task: Task
+  interval: Interval
+  remaining: Remaining
+  range: Range
+  location: Location
+  spentTime: Time spent
+  description: Description
+  cost: Cost
+  years: years
+  months: months
+  days: days
+  qualifiedSamples: Qualified samples
+  excludedSamples: Excluded samples
+  sampleThreshold: Sample threshold
+  dueIn: Due in
+  overdueBy: Overdue by
+  dueAt: Due at
+  dueOn: Due on
+  lastServiceEntry: Last service
+  purchaseBaseline: Using purchase entry as baseline
+  trackedTasks: tracked tasks
+  units:
+    bikes: bikes
+    services: services
   noneFound:
     users: Can't find any users.
     refuelings: Can't find any refuelings
+    maintenances: Can't find any maintenance entries.
   username: Username
   password: Password
   repeatPassword: Repeat password
@@ -81,8 +132,38 @@ action:
     check: Check for updates
   
 body:
+  dashboard:
+    summary: A clear workshop-style view of your bikes, service history, and day-to-day activity.
+    inventory: Current motorcycles prepared for the shop floor and ready for inspection.
+    sidebar: Start a new bike record and keep the workshop inventory current.
+  bikeIndex:
+    summary: A workshop-style bike register with mileage, fuel, and service context available at a glance.
+    inventory: Review each bike, open its detail page, or jump straight into refueling and maintenance work.
+    sidebar: Create a bike or register the next fuel stop without leaving the dashboard.
+    empty: Start the inventory with your first motorcycle and its workshop record.
+  bikeShow:
+    summary: A workshop-ready bike file with fuel, maintenance, and service timing in one place.
+    statistics: Key running costs, refueling sample quality, and tracked service items.
+    upcoming: The next service events sorted by urgency, including due mileage and dates.
+    alerts: Overdue work and weak fuel statistics that need attention first.
+    serviceIntervals: Current service intervals with history pulled from recent maintenance entries.
+    refueling: Refueling history with averages based on full, meaningful samples instead of tiny top-ups.
+    maintenance: Workshop history, time spent, and costs recorded for this bike.
+    sidebar: Log fuel, add maintenance, or jump straight into the service schedule from here.
+    noAlerts: No active alerts. This bike is currently on schedule.
+    noUpcomingEvents: No service intervals are configured for this bike.
+    usingPurchaseBaseline: When a task has never been recorded, the purchase date or purchase odometer is used as the starting point.
+    refuelingThreshold: Fuel averages ignore partial or very small fills below %threshold% l.
+    refuelingPending: Fuel averages need a full refueling of at least %threshold% l before they become reliable.
+    refuelingSingleSample: Fuel averages are currently based on a single qualified full refueling.
+    refuelingFiltered: "%count% small or partial refuelings were excluded from the fuel averages."
   delete:
     userModal: Do you really want to delete the user?
+
+status:
+  ok: On schedule
+  warning: Due soon
+  overdue: Overdue
 
 
   
@@ -93,6 +174,7 @@ menu:
   user: User
   logout: Logout
   users: Users
+  bikes: Bikes
   updater: Updates
 
 help:

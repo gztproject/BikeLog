@@ -1,58 +1,92 @@
+{% set serviceStatuses = bike.serviceIntervalStatuses %}
+{% set recentMaintenances = bike.maintenances|slice(-5, 5) %}
+{% set distanceIntervalTypes = [
+    constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::ABSOLUTE_DISTANCE'),
+    constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::RELATIVE_DISTANCE')
+] %}
+{% set dayIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::DAYS') %}
+{% set monthIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::MONTHS') %}
+{% set yearIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::YEARS') %}
+
 <div class="table-responsive-xl">
-	<table class="table table-hover table-bordered maintenance-table">
+	<table class="table table-hover table-bordered maintenance-table service-interval-table">
 		<thead class="thead-dark">
 			<tr>
-				<th scope="col">{{ "label.task"|trans }}</th>
-				<th scope="col">{{ "label.interval"|trans }}</th>
-				<th scope="col">{{ "label.remaining"|trans }}</th>
-				{% for m in bike.maintenances[-5:] %}
-				<th>{{ m.dateString }}</th>
+				<th scope="col">{{ 'label.task'|trans }}</th>
+				<th scope="col">{{ 'label.interval'|trans }}</th>
+				<th scope="col">{{ 'label.remaining'|trans }}</th>
+				{% for maintenance in recentMaintenances %}
+				<th>{{ maintenance.dateString }}</th>
 				{% endfor %}
 			</tr>
 		</thead>
 		<tbody>
-			{% for si in bike.serviceIntervals %}
-			{% set warning = 0 %}
-			{% set remaining = 0 %}
-			{% if si.intervalType == 00 %}
-			{% set warning = 500 %}
-			{% set remaining = (bike.odometer - bike.lastTaskOdometer(si.task)) %}
-			{% elseif si.intervalType == 10 %}
-			{% set warning = 500 %}
-			{% set remaining = (bike.odometer - bike.lastTaskOdometer(si.task)) %}
-			{% elseif si.intervalType == 20 %}
-			{% set warning = 7 %}
-			{% set remaining =  date("now").diff(date(bike.lastTaskDate(si.task))).days %}
-			{% elseif si.intervalType == 30 %}
-			{% set warning = 14 %}
-			{% set remaining = date("now").diff(date(bike.lastTaskDate(si.task))).days %}
-			{% elseif si.intervalType == 40 %}
-			{% set warning = 30 %}
-			{% set remaining = date("now").diff(date(bike.lastTaskDate(si.task))).days %}
-			{% endif %}			
-			<tr class={% if (si.interval - remaining) > warning %}
-				"table-success"
-				{% elseif (si.interval - remaining) < 0 %}"table-danger"
-				{% else %}"table-warning"
-				{% endif %}>
-				<th scope="row">{{ si.task.name }}</th>
-				<td>{{ si.interval | number_format }} {% if si.intervalType == 00 or si.intervalType == 10 %}km
-					{% elseif si.intervalType == 20 %} {{ "label.days"|trans }} {% elseif si.intervalType == 30 %}
-					{{ "label.months"|trans }} {% elseif si.intervalType == 40 %} {{ "label.years"|trans }}
-					{% endif %}</td>
-				<td>{% if si.intervalType == 00 or si.intervalType == 10 %} {{ (si.interval - remaining) | number_format}} km
-					{% elseif si.intervalType >= 20 %} {{ remaining | number_format}} {{ "label.days"|trans }} 
-					{% endif %}</td>
-				{% for m in bike.maintenances[-5:] %}
-				<td>{% if m.hasTask(si.task) %} 
-					{% if si.intervalType == 00 or si.intervalType == 10 %}{{ m.odometer|number_format }}km {% elseif si.intervalType == 20 %}{{ m.dateString }} {% elseif si.intervalType == 30 %} {{ m.dateString }}
-					{% elseif si.intervalType == 40 %} {{ m.dateString }} {% endif %}
-					{% endif %}</td>
+			{% for status in serviceStatuses %}
+			<tr class="{% if status.status == 'overdue' %}table-danger{% elseif status.status == 'warning' %}table-warning{% else %}table-success{% endif %}">
+				<th scope="row">
+					<div class="service-interval-table__task">
+						<strong>{{ status.task.name }}</strong>
+						<span class="status-pill status-pill--{{ status.status }}">{{ ('status.' ~ status.status)|trans }}</span>
+					</div>
+				</th>
+				<td>
+					{{ status.interval|number_format }}
+					{% if status.intervalType in distanceIntervalTypes %}
+						km
+					{% elseif status.intervalType == dayIntervalType %}
+						{{ 'label.days'|trans }}
+					{% elseif status.intervalType == monthIntervalType %}
+						{{ 'label.months'|trans }}
+					{% elseif status.intervalType == yearIntervalType %}
+						{{ 'label.years'|trans }}
+					{% endif %}
+				</td>
+				<td>
+					{% if status.remainingDistance is not null %}
+						{% if status.remainingDistance >= 0 %}
+							{{ status.remainingDistance|number_format }} km
+						{% else %}
+							{{ 'label.overdueBy'|trans }} {{ (status.remainingDistance * -1)|number_format }} km
+						{% endif %}
+						<small class="d-block text-muted">{{ 'label.dueAt'|trans }} {{ status.dueOdometer|number_format }} km</small>
+					{% else %}
+						{% if status.remainingDays >= 0 %}
+							{{ status.remainingDays|number_format }} {{ 'label.days'|trans }}
+						{% else %}
+							{{ 'label.overdueBy'|trans }} {{ (status.remainingDays * -1)|number_format }} {{ 'label.days'|trans }}
+						{% endif %}
+						<small class="d-block text-muted">{{ 'label.dueOn'|trans }} {{ status.dueDate|date('Y-m-d') }}</small>
+					{% endif %}
+					<small class="d-block text-muted">
+						{% if status.hasRecordedService %}
+							{{ 'label.lastServiceEntry'|trans }}
+							{% if status.remainingDistance is not null %}
+								{{ status.lastServiceOdometer|number_format }} km
+							{% else %}
+								{{ status.lastServiceDate|date('Y-m-d') }}
+							{% endif %}
+						{% else %}
+							{{ 'label.purchaseBaseline'|trans }}
+						{% endif %}
+					</small>
+				</td>
+				{% for maintenance in recentMaintenances %}
+				<td>
+					{% if maintenance.hasTask(status.task) %}
+						{% if status.intervalType in distanceIntervalTypes %}
+							{{ maintenance.odometer|number_format }} km
+						{% else %}
+							{{ maintenance.dateString }}
+						{% endif %}
+					{% endif %}
+				</td>
 				{% endfor %}
 			</tr>
-
+			{% else %}
+			<tr class="table-warning">
+				<td colspan="{{ 3 + recentMaintenances|length }}" align="center">{{ 'body.bikeShow.noUpcomingEvents'|trans }}</td>
+			</tr>
 			{% endfor %}
 		</tbody>
-
 	</table>
 </div>

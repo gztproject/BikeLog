@@ -6,6 +6,7 @@ use App\Repository\Maintenance\MaintenanceRepository;
 use App\Repository\Refueling\RefuelingRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,16 +29,23 @@ class BikeQueryController extends AbstractController
      * Finds and displays the bike entity.
      */
     #[Route('/dashboard/bike/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}', methods: ['GET'], name: 'bike_show')]
-    public function show(Bike $bike, RefuelingRepository $refuelingRepo, MaintenanceRepository $maintenanceRepo, PaginatorInterface $paginator): Response
+    public function show(Bike $bike, RefuelingRepository $refuelingRepo, MaintenanceRepository $maintenanceRepo, PaginatorInterface $paginator, Request $request): Response
     {
         if ($bike->getOwner() != $this->getUser())
             throw $this->createAccessDeniedException("Bikes can only be shown to their owners.");
 
+        $refuelingPage = max(1, $request->query->getInt('refueling_page', 1));
+        $maintenancePage = max(1, $request->query->getInt('maintenance_page', 1));
+
         $queryBuilder = $refuelingRepo->getFilteredQuery(null, null, $bike->getId(), $this->getUser());
-        $refuelings = $paginator->paginate($queryBuilder, 1, 10);
+        $refuelings = $paginator->paginate($queryBuilder, $refuelingPage, 10, [
+            'pageParameterName' => 'refueling_page',
+        ]);
 
         $queryBuilder = $maintenanceRepo->getFilteredQuery(null, null, $bike->getId(), $this->getUser());
-        $maintenances = $paginator->paginate($queryBuilder, 1, 10);
+        $maintenances = $paginator->paginate($queryBuilder, $maintenancePage, 10, [
+            'pageParameterName' => 'maintenance_page',
+        ]);
 
         return $this->render('dashboard/bike/show.html.twig', [
             'bike' => $bike,

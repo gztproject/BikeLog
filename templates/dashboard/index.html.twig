@@ -3,36 +3,47 @@
 {% block body_id 'dashboard_index' %}
 
 {% block main %}
+<section class="page-shell dashboard-home">
+    <div class="dashboard-page__header">
+        <div>
+            <span class="dashboard-page__eyebrow">{{ 'label.workshopProfile'|trans }}</span>
+            <h1 class="page-shell__title">{{ 'title.homepage'|trans }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.dashboard.summary'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <a href="{{ path('bike_new') }}" class="btn btn-success">
+                <i class="fa fa-plus" aria-hidden="true"></i> {{ 'action.add.bike'|trans }}
+            </a>
+            <a href="{{ path('bike_index') }}" class="btn btn-outline-secondary">
+                <i class="fa fa-motorcycle" aria-hidden="true"></i> {{ 'title.myBikes'|trans }}
+            </a>
+        </div>
+    </div>
 
-<div class="row">
-	<div class="col-12">
-		<div class="bs-component">
-			<div class="card">
-				<div class="card-header">
-					<a href="{{ path('bike_index') }}"><h2>
-							{{ 'title.myBikes'|trans }}
-						</h2></a>
-				</div>
-				<div class="card-body">
-					{{ include('dashboard/bike/_table.html.twig', {bikes: bikesDropDown.getList}, with_context = false) }}
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+    <div class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'label.bikeOverview'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.dashboard.inventory'|trans }}</p>
+            </div>
+        </div>
 
-</br>
-
+        {{ include('dashboard/bike/_table.html.twig', {bikes: bikesDropDown.getList}, with_context = false) }}
+    </div>
+</section>
 
 {% endblock %}
 
 {% block sidebar %}
 
 {{ parent() }}
-<a href="{{ path('bike_new') }}"
-	class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-	aria-hidden="true"></i> {{ 'action.add.bike'|trans }}
-</a>
+<section class="sidebar-card">
+    <h2 class="sidebar-card__title">{{ 'label.workshopActions'|trans }}</h2>
+    <p class="sidebar-card__text">{{ 'body.dashboard.sidebar'|trans }}</p>
+    <a href="{{ path('bike_new') }}" class="btn btn-success btn-block">
+        <i class="fa fa-plus" aria-hidden="true"></i> {{ 'action.add.bike'|trans }}
+    </a>
+</section>
 
 {% endblock %}
 

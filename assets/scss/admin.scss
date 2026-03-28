@@ -6,8 +6,8 @@
     align-items: center;
     gap: 1rem;
     padding: 1.1rem 1.2rem;
-    background: #ffffff;
-    border: 1px solid #d9e2ec;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
     border-radius: 0.9rem;
 }
 
@@ -21,13 +21,13 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #829ab1;
+    color: var(--theme-muted);
 }
 
 .update-modal__state {
     display: flex;
     align-items: center;
-    color: #486581;
+    color: var(--theme-muted);
 }
 
 .update-modal__summary {
@@ -38,13 +38,13 @@
 }
 
 .update-modal__placeholder {
-    color: #627d98;
+    color: var(--theme-muted);
 }
 
 .update-modal__metric {
     padding: 0.9rem 1rem;
-    background: #f8fafc;
-    border: 1px solid #d9e2ec;
+    background: var(--theme-surface-soft);
+    border: 1px solid var(--theme-border);
     border-radius: 0.8rem;
 }
 
@@ -54,14 +54,14 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #829ab1;
+    color: var(--theme-muted);
 }
 
 .update-modal__progress-shell {
     margin-bottom: 1rem;
     padding: 1rem;
-    background: #f8fafc;
-    border: 1px solid #d9e2ec;
+    background: var(--theme-surface-soft);
+    border: 1px solid var(--theme-border);
     border-radius: 0.8rem;
 }
 
@@ -70,12 +70,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.75rem;
-    color: #486581;
+    color: var(--theme-muted);
 }
 
 .update-modal__progress-label {
     margin-top: 0.75rem;
-    color: #627d98;
+    color: var(--theme-muted);
 }
 
 .update-modal__release-notes {
@@ -83,8 +83,8 @@
     margin-bottom: 1rem;
     padding: 1rem;
     overflow: auto;
-    background: #ffffff;
-    border: 1px solid #d9e2ec;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
     border-radius: 0.8rem;
 }
 
@@ -103,8 +103,8 @@
     margin-bottom: 0;
     padding: 1rem;
     overflow: auto;
-    color: #f0f4f8;
-    background: #102a43;
+    color: var(--theme-primary-contrast);
+    background: var(--theme-surface-strong);
     border-radius: 0.8rem;
 }
 

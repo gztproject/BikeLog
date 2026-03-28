@@ -248,8 +248,25 @@ class Refueling extends AggregateBaseWithComment {
 	 *
 	 * @return bool
 	 */
+	public function isTankFull(): bool {
+	    return $this->isTankFull;
+	}
+
+	/**
+	 *
+	 * @return bool
+	 */
 	public function isValid(): bool {
-		return $this->getPreviousRefueling () != null;
+		return $this->getPreviousRefueling () != null && ($this->getDistance () ?? 0) > 0;
+	}
+
+	/**
+	 *
+	 * @param float $minimumFuelQuantity
+	 * @return bool
+	 */
+	public function isStatisticallyRelevant(float $minimumFuelQuantity = 0.0): bool {
+	    return $this->isValid() && $this->isTankFull() && $this->getFuelQuantity() >= $minimumFuelQuantity;
 	}
 
 	/**
