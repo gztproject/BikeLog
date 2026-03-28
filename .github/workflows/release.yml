@@ -1,0 +1,105 @@
+name: Release Artifact
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing tag to package and publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build Release Artifact
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+          tools: composer:v2
+          extensions: intl, xml, simplexml
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --no-check-publish
+
+      - name: Lint Twig templates
+        run: php bin/console lint:twig templates/dashboard/bike/show.html.twig templates/dashboard/refueling/index.html.twig templates/dashboard/maintenance/index.html.twig templates/admin/servicePlan/model.html.twig
+
+      - name: Lint YAML config
+        run: php bin/console lint:yaml translations/messages.en.yaml translations/messages.sl.yaml config/packages config/routes
+
+      - name: Run PHPUnit
+        run: php bin/phpunit
+
+      - name: Run frontend tests
+        run: npm test
+
+      - name: Install production Composer dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Create release archive
+        run: |
+          set -euo pipefail
+          VERSION="${RELEASE_VERSION}"
+          STAGING_DIR="$(mktemp -d)"
+          PACKAGE_DIR="$STAGING_DIR/BikeLog-$VERSION"
+          ARCHIVE_NAME="BikeLog-$VERSION-build.tar.gz"
+
+          mkdir -p "$PACKAGE_DIR"
+          rsync -a \
+            --exclude=".git" \
+            --exclude=".github" \
+            --exclude="node_modules" \
+            --exclude="var/cache" \
+            --exclude="var/log" \
+            --exclude=".env.local" \
+            --exclude=".env.*.local" \
+            ./ "$PACKAGE_DIR"/
+
+          tar -C "$STAGING_DIR" -czf "$ARCHIVE_NAME" "BikeLog-$VERSION"
+          mv "$STAGING_DIR/$ARCHIVE_NAME" .
+
+      - name: Publish GitHub release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="${RELEASE_VERSION}"
+          ARCHIVE_NAME="BikeLog-$VERSION-build.tar.gz"
+
+          if ! gh release view "$VERSION" > /dev/null 2>&1; then
+            gh release create "$VERSION" --generate-notes
+          fi
+
+          gh release upload "$VERSION" "$ARCHIVE_NAME" --clobber
