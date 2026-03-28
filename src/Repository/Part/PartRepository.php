@@ -2,8 +2,10 @@
 
 namespace App\Repository\Part;
 
+use App\Entity\Manufacturer\Manufacturer;
 use App\Entity\Part\Part;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,6 +19,25 @@ class PartRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
     	parent::__construct($registry, Part::class);
+    }
+
+    public function getManufacturerPartsQuery(Manufacturer $manufacturer): QueryBuilder
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.manufacturers', 'm')
+            ->where('m = :manufacturer')
+            ->setParameter('manufacturer', $manufacturer)
+            ->orderBy('p.name', 'ASC');
+    }
+
+    public function findOneForManufacturerByName(Manufacturer $manufacturer, string $name): ?Part
+    {
+        return $this->getManufacturerPartsQuery($manufacturer)
+            ->andWhere('LOWER(p.name) = :name')
+            ->setParameter('name', mb_strtolower(trim($name)))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     // /**

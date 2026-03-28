@@ -20,6 +20,9 @@ title:
   statistics: Statistika
   upcomingEvents: Prihajajoči dogodki
   alerts: Opozorila
+  parts: Deli
+  servicePlan: Servisni plan
+  bikeOverrides: Prilagoditve motorja
   
 
 label:
@@ -94,7 +97,17 @@ label:
   isRoleAdmin: Administrator
   currentVersion: Trenutna različica
   task: Opravilo
+  manufacturer: Proizvajalec
+  part: Del
+  existingTask: Obstoječe opravilo
+  createNewTask: Ustvari novo opravilo
+  selectPart: Izberite del
+  selectTask: Izberite opravilo
+  searchParts: Išči dele
+  noMatchingParts: Ni ustreznih delov
+  taskName: Naziv opravila
   interval: Interval
+  intervalType: Vrsta intervala
   remaining: Do nasl. servisa
   spentTime: Porabljen čas
   unspecifiedCosts: Neopredeljeni stroški
@@ -124,8 +137,31 @@ label:
   dueAt: Zapade pri
   dueOn: Zapade dne
   lastServiceEntry: Zadnji servis
+  lastService: Zadnji servis
   purchaseBaseline: Osnova je nakup
   trackedTasks: spremljanih opravil
+  servicesRecorded: zabeleženih servisov
+  serviceHistory: Zgodovina servisov
+  expectedInterval: Predviden interval
+  actualInterval: Dejanski interval
+  avgIntervalDistance: Povp. servisni razmik
+  avgIntervalTime: Povp. časovni razmik
+  source: Vir
+  modelDefault: Modelski privzeto
+  bikeOverride: Prilagoditev motorja
+  notEnoughHistory: Premalo zgodovine
+  notTracked: Ni spremljano
+  general: Splošno
+  intervalDistanceAbsolute: Absolutna razdalja
+  intervalDistanceRelative: Relativna razdalja
+  performanceOver: Nad pričakovanji
+  performanceUnder: Pod pričakovanji
+  performance:
+    overperforming: Nad pričakovanji
+    underperforming: Pod pričakovanji
+    on_target: V okviru plana
+    not_enough_history: Premalo zgodovine
+    not_tracked: Ni spremljano
 
 
 action:
@@ -135,6 +171,7 @@ action:
     user: Dodaj uporabnika
     maintenance: Dodaj servis
     task: Dodaj opravilo
+    part: Dodaj del
   delete:
     user: Izbriši uporabnika
   show: Pokaži
@@ -143,6 +180,9 @@ action:
   login: Prijava
   save: Shrani
   locate: Osveži lokacijo
+  manageBikePlan: Servisni plan motorja
+  manageModelPlan: Servisni plan modela
+  addBikeOverride: Dodaj prilagoditev motorja
   backToList: Nazaj na seznam
   cancel: Prekliči
   back_to_list: Nazaj na seznam
@@ -163,6 +203,8 @@ body:
   bikeShow:
     summary: Delavniški karton motorja z gorivom, servisi in časovnico opravil na enem mestu.
     statistics: Ključni stroški, kakovost vzorca točenj in spremljani servisni intervali.
+    parts: Zgodovina servisov po delih, primerjava z intervali in trenutna uspešnost posameznih delov.
+    partSelector: Osredotočite se na en del naenkrat in preglejte njegov servisni trend, skladnost z intervali in zgodovino.
     upcoming: Naslednji servisni dogodki, urejeni po nujnosti, z datumom ali kilometrino zapadlosti.
     alerts: Najprej izpostavljena zapadla opravila in nezanesljiva statistika točenj.
     serviceIntervals: Trenutni servisni intervali z zgodovino iz zadnjih zabeleženih servisov.
@@ -176,8 +218,31 @@ body:
     refuelingPending: Za zanesljivo statistiko potrebujete polno točenje vsaj %threshold% l.
     refuelingSingleSample: Povprečja goriva trenutno temeljijo le na enem ustreznem polnem točenju.
     refuelingFiltered: "Iz povprečij goriva je bilo izločenih %count% majhnih ali delnih točenj."
+    noPartStats: Podatki za statistiko delov še niso na voljo.
+    noPartHistory: Za ta del še ni zabeleženih servisnih vnosov.
+  servicePlan:
+    bike: Preglejte veljavni servisni plan za ta motor in po potrebi dodajte prilagoditve intervalov samo za ta motor.
+    bikeCurrent: Združeni modelski privzeti intervali in prilagoditve za ta motor.
+    model: Urejajte ponovljivo servisno shemo modela, vključno z deli, opravili in privzetimi intervali.
+    modelCurrent: Trenutna modelska opravila in servisni intervali, razvrščeni po delih.
+    modelSwitch: Tukaj izberite proizvajalca in model. Predlogi obstoječih opravil ostanejo omejeni na izbrani model in univerzalna opravila.
+    override: Dodajte ali prilagodite interval posameznega opravila za ta motor, brez spremembe modelskih privzetih nastavitev.
+    existingTaskModelScoped: Ponovno uporabite opravila, ki jih ta model že spremlja. Opravila brez dela se obravnavajo kot univerzalna in jih lahko uporabite na več modelih.
+    partOptional: Polje za del pustite prazno, če želite ustvariti splošno opravilo, ki ga lahko uporabite tudi na drugih modelih.
+    partEditor: Dodajte nov del za tega proizvajalca, da lahko nanj vežete opravila.
+    taskEditor: Uporabite obstoječe opravilo ali ustvarite novo ter mu nastavite privzeti modelski interval.
+    empty: Za ta servisni plan še ni nastavljenih vnosov.
   delete:
     userModal: Ali ste prepričani da želite izbrisati uporabnika?
+
+flash:
+  servicePlan:
+    bikeTaskExists: Ta motor že ima prilagojen interval za izbrano opravilo.
+    bikeOverrideCreated: Servisni interval za ta motor je shranjen.
+    partExists: Ta del za tega proizvajalca že obstaja.
+    partCreated: Del je dodan v katalog proizvajalca.
+    modelTaskExists: Ta model že spremlja izbrano opravilo.
+    taskCreated: Opravilo in interval sta shranjena v servisni plan modela.
 
 status:
   ok: V planu

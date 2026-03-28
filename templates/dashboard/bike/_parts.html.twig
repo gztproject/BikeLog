@@ -1,0 +1,218 @@
+{% set distanceIntervalTypes = [
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::ABSOLUTE_DISTANCE'),
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::RELATIVE_DISTANCE')
+] %}
+{% set dayIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::DAYS') %}
+{% set monthIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::MONTHS') %}
+{% set yearIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::YEARS') %}
+
+{% if partStatistics is not empty %}
+    {% set selectedPart = partStatistics|first %}
+
+    <div class="part-stat-shell">
+        <div class="part-stat-toolbar">
+            <div>
+                <label class="part-stat-toolbar__label" for="bike-part-selector">{{ 'label.part'|trans }}</label>
+                <select id="bike-part-selector" class="form-control" data-part-stat-selector="true" aria-label="{{ 'label.part'|trans }}">
+                    {% for part in partStatistics %}
+                        <option value="{{ part.part.id }}" {% if loop.first %}selected{% endif %}>
+                            {{ part.name }} · {{ part.trackedTaskCount|number_format }} {{ 'label.trackedTasks'|trans }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">{{ 'body.bikeShow.partSelector'|trans }}</small>
+            </div>
+            <span class="inventory-panel__badge">{{ selectedPart.name }}</span>
+        </div>
+
+        {% for part in partStatistics %}
+            <article class="part-stat-card" data-part-stat-card="{{ part.part.id }}" {% if not loop.first %}hidden{% endif %}>
+                <div class="part-stat-card__header">
+                    <div>
+                        <h3 class="part-stat-card__title">{{ part.name }}</h3>
+                        <p class="part-stat-card__subtitle">
+                            {{ part.servicesRecorded|number_format }} {{ 'label.servicesRecorded'|trans }}
+                            ·
+                            {{ part.trackedTaskCount|number_format }} {{ 'label.trackedTasks'|trans }}
+                        </p>
+                    </div>
+                    <div class="bike-detail__status-strip">
+                        <span class="status-pill status-pill--{{ part.status }}">
+                            {{ part.status == 'info' ? ('label.notTracked'|trans) : (('status.' ~ part.status)|trans) }}
+                        </span>
+                        {% if part.alertCount > 0 %}
+                            <span class="status-pill status-pill--warning">{{ part.alertCount|number_format }} {{ 'label.alertsOpen'|trans }}</span>
+                        {% endif %}
+                        {% if part.underperformerCount > 0 %}
+                            <span class="status-pill status-pill--warning">{{ part.underperformerCount|number_format }} {{ 'label.performanceUnder'|trans }}</span>
+                        {% endif %}
+                        {% if part.overperformerCount > 0 %}
+                            <span class="status-pill status-pill--ok">{{ part.overperformerCount|number_format }} {{ 'label.performanceOver'|trans }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="bike-detail__facts-grid">
+                    <div class="bike-detail__fact">
+                        <span>{{ 'label.lastService'|trans }}</span>
+                        <strong>
+                            {% if part.lastServiceDate %}
+                                {{ part.lastServiceDate|date('Y-m-d') }}
+                            {% else %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="bike-detail__fact">
+                        <span>{{ 'label.odometer'|trans }}</span>
+                        <strong>
+                            {% if part.lastServiceOdometer is not null %}
+                                {{ part.lastServiceOdometer|number_format }} km
+                            {% else %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="bike-detail__fact">
+                        <span>{{ 'label.avgIntervalDistance'|trans }}</span>
+                        <strong>
+                            {% if part.averageDistanceBetweenServices is not null %}
+                                {{ part.averageDistanceBetweenServices|number_format(0) }} km
+                            {% else %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% endif %}
+                        </strong>
+                    </div>
+                    <div class="bike-detail__fact">
+                        <span>{{ 'label.avgIntervalTime'|trans }}</span>
+                        <strong>
+                            {% if part.averageDaysBetweenServices is not null %}
+                                {{ part.averageDaysBetweenServices|number_format }} {{ 'label.days'|trans }}
+                            {% else %}
+                                {{ 'label.notRecorded'|trans }}
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="part-stat-card__table-shell">
+                    <div class="table-responsive-xl inventory-panel__table-scroll">
+                        <table class="table table-hover table-bordered">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">{{ 'label.task'|trans }}</th>
+                                    <th scope="col">{{ 'label.expectedInterval'|trans }}</th>
+                                    <th scope="col">{{ 'label.actualInterval'|trans }}</th>
+                                    <th scope="col">{{ 'label.performance'|trans }}</th>
+                                    <th scope="col">{{ 'label.remaining'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for taskStat in part.taskStats %}
+                                    <tr>
+                                        <th scope="row">
+                                            <strong>{{ taskStat.task.name }}</strong>
+                                            <small class="d-block text-muted">{{ taskStat.servicesRecorded|number_format }} {{ 'label.servicesRecorded'|trans }}</small>
+                                        </th>
+                                        <td>
+                                            {% if taskStat.serviceInterval %}
+                                                {{ taskStat.serviceInterval.interval|number_format }}
+                                                {% if taskStat.serviceInterval.intervalType in distanceIntervalTypes %}
+                                                    km
+                                                {% elseif taskStat.serviceInterval.intervalType == dayIntervalType %}
+                                                    {{ 'label.days'|trans }}
+                                                {% elseif taskStat.serviceInterval.intervalType == monthIntervalType %}
+                                                    {{ 'label.months'|trans }}
+                                                {% elseif taskStat.serviceInterval.intervalType == yearIntervalType %}
+                                                    {{ 'label.years'|trans }}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ 'label.notTracked'|trans }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if taskStat.actualIntervalValue is not null %}
+                                                {{ taskStat.actualIntervalValue|number_format(taskStat.actualIntervalUnit == 'km' ? 0 : 0) }} {{ taskStat.actualIntervalUnit == 'km' ? 'km' : ('label.days'|trans) }}
+                                            {% else %}
+                                                {{ 'label.notEnoughHistory'|trans }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="status-pill status-pill--{{ taskStat.performanceTone }}">
+                                                {{ ('label.performance.' ~ taskStat.performanceKey)|trans }}
+                                            </span>
+                                            {% if taskStat.performanceRatio is not null %}
+                                                <small class="d-block text-muted">{{ (taskStat.performanceRatio * 100)|number_format(0) }}%</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if taskStat.serviceStatus %}
+                                                <span class="status-pill status-pill--{{ taskStat.serviceStatus.status }}">{{ ('status.' ~ taskStat.serviceStatus.status)|trans }}</span>
+                                                {% if taskStat.serviceStatus.remainingDistance is not null %}
+                                                    <small class="d-block text-muted">
+                                                        {% if taskStat.serviceStatus.remainingDistance >= 0 %}
+                                                            {{ 'label.dueIn'|trans }} {{ taskStat.serviceStatus.remainingDistance|number_format }} km
+                                                        {% else %}
+                                                            {{ 'label.overdueBy'|trans }} {{ (taskStat.serviceStatus.remainingDistance * -1)|number_format }} km
+                                                        {% endif %}
+                                                    </small>
+                                                {% else %}
+                                                    <small class="d-block text-muted">
+                                                        {% if taskStat.serviceStatus.remainingDays >= 0 %}
+                                                            {{ 'label.dueIn'|trans }} {{ taskStat.serviceStatus.remainingDays|number_format }} {{ 'label.days'|trans }}
+                                                        {% else %}
+                                                            {{ 'label.overdueBy'|trans }} {{ (taskStat.serviceStatus.remainingDays * -1)|number_format }} {{ 'label.days'|trans }}
+                                                        {% endif %}
+                                                    </small>
+                                                {% endif %}
+                                            {% else %}
+                                                {{ 'label.notTracked'|trans }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="part-stat-card__history">
+                    <div class="part-stat-card__history-header">
+                        <h4>{{ 'label.serviceHistory'|trans }}</h4>
+                        <span>{{ part.serviceHistory|length|number_format }}</span>
+                    </div>
+                    <div class="table-responsive-xl inventory-panel__table-scroll">
+                        <table class="table table-hover table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">{{ 'label.date'|trans }}</th>
+                                    <th scope="col">{{ 'label.odometer'|trans }}</th>
+                                    <th scope="col">{{ 'label.task'|trans }}</th>
+                                    <th scope="col">{{ 'label.cost'|trans }}</th>
+                                    <th scope="col">{{ 'label.workshop.workshop'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in part.serviceHistory %}
+                                    <tr>
+                                        <th scope="row">{{ event.dateString }}</th>
+                                        <td>{{ event.odometer|number_format }} km</td>
+                                        <td>{{ event.tasks|join(', ') }}</td>
+                                        <td>{{ event.taskCost|number_format(2) }} EUR</td>
+                                        <td>{{ event.workshop }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr class="table-warning">
+                                        <td colspan="5" align="center">{{ 'body.bikeShow.noPartHistory'|trans }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="bike-detail__empty">{{ 'body.bikeShow.noPartStats'|trans }}</p>
+{% endif %}

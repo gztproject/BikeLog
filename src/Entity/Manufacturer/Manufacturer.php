@@ -91,6 +91,7 @@ class Manufacturer extends AggregateBase implements iHasParts {
 			return $part;
 		parent::updateBase ( $user );
 		$this->parts->add ( $part );
+		$part->addManufacturer ( $this, $user );
 		return $part;
 	}
 

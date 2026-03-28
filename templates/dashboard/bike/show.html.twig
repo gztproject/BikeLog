@@ -7,7 +7,14 @@
 {{ encore_entry_link_tags('css/maintenance') }}
 {% endblock %}
 
+{% block javascripts %}
+{{ parent() }}
+{{ encore_entry_script_tags('js/bike/show') }}
+{{ encore_entry_script_tags('js/maintenance/table') }}
+{% endblock %}
+
 {% set refuelingStats = bike.refuelingStatistics %}
+{% set partStatistics = bike.partStatistics %}
 {% set upcomingServiceEvents = bike.upcomingServiceEvents %}
 {% set serviceAlerts = bike.serviceAlerts %}
 {% set totalSpend = bike.totalFuelPrice + bike.totalMaintenanceCosts %}
@@ -18,8 +25,8 @@
 {% set dayIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::DAYS') %}
 {% set monthIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::MONTHS') %}
 {% set yearIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::YEARS') %}
-{% set hasFuelAlerts = refuelingStats.qualifiedRefuelings < 2 or refuelingStats.excludedRefuelings > 0 %}
-{% set fuelAlertCount = (refuelingStats.qualifiedRefuelings < 2 ? 1 : 0) + (refuelingStats.excludedRefuelings > 0 ? 1 : 0) %}
+{% set hasFuelAlerts = refuelingStats.qualifiedRefuelings < 2 %}
+{% set fuelAlertCount = refuelingStats.qualifiedRefuelings < 2 ? 1 : 0 %}
 {% set totalAlertCount = serviceAlerts|length + fuelAlertCount %}
 
 {% block main %}
@@ -55,6 +62,10 @@
         <a href="#bike-upcoming" class="bike-detail__quick-link">
             <span>{{ 'title.upcomingEvents'|trans }}</span>
             <strong>{{ upcomingServiceEvents|length|number_format }}</strong>
+        </a>
+        <a href="#bike-parts" class="bike-detail__quick-link">
+            <span>{{ 'title.parts'|trans }}</span>
+            <strong>{{ partStatistics|length|number_format }}</strong>
         </a>
         <a href="#bike-service-intervals" class="bike-detail__quick-link">
             <span>{{ 'title.serviceIntervals'|trans }}</span>
@@ -137,14 +148,6 @@
                 <span class="status-pill status-pill--{{ totalAlertCount > 0 ? 'warning' : 'ok' }}">
                     {{ totalAlertCount|number_format }} {{ 'label.alertsOpen'|trans }}
                 </span>
-                <span class="status-pill status-pill--{{ refuelingStats.qualifiedRefuelings >= 2 ? 'ok' : 'info' }}">
-                    {{ refuelingStats.qualifiedRefuelings|number_format }} {{ 'label.qualifiedSamples'|trans }}
-                </span>
-                {% if refuelingStats.excludedRefuelings > 0 %}
-                    <span class="status-pill status-pill--info">
-                        {{ refuelingStats.excludedRefuelings|number_format }} {{ 'label.excludedSamples'|trans }}
-                    </span>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -199,11 +202,6 @@
             <strong class="dashboard-stat-card__value">{{ totalSpend|number_format(2) }}</strong>
             <span class="dashboard-stat-card__meta">EUR</span>
         </article>
-        <article class="dashboard-stat-card">
-            <span class="dashboard-stat-card__label">{{ 'label.qualifiedSamples'|trans }}</span>
-            <strong class="dashboard-stat-card__value">{{ refuelingStats.qualifiedRefuelings|number_format }}</strong>
-            <span class="dashboard-stat-card__meta">{{ 'label.sampleThreshold'|trans }} {{ refuelingStats.minimumFuelQuantity|number_format(2) }} l</span>
-        </article>
     </div>
 
     <div class="bike-detail__section-grid">
@@ -232,25 +230,6 @@
                 <div class="bike-detail__fact">
                     <span>{{ 'title.maintenance'|trans }}</span>
                     <strong>{{ bike.numberOfMaintenances|number_format }}</strong>
-                </div>
-                <div class="bike-detail__fact">
-                    <span>{{ 'label.qualifiedSamples'|trans }}</span>
-                    <strong>{{ refuelingStats.qualifiedRefuelings|number_format }}</strong>
-                </div>
-                <div class="bike-detail__fact">
-                    <span>{{ 'label.excludedSamples'|trans }}</span>
-                    <strong>{{ refuelingStats.excludedRefuelings|number_format }}</strong>
-                </div>
-            </div>
-
-            <div class="bike-detail__note-grid">
-                <div class="bike-detail__note">
-                    <strong>{{ 'label.sampleThreshold'|trans }}</strong>
-                    <p>{{ 'body.bikeShow.refuelingThreshold'|trans({'%threshold%': refuelingStats.minimumFuelQuantity|number_format(2)}) }}</p>
-                </div>
-                <div class="bike-detail__note">
-                    <strong>{{ 'label.purchaseBaseline'|trans }}</strong>
-                    <p>{{ 'body.bikeShow.usingPurchaseBaseline'|trans }}</p>
                 </div>
             </div>
         </article>
@@ -305,16 +284,6 @@
                                 <span class="status-pill status-pill--info">{{ 'status.warning'|trans }}</span>
                             </div>
                             <div class="service-event-list__meta">{{ 'body.bikeShow.refuelingSingleSample'|trans }}</div>
-                        </li>
-                    {% endif %}
-
-                    {% if refuelingStats.excludedRefuelings > 0 %}
-                        <li class="service-event-list__item service-event-list__item--info">
-                            <div class="service-event-list__title-row">
-                                <strong>{{ 'title.refueling'|trans }}</strong>
-                                <span class="status-pill status-pill--info">{{ 'status.warning'|trans }}</span>
-                            </div>
-                            <div class="service-event-list__meta">{{ 'body.bikeShow.refuelingFiltered'|trans({'%count%': refuelingStats.excludedRefuelings|number_format}) }}</div>
                         </li>
                     {% endif %}
                 </ul>
@@ -391,6 +360,20 @@
         </article>
     </div>
 
+    <section id="bike-parts" class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'title.parts'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.bikeShow.parts'|trans }}</p>
+            </div>
+            <span class="inventory-panel__badge">{{ partStatistics|length|number_format }} {{ 'title.parts'|trans|lower }}</span>
+        </div>
+
+        {{ include('dashboard/bike/_parts.html.twig', {
+            partStatistics: partStatistics
+        }, with_context = false) }}
+    </section>
+
     <section id="bike-service-intervals" class="inventory-panel">
         <div class="inventory-panel__header">
             <div>
@@ -450,6 +433,14 @@
     <a href="{{ path('maintenance_new_id', { 'id': bike.id }) }}" class="btn btn-outline-secondary btn-block">
         <i class="fa fa-wrench" aria-hidden="true"></i> {{ 'action.add.maintenance'|trans }}
     </a>
+    <a href="{{ path('bike_service_plan', { 'id': bike.id }) }}" class="btn btn-outline-secondary btn-block">
+        <i class="fa fa-list" aria-hidden="true"></i> {{ 'action.manageBikePlan'|trans }}
+    </a>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('admin_model_service_plan', { 'id': bike.model.id }) }}" class="btn btn-outline-secondary btn-block">
+            <i class="fa fa-cogs" aria-hidden="true"></i> {{ 'action.manageModelPlan'|trans }}
+        </a>
+    {% endif %}
 </section>
 
 <section class="sidebar-card">
@@ -461,8 +452,6 @@
             {{ 'body.bikeShow.refuelingPending'|trans({'%threshold%': refuelingStats.minimumFuelQuantity|number_format(2)}) }}
         {% elseif refuelingStats.qualifiedRefuelings == 1 %}
             {{ 'body.bikeShow.refuelingSingleSample'|trans }}
-        {% elseif refuelingStats.excludedRefuelings > 0 %}
-            {{ 'body.bikeShow.refuelingFiltered'|trans({'%count%': refuelingStats.excludedRefuelings|number_format}) }}
         {% elseif hasFuelAlerts %}
             {{ 'body.bikeShow.alerts'|trans }}
         {% else %}

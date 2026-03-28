@@ -16,7 +16,7 @@
     "license": "UNLICENSED",
     "private": true,
     "scripts": {
-        "test": "node --test \"tests/js/**/*.test.cjs\"",
+        "test": "node --test tests/js",
         "dev-server": "encore dev-server",
         "dev": "encore dev",
         "watch": "encore dev --watch",

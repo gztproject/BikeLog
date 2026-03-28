@@ -1,0 +1,99 @@
+{% set distanceIntervalTypes = [
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::ABSOLUTE_DISTANCE'),
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::RELATIVE_DISTANCE')
+] %}
+{% set dayIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::DAYS') %}
+{% set monthIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::MONTHS') %}
+{% set yearIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::YEARS') %}
+
+{% if servicePlanGroups is not empty %}
+    <div class="service-plan-groups">
+        {% for group in servicePlanGroups %}
+            <section class="service-plan-group">
+                <div class="service-plan-group__header">
+                    <div>
+                        <h3 class="service-plan-group__title">{{ group.translationKey is not null ? (group.translationKey|trans) : group.name }}</h3>
+                        <p class="service-plan-group__subtitle">{{ group.entries|length|number_format }} {{ 'label.trackedTasks'|trans }}</p>
+                    </div>
+                </div>
+                <div class="table-responsive-xl">
+                    <table class="table table-hover table-bordered service-plan-table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">{{ 'label.task'|trans }}</th>
+                                <th scope="col">{{ 'label.interval'|trans }}</th>
+                                {% if show_source|default(false) %}
+                                    <th scope="col">{{ 'label.source'|trans }}</th>
+                                {% endif %}
+                                {% if show_status|default(false) %}
+                                    <th scope="col">{{ 'label.remaining'|trans }}</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in group.entries %}
+                                <tr>
+                                    <th scope="row">
+                                        <strong>{{ entry.task.name }}</strong>
+                                        {% if entry.task.description is not empty %}
+                                            <small class="d-block text-muted">{{ entry.task.description }}</small>
+                                        {% endif %}
+                                    </th>
+                                    <td>
+                                        {{ entry.serviceInterval.interval|number_format }}
+                                        {% if entry.serviceInterval.intervalType in distanceIntervalTypes %}
+                                            km
+                                        {% elseif entry.serviceInterval.intervalType == dayIntervalType %}
+                                            {{ 'label.days'|trans }}
+                                        {% elseif entry.serviceInterval.intervalType == monthIntervalType %}
+                                            {{ 'label.months'|trans }}
+                                        {% elseif entry.serviceInterval.intervalType == yearIntervalType %}
+                                            {{ 'label.years'|trans }}
+                                        {% endif %}
+                                    </td>
+                                    {% if show_source|default(false) %}
+                                        <td>
+                                            {% if entry.source == 'bike' %}
+                                                <span class="status-pill status-pill--info">{{ 'label.bikeOverride'|trans }}</span>
+                                            {% else %}
+                                                <span class="status-pill status-pill--ok">{{ 'label.modelDefault'|trans }}</span>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    {% if show_status|default(false) %}
+                                        <td>
+                                            {% if entry.status %}
+                                                <span class="status-pill status-pill--{{ entry.status.status }}">{{ ('status.' ~ entry.status.status)|trans }}</span>
+                                                {% if entry.status.remainingDistance is not null %}
+                                                    <small class="d-block text-muted">
+                                                        {% if entry.status.remainingDistance >= 0 %}
+                                                            {{ 'label.dueIn'|trans }} {{ entry.status.remainingDistance|number_format }} km
+                                                        {% else %}
+                                                            {{ 'label.overdueBy'|trans }} {{ (entry.status.remainingDistance * -1)|number_format }} km
+                                                        {% endif %}
+                                                    </small>
+                                                {% else %}
+                                                    <small class="d-block text-muted">
+                                                        {% if entry.status.remainingDays >= 0 %}
+                                                            {{ 'label.dueIn'|trans }} {{ entry.status.remainingDays|number_format }} {{ 'label.days'|trans }}
+                                                        {% else %}
+                                                            {{ 'label.overdueBy'|trans }} {{ (entry.status.remainingDays * -1)|number_format }} {{ 'label.days'|trans }}
+                                                        {% endif %}
+                                                    </small>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="status-pill status-pill--info">{{ 'label.notTracked'|trans }}</span>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="bike-detail__empty">{{ 'body.servicePlan.empty'|trans }}</p>
+{% endif %}
