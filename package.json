@@ -16,7 +16,7 @@
     "license": "UNLICENSED",
     "private": true,
     "scripts": {
-        "test": "node --test tests/js",
+        "test": "node --test $(find tests/js -type f -name '*.test.cjs' | sort)",
         "dev-server": "encore dev-server",
         "dev": "encore dev",
         "watch": "encore dev --watch",

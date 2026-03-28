@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-namespace App\Migrations;
+namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -20,13 +20,35 @@ final class Version20210814071647 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE refueling ADD latitude NUMERIC(9, 6) NOT NULL, ADD longitude NUMERIC(9, 6) NOT NULL');
+        if (!$schema->hasTable('refueling')) {
+            $this->skipIf(true, 'The refueling table does not exist.');
+        }
+
+        $table = $schema->getTable('refueling');
+
+        if (!$table->hasColumn('latitude')) {
+            $this->addSql('ALTER TABLE refueling ADD latitude NUMERIC(9, 6) NOT NULL');
+        }
+
+        if (!$table->hasColumn('longitude')) {
+            $this->addSql('ALTER TABLE refueling ADD longitude NUMERIC(9, 6) NOT NULL');
+        }
     }
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE refueling DROP latitude, DROP longitude');
+        if (!$schema->hasTable('refueling')) {
+            $this->skipIf(true, 'The refueling table does not exist.');
+        }
+
+        $table = $schema->getTable('refueling');
+
+        if ($table->hasColumn('latitude')) {
+            $this->addSql('ALTER TABLE refueling DROP latitude');
+        }
+
+        if ($table->hasColumn('longitude')) {
+            $this->addSql('ALTER TABLE refueling DROP longitude');
+        }
     }
 }
