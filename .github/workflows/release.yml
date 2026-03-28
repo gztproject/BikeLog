@@ -75,6 +75,7 @@ jobs:
           STAGING_DIR="$(mktemp -d)"
           PACKAGE_DIR="$STAGING_DIR/BikeLog-$VERSION"
           ARCHIVE_NAME="BikeLog-$VERSION-build.tar.gz"
+          ARCHIVE_PATH="$PWD/$ARCHIVE_NAME"
 
           mkdir -p "$PACKAGE_DIR"
           rsync -a \
@@ -87,8 +88,7 @@ jobs:
             --exclude=".env.*.local" \
             ./ "$PACKAGE_DIR"/
 
-          tar -C "$STAGING_DIR" -czf "$ARCHIVE_NAME" "BikeLog-$VERSION"
-          mv "$STAGING_DIR/$ARCHIVE_NAME" .
+          tar -C "$STAGING_DIR" -czf "$ARCHIVE_PATH" "BikeLog-$VERSION"
 
       - name: Publish GitHub release asset
         env:
