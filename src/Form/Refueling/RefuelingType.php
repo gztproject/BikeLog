@@ -17,6 +17,7 @@ use App\Entity\Refueling\CreateRefuelingCommand;
 use App\Repository\Bike\BikeRepository;
 use App\Entity\User\User;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use DateTimeInterface;
 
 class RefuelingType extends AbstractType {
 	/**
@@ -48,7 +49,8 @@ class RefuelingType extends AbstractType {
 						'min' => 0,
 						'step' => 1,
 						'inputmode' => 'numeric',
-						'placeholder' => '0'
+						'placeholder' => '0',
+						'data-refueling-role' => 'odometer'
 				]
 		] )->add ( 'fuelQuantity', NumberType::class, [ 
 				'label' => 'label.fuelQuantity',
@@ -72,6 +74,19 @@ class RefuelingType extends AbstractType {
 				'choice_label' => 'name',
 				'expanded' => false,
 				'multiple' => false,
+				'attr' => [
+						'data-refueling-role' => 'bike'
+				],
+				'choice_attr' => function (Bike $bike) {
+					$lastRefueling = $bike->getLastRefueling ();
+					return [
+							'data-bike-name' => $bike->getName (),
+							'data-current-odometer' => $bike->getOdometer (),
+							'data-purchase-odometer' => $bike->getPurchaseOdometer (),
+							'data-last-refueling-odometer' => $lastRefueling != null ? $lastRefueling->getOdometer () : '',
+							'data-last-refueling-date' => $lastRefueling != null ? $lastRefueling->getDate ()->format ( DateTimeInterface::ATOM ) : ''
+					];
+				},
 				'query_builder' => function (BikeRepository $repository) use ($options) {
 					$qb = $repository->createQueryBuilder ( 'b' );
 					// the function returns a QueryBuilder object

@@ -12,12 +12,12 @@
 {% set serviceAlerts = bike.serviceAlerts %}
 {% set totalSpend = bike.totalFuelPrice + bike.totalMaintenanceCosts %}
 {% set distanceIntervalTypes = [
-    constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::ABSOLUTE_DISTANCE'),
-    constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::RELATIVE_DISTANCE')
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::ABSOLUTE_DISTANCE'),
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::RELATIVE_DISTANCE')
 ] %}
-{% set dayIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::DAYS') %}
-{% set monthIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::MONTHS') %}
-{% set yearIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::YEARS') %}
+{% set dayIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::DAYS') %}
+{% set monthIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::MONTHS') %}
+{% set yearIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::YEARS') %}
 {% set hasFuelAlerts = refuelingStats.qualifiedRefuelings < 2 or refuelingStats.excludedRefuelings > 0 %}
 {% set fuelAlertCount = (refuelingStats.qualifiedRefuelings < 2 ? 1 : 0) + (refuelingStats.excludedRefuelings > 0 ? 1 : 0) %}
 {% set totalAlertCount = serviceAlerts|length + fuelAlertCount %}
@@ -416,12 +416,9 @@
 
         {{ include('dashboard/refueling/_table.html.twig', {
             bike: bike,
-            refuelings: refuelings
+            refuelings: refuelings,
+            scrollable: true
         }, with_context = false) }}
-
-        <div class="pagination-shell">
-            {{ knp_pagination_render(refuelings) }}
-        </div>
     </section>
 
     <section id="bike-maintenance" class="inventory-panel">
@@ -435,12 +432,9 @@
 
         {{ include('dashboard/maintenance/_table.html.twig', {
             bike: bike,
-            maintenances: maintenances
+            maintenances: maintenances,
+            scrollable: true
         }, with_context = false) }}
-
-        <div class="pagination-shell">
-            {{ knp_pagination_render(maintenances) }}
-        </div>
     </section>
 </section>
 {% endblock %}

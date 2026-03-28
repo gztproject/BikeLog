@@ -1,12 +1,12 @@
 {% set serviceStatuses = bike.serviceIntervalStatuses %}
 {% set recentMaintenances = bike.maintenances|slice(-5, 5) %}
 {% set distanceIntervalTypes = [
-    constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::ABSOLUTE_DISTANCE'),
-    constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::RELATIVE_DISTANCE')
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::ABSOLUTE_DISTANCE'),
+    constant('App\\Entity\\ServiceInterval\\ServiceInterval::RELATIVE_DISTANCE')
 ] %}
-{% set dayIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::DAYS') %}
-{% set monthIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::MONTHS') %}
-{% set yearIntervalType = constant('App\\\\Entity\\\\ServiceInterval\\\\ServiceInterval::YEARS') %}
+{% set dayIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::DAYS') %}
+{% set monthIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::MONTHS') %}
+{% set yearIntervalType = constant('App\\Entity\\ServiceInterval\\ServiceInterval::YEARS') %}
 
 <div class="table-responsive-xl">
 	<table class="table table-hover table-bordered maintenance-table service-interval-table">

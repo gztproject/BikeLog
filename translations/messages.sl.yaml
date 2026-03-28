@@ -69,6 +69,7 @@ label:
   dateTo: Do  
   odometer: Števec
   distance: Razdalja
+  relativeMileage: Relativna kilometrina
   fuelQuantity: Količina goriva
   price: Cena
   consumption: Poraba
@@ -199,9 +200,23 @@ menu:
 
 help:
  login: Prijava
+ formInvalidTitle: Popravite označena polja in poskusite znova.
  locationPending: Poskušam pridobiti trenutno lokacijo.
  locationReady: Trenutna lokacija je dodana.
  locationUnavailable: Trenutna lokacija ni na voljo.
  locationUnsupported: Brskalnik ne podpira dostopa do lokacije.
+ refuelingSelectBike: Izberite motor za sprotni pomočnik pri kilometrini.
+ refuelingCurrentOdometer: Trenutno zabeležen števec
+ refuelingRelativeBaseline: Izhodišče relativne kilometrine
+ refuelingBaselineLastRefueling: zadnje točenje
+ refuelingBaselinePurchase: kilometrina ob nakupu
+ refuelingRelativeReady: Relativna kilometrina se prišteje k
+ refuelingRelativeDisabled: Relativna kilometrina je na voljo le za vnose na ali po zadnjem točenju.
+ refuelingRelativeDisabledContinuum: Relativna kilometrina je izključena, ko dopuščate izpuščena točenja.
+ refuelingOdometerMinimum: Najmanjši števec za ta vnos
+ refuelingOdometerValid: Števec je v veljavnem območju. Najmanj pričakovana vrednost
+ refuelingOdometerTooLow: Števec je prenizek za ta motor. Najmanj pričakovana vrednost
+ refuelingTankFull: Pustite označeno pri polnem točenju, da ostane statistika porabe zanesljiva.
+ refuelingContinuum: Pustite kontinuiteto vključeno, ko točenje neposredno sledi prejšnjemu vnosu.
 
 Save: Shrani

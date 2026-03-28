@@ -10,6 +10,7 @@ use App\Entity\Bike\Bike;
 use App\Entity\Refueling\CreateRefuelingCommand;
 use App\Form\Refueling\RefuelingType;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Form\FormError;
 
 class RefuelingCommandController extends AbstractController {
 	#[Route('/dashboard/refueling/new', methods: ['GET', 'POST'], name: 'refueling_new')]
@@ -44,54 +45,61 @@ class RefuelingCommandController extends AbstractController {
 		$form->handleRequest ( $request );
 
 		if ($form->isSubmitted () && $form->isValid ()) {
+			try {
+				$bike = $doctrine->getRepository ( Bike::class )->findOneBy ( [ 
+						'id' => $crc->bike->getId ()
+				] );
 
-			$bike = $doctrine->getRepository ( Bike::class )->findOneBy ( [ 
-					'id' => $crc->bike->getId ()
-			] );
+				$refueling = $bike->createRefueling ( $crc, $this->getUser () );
 
-			$refueling = $bike->createRefueling ( $crc, $this->getUser () );
+				$em = $doctrine->getManager ();
 
-			$em = $doctrine->getManager ();
-
-			// If it's older we should find where it belongs and check the odometer
-			if ($bike->getLastRefueling() != null && $refueling->getDate () < $bike->getLastRefueling ()->getDate ()) {
-				// Find the previous and next refueling
-				$previous = null;
-				$next = $bike->getLastRefueling ();
-				foreach ( $bike->getRefuelings () as $r ) {
-					if ($r->getDate () > $refueling->getDate ()) {
-						if ($next->getDate () > $r->getDate () && $r != $refueling)
-							$next = $r;
-						continue;
-					} else {
-						if (($previous == null || ($previous->getDate () < $r->getDate ())) && $r != $refueling)
-							$previous = $r;
-						continue;
+				// If it's older we should find where it belongs and check the odometer
+				if ($bike->getLastRefueling() != null && $refueling->getDate () < $bike->getLastRefueling ()->getDate ()) {
+					// Find the previous and next refueling
+					$previous = null;
+					$next = $bike->getLastRefueling ();
+					foreach ( $bike->getRefuelings () as $r ) {
+						if ($r->getDate () > $refueling->getDate ()) {
+							if ($next->getDate () > $r->getDate () && $r != $refueling)
+								$next = $r;
+							continue;
+						} else {
+							if (($previous == null || ($previous->getDate () < $r->getDate ())) && $r != $refueling)
+								$previous = $r;
+							continue;
+						}
 					}
+
+					// first we have to dereference old (and wrong) previous refuelings
+					$refueling->setPreviousRefueling ( null, $this->getUser () );
+					$next->setPreviousRefueling ( null, $this->getUser () );
+					$em->persist ( $refueling );
+					$em->persist ( $next );
+					$em->flush ();
+
+					// Just assuming that there was nothing in between this and the next existing refueling
+					$next->setPreviousRefueling ( $refueling, $this->getUser () );
+					if ($crc->isNotBreakingContinuum)
+						$refueling->setPreviousRefueling ( $previous, $this->getUser () );
+					$em->persist ( $refueling );
+					$em->flush ();
+					$em->persist ( $next );
+				} // In normal case just persist the new refueling and updated bike's reference.
+				else {
+					$em->persist ( $refueling );
+					$em->persist ( $bike );
 				}
-
-				// first we have to dereference old (and wrong) previous refuelings
-				$refueling->setPreviousRefueling ( null, $this->getUser () );
-				$next->setPreviousRefueling ( null, $this->getUser () );
-				$em->persist ( $refueling );
-				$em->persist ( $next );
 				$em->flush ();
 
-				// Just assuming that there was nothing in between this and the next existing refueling
-				$next->setPreviousRefueling ( $refueling, $this->getUser () );
-				if ($crc->isNotBreakingContinuum)
-					$refueling->setPreviousRefueling ( $previous, $this->getUser () );
-				$em->persist ( $refueling );
-				$em->flush ();
-				$em->persist ( $next );
-			} // In normal case just persist the new refueling and updated bike's reference.
-			else {
-				$em->persist ( $refueling );
-				$em->persist ( $bike );
+				return $this->redirectToRoute ( 'refueling_index', ["bike"=>$bike->getId()] );
+			} catch ( \Exception $exception ) {
+				if (stripos ( $exception->getMessage (), 'odometer' ) !== false) {
+					$form->get ( 'odometer' )->addError ( new FormError ( $exception->getMessage () ) );
+				} else {
+					$form->addError ( new FormError ( $exception->getMessage () ) );
+				}
 			}
-			$em->flush ();
-
-			return $this->redirectToRoute ( 'refueling_index', ["bike"=>$bike->getId()] );
 		}
 
 		return $this->render ( 'dashboard/refueling/new.html.twig', [ 

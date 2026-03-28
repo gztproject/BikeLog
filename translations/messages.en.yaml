@@ -85,6 +85,7 @@ label:
   dateTo: To  
   odometer: Odometer
   distance: Distance
+  relativeMileage: Relative mileage
   fuelQuantity: fuel quantity
   price: Price
   consumption: Consumption
@@ -179,9 +180,23 @@ menu:
 
 help:
  login: Login
+ formInvalidTitle: Fix the highlighted fields and try again.
  locationPending: Trying to attach your current location.
  locationReady: Current location attached.
  locationUnavailable: Current location is unavailable.
  locationUnsupported: Browser location is not available.
+ refuelingSelectBike: Select a bike to enable live mileage assistance.
+ refuelingCurrentOdometer: Current recorded odometer
+ refuelingRelativeBaseline: Relative mileage baseline
+ refuelingBaselineLastRefueling: last refueling
+ refuelingBaselinePurchase: purchase odometer
+ refuelingRelativeReady: Relative mileage adds to
+ refuelingRelativeDisabled: Relative mileage is only available for entries on or after the latest refueling.
+ refuelingRelativeDisabledContinuum: Relative mileage is disabled while skipped refuelings are allowed.
+ refuelingOdometerMinimum: Minimum odometer for this entry
+ refuelingOdometerValid: Odometer is in range. Minimum expected value
+ refuelingOdometerTooLow: Odometer is too low for this bike. Minimum expected value
+ refuelingTankFull: Keep this checked for full-tank entries so fuel averages stay reliable.
+ refuelingContinuum: Keep continuity enabled when this entry belongs directly after the previous refueling.
 
 Save: Save
