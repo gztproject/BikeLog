@@ -1,26 +1,134 @@
-{{ form_start(form, {'attr': {'class': 'bs-component'}}) }}
+{{ form_start(form, {'attr': {'class': 'bs-component form-shell', 'autocomplete': 'off'}}) }}
+{{ form_errors(form) }}
 
-<div class="row">
-    <div class="col-sm-6">
-        <div class="form-group">
-            {{ form_label(form.nickname, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-            <div class='input-group'>
-                {{ form_widget(form.nickname, {'attr': {'class': 'form-control'}}) }}
+<div class="form-section">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.nickname, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-card-text-outline"></span>
+                    </div>
+                    {{ form_widget(form.nickname, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.model, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-motorbike"></span>
+                    </div>
+                    {{ form_widget(form.model, {'attr': {'class': 'form-control'}}) }}
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-6">
-        <div class="form-group" id='DatePicker'>
-            {{ form_label(form.purchaseDate, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-            <div class='input-group'>
-                {{ form_widget(form.purchaseDate, {'attr': {'class': 'form-control'}}) }}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.purchaseDate, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group date">
+                    {{ form_widget(form.purchaseDate, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text mdi mdi-calendar"></span>
+                    </div>
+                </div>
             </div>
-            <div class="input-group-append">
-                <span class="input-group-text"><i class="fa fa-calendar"
-                    aria-hidden="true"></i></span>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.year, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-calendar-range"></span>
+                    </div>
+                    {{ form_widget(form.year, {'attr': {'class': 'form-control'}}) }}
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="form-section">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.purchasePrice, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-cash"></span>
+                    </div>
+                    {{ form_widget(form.purchasePrice, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">EUR</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.purchaseOdometer, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-map-marker-distance"></span>
+                    </div>
+                    {{ form_widget(form.purchaseOdometer, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">km</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.fuelTanksize, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-gas-station"></span>
+                    </div>
+                    {{ form_widget(form.fuelTanksize, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">l</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.vin, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-barcode-scan"></span>
+                    </div>
+                    {{ form_widget(form.vin, {'attr': {'class': 'form-control text-uppercase'}}) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.picture, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                {{ form_widget(form.picture, {'attr': {'class': 'form-control-file'}}) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+        <i class="fa fa-save" aria-hidden="true"></i>
+        {{ button_label|default('action.add.bike'|trans) }}
+    </button>
+    {% if include_back_to_home_link|default(false) %}
+        <a href="{{ path('bike_index') }}" class="btn btn-link">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> {{ 'action.backToList'|trans }}
+        </a>
+    {% endif %}
+</div>
+
 {{ form_row(form._token) }}
-{{ form_end(form, {'render_rest': true}) }}
+{{ form_end(form, {'render_rest': false}) }}

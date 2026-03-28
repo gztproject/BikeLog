@@ -1,71 +1,138 @@
 #!/bin/bash
-VER="";
+set -euo pipefail
+
+VER=""
+
 while getopts ":v:" opt; do
     case $opt in
         v) VER="$OPTARG"
         ;;
         \?) echo "Invalid option -$OPTARG" >&2
+        exit 1
+        ;;
+        :) echo "Option -$OPTARG requires an argument." >&2
+        exit 1
         ;;
     esac
 done
 
-#cd to a level above root dir, we're virtually executing in [root]/public
-cd ..
+progress() {
+    local percent="$1"
+    shift
 
-if [[ -n $VER ]];
-then
+    printf '__BL_PROGRESS__|%s|%s\n' "$percent" "$*"
+}
 
-    echo "Backup current version"
-    tar -czf BikeLog_backup_before_$VER.tar.gz *
+log() {
+    printf '%s\n' "$*"
+}
 
-    echo "Downloading the desired release"
-    wget https://github.com/gztproject/BikeLog/archive/refs/tags/$VER.tar.gz
-    echo "Extracting release"
-    tar -xf $VER.tar.gz
-    rm $VER.tar.gz
-    #We've got the new release in dir BikeLog-$VER
+copy_file_if_exists() {
+    local source="$1"
+    local destination="$2"
 
-    echo "Copy over current version backup"
-    cp -v BikeLog_backup_before_$VER.tar.gz BikeLog-$VER/
-    echo "Copy over config"
-    cp -v .env BikeLog-$VER/.env
-    cp -v .env.local BikeLog-$VER/.env.local
-    echo "Copy over logs"
-    mkdir BikeLog-$VER/var
-    mkdir BikeLog-$VER/var/log
-    cp -rv var/log/* BikeLog-$VER/var/log/
-    echo "Copy over user stuff..."
-    mkdir BikeLog-$VER/public/uploads
-    cp -rv public/uploads/* BikeLog-$VER/public/uploads/
+    if [[ -f "$source" ]]; then
+        cp -v "$source" "$destination"
+        return
+    fi
 
-    echo "Remove current version"
-    GLOBIGNORE=BikeLog-*
-    rm -rf *
-    unset GLOBIGNORE
+    log "Skipping missing file: $source"
+}
 
-    echo "Copy over the new version"
-    cp -r BikeLog-$VER/. .
-    rm -rf BikeLog-$VER   
+copy_dir_contents_if_exists() {
+    local source_dir="$1"
+    local destination_dir="$2"
 
-else
+    mkdir -p "$destination_dir"
+
+    if [[ -d "$source_dir" ]] && compgen -G "$source_dir/*" > /dev/null; then
+        cp -rv "$source_dir"/. "$destination_dir"/
+        return
+    fi
+
+    log "Skipping empty or missing directory: $source_dir"
+}
+
+run_yarn() {
+    if command -v yarn > /dev/null 2>&1; then
+        yarn "$@"
+        return
+    fi
+
+    if command -v corepack > /dev/null 2>&1; then
+        corepack yarn "$@"
+        return
+    fi
+
+    log "Neither yarn nor corepack is available."
+    exit 1
+}
+
+if [[ -z $VER ]]; then
     echo "No version provided via the -v argument"
     exit 1
 fi
 
-#Instal dependencies 
-#composer self-update
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+RELEASE_DIR="$PROJECT_DIR/BikeLog-$VER"
+ARCHIVE_FILE="$PROJECT_DIR/$VER.tar.gz"
+BACKUP_FILE="$PROJECT_DIR/BikeLog_backup_before_$VER.tar.gz"
+
+cd "$PROJECT_DIR"
+
+progress 5 "Preparing update workspace."
+log "Updating BikeLog to $VER"
+
+progress 10 "Creating a backup of the current installation."
+tar -czf "$BACKUP_FILE" --exclude="$(basename "$BACKUP_FILE")" *
+
+progress 20 "Downloading the desired release."
+wget -O "$ARCHIVE_FILE" "https://github.com/gztproject/BikeLog/archive/refs/tags/$VER.tar.gz"
+
+progress 30 "Extracting the release archive."
+tar -xf "$ARCHIVE_FILE"
+rm "$ARCHIVE_FILE"
+
+if [[ ! -d "$RELEASE_DIR" ]]; then
+    log "Expected release directory was not created: $RELEASE_DIR"
+    exit 1
+fi
+
+progress 40 "Copying environment files into the new release."
+cp -v "$BACKUP_FILE" "$RELEASE_DIR/"
+copy_file_if_exists "$PROJECT_DIR/.env" "$RELEASE_DIR/.env"
+copy_file_if_exists "$PROJECT_DIR/.env.local" "$RELEASE_DIR/.env.local"
+
+progress 50 "Copying runtime data and user uploads."
+copy_dir_contents_if_exists "$PROJECT_DIR/var/log" "$RELEASE_DIR/var/log"
+copy_dir_contents_if_exists "$PROJECT_DIR/public/uploads" "$RELEASE_DIR/public/uploads"
+
+progress 60 "Replacing application files."
+GLOBIGNORE=BikeLog-*
+rm -rf *
+unset GLOBIGNORE
+
+cp -r "$RELEASE_DIR"/. .
+rm -rf "$RELEASE_DIR"
+
+progress 72 "Installing PHP dependencies."
 composer clear-cache
-composer update --no-dev
+composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-yarn install
+progress 84 "Installing JavaScript dependencies."
+run_yarn install --frozen-lockfile
 
-#Build new .js and .css
-yarn encore prod
+progress 92 "Building frontend assets."
+./node_modules/.bin/encore production --progress
 
-#Migrate DB if necessary
+progress 96 "Running database migrations."
 php bin/console doctrine:migrations:migrate -n
 
-#clear the cache
+progress 99 "Clearing application cache."
 php bin/console cache:clear
+
+progress 100 "Update completed."
+log "BikeLog $VER is now installed."
 
 exit 0

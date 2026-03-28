@@ -1,103 +1,137 @@
-{{ form_start(form, {'attr': {'class': 'bs-component'}}) }}
+{{ form_start(form, {'attr': {'class': 'bs-component form-shell', 'autocomplete': 'off'}}) }}
+{{ form_errors(form) }}
 
-<div class="row">
-	<div class="col-sm-4">
-		<div class="form-group">
-			{{ form_label(form.datetime, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
-			<div class='input-group date' id='datetimepicker1'>
-				{{ form_widget(form.datetime, {'attr': {'class': 'form-control'}}) }}
-				<div class="input-group-append input-group-addon">
-					<span class="input-group-text mdi mdi-calendar"></span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-4">
-		<div class="form-group">
-			{{ form_label(form.odometer, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
-			<div class='input-group'>
-				<div class="input-group-prepend">
-					<span class="input-group-text mdi mdi-map-marker-distance"></span>
-				</div>
-				{{ form_widget(form.odometer, {'attr': {'class': 'form-control'}}) }}
-				<div class="input-group-append">
-					<span class="input-group-text">km</span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-4">
-		<div class="form-group">
-			{{ form_label(form.fuelQuantity, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
-			<div class='input-group'>
-				<div class="input-group-prepend">
-					<span class="input-group-text mdi mdi-gas-station"></span>
-				</div>
-				{{ form_widget(form.fuelQuantity, {'attr': {'class': 'form-control'}}) }}
-				<div class="input-group-append">
-					<span class="input-group-text">l</span>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="row">
-
-	<div class="col-sm-4">
-		<div class="form-group" id='DatePicker'>
-			{{ form_label(form.price, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
-			<div class='input-group'>
-				<div class="input-group-prepend">
-					<span class="input-group-text mdi mdi-circle-multiple"></span>
-				</div>
-				{{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
-				<div class="input-group-append">
-					<span class="input-group-text">€</span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-4">
-		<div class="form-group">
-			{{ form_label(form.bike, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
-			<div class='input-group'>
-				<div class="input-group-prepend">
-					<span class="input-group-text mdi mdi-motorbike"></span>
-				</div>
-				{{ form_widget(form.bike, {'attr': {'class': 'form-control'}}) }}
-			</div>
-		</div>
-	</div>
-	
-	<div class="col-sm-2">
-        <div class="form-group">
-            {{ form_label(form.isTankFull, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
-            <div class='input-group'>
-                {{ form_widget(form.isTankFull, {'attr': {'class': 'form-control'}}) }}
+<div class="form-section">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.datetime, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group date" id="datetimepicker1">
+                    {{ form_widget(form.datetime, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append input-group-addon">
+                        <span class="input-group-text mdi mdi-calendar"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.bike, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-motorbike"></span>
+                    </div>
+                    {{ form_widget(form.bike, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="col-form-label-lg">{{ 'label.location'|trans }}</label>
+                <div class="location-panel">
+                    <div
+                        id="refueling-location-status"
+                        class="location-status status-pending"
+                        data-pending-label="{{ 'help.locationPending'|trans }}"
+                        data-ready-label="{{ 'help.locationReady'|trans }}"
+                        data-error-label="{{ 'help.locationUnavailable'|trans }}"
+                        data-unsupported-label="{{ 'help.locationUnsupported'|trans }}"
+                    >{{ 'help.locationPending'|trans }}</div>
+                    <button type="button" id="refresh-location" class="btn btn-outline-primary btn-sm">
+                        <i class="mdi mdi-crosshairs-gps" aria-hidden="true"></i> {{ 'action.locate'|trans }}
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="col-sm-2">
-        <div class="form-group">
-            {{ form_label(form.isNotBreakingContinuum, null, {'label_attr': {'class': 'col-form-label-sm'}} ) }}
-            <div class='input-group'>
-                {{ form_widget(form.isNotBreakingContinuum, {'attr': {'class': 'form-control'}}) }}
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.odometer, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-map-marker-distance"></span>
+                    </div>
+                    {{ form_widget(form.odometer, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">km</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.fuelQuantity, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-gas-station"></span>
+                    </div>
+                    {{ form_widget(form.fuelQuantity, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">l</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                {{ form_label(form.price, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-cash"></span>
+                    </div>
+                    {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">EUR</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-	
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="form-group">
+                {{ form_label(form.comment, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                {{ form_widget(form.comment, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-toggle-card">
+                <div class="custom-control custom-switch">
+                    {{ form_widget(form.isTankFull, {'attr': {'class': 'custom-control-input'}}) }}
+                    {{ form_label(form.isTankFull, null, {'label_attr': {'class': 'custom-control-label'}}) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-toggle-card">
+                <div class="custom-control custom-switch">
+                    {{ form_widget(form.isNotBreakingContinuum, {'attr': {'class': 'custom-control-input'}}) }}
+                    {{ form_label(form.isNotBreakingContinuum, null, {'label_attr': {'class': 'custom-control-label'}}) }}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="row">
-	<div class="col-sm-12">
-		<button type="submit" class="btn btn-primary">
-			<i class="fa fa-save" aria-hidden="true"></i>
-			{{ button_label|default('label.create.refueling'|trans) }}
-		</button>
-	</div>
+
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+        <i class="fa fa-save" aria-hidden="true"></i>
+        {{ button_label|default('action.save'|trans) }}
+    </button>
+    {% if include_back_to_home_link|default(false) %}
+        <a href="{{ path('refueling_index') }}" class="btn btn-link">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+        </a>
+    {% endif %}
 </div>
-{{ form_row(form.longitude) }}
-{{ form_row(form.latitude) }}
+
+{{ form_widget(form.longitude) }}
+{{ form_widget(form.latitude) }}
 {{ form_row(form._token) }}
 {{ form_end(form, {'render_rest': false}) }}

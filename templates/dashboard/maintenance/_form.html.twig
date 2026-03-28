@@ -1,102 +1,158 @@
-{{ form_start(form, {'attr': {'class': 'bs-component'}}) }}
+{{ form_start(form, {'attr': {'class': 'bs-component form-shell', 'autocomplete': 'off'}}) }}
+{{ form_errors(form) }}
 
-<div class="row">
-	<div class="col-sm-6">
-		<div class="form-group">
-			{{ form_label(form.workshop, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-			<div class='input-group'>
-				{{ form_widget(form.workshop, {'attr': {'class': 'form-control'}}) }}
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-6">
-		<div class="form-group" id='DatePicker'>
-			{{ form_label(form.date, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-			<div class='input-group'>
-				{{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
-			</div>
-			<div class="input-group-append">
-				<span class="input-group-text"><i class="fa fa-calendar"
-					aria-hidden="true"></i></span>
-			</div>
-		</div>
-	</div>
+<div class="form-section">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.workshop, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-storefront"></span>
+                    </div>
+                    {{ form_widget(form.workshop, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                {{ form_label(form.date, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group date">
+                    {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text mdi mdi-calendar"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 {% if not showBikeSelecor %}d-none{% endif %}">
+            <div class="form-group">
+                {{ form_label(form.bike, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-motorbike"></span>
+                    </div>
+                    {{ form_widget(form.bike, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                {{ form_label(form.odometer, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-map-marker-distance"></span>
+                    </div>
+                    {{ form_widget(form.odometer, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">km</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                {{ form_label(form.spentTime, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-timer-outline"></span>
+                    </div>
+                    {{ form_widget(form.spentTime, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">h</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                {{ form_label(form.unspecifiedCosts, null, {'label_attr': {'class': 'col-form-label-lg'}}) }}
+                <div class="input-group unit-input">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text mdi mdi-cash-multiple"></span>
+                    </div>
+                    {{ form_widget(form.unspecifiedCosts, {'attr': {'class': 'form-control'}}) }}
+                    <div class="input-group-append">
+                        <span class="input-group-text">EUR</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="row">
-	<div class="col-sm-3" {% if not showBikeSelecor %} hidden="true"
-		{% endif %}>
-		<div class="form-group">
-			{{ form_label(form.bike, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-			<div class='input-group'>
-				{{ form_widget(form.bike, {'attr': {'class': 'form-control'}}) }}
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-3">
-		<div class="form-group">
-			{{ form_label(form.odometer, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-			<div class='input-group'>
-				{{ form_widget(form.odometer, {'attr': {'class': 'form-control'}}) }}
-			</div>
-		</div>
-	</div>
 
-	<div class="col-sm-3">
-		<div class="form-group">
-			{{ form_label(form.spentTime, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-			<div class='input-group'>
-				{{ form_widget(form.spentTime, {'attr': {'class': 'form-control'}}) }}
-			</div>
-		</div>
-	</div>
-	<div class="col-sm-3">
-		<div class="form-group">
-			{{ form_label(form.unspecifiedCosts, null, {'label_attr': {'class': 'col-form-label-lg'}} ) }}
-			<div class='input-group'>
-				{{ form_widget(form.unspecifiedCosts, {'attr': {'class': 'form-control'}}) }}
-			</div>
-		</div>
-	</div>
+<div class="form-section">
+    <div class="maintenance-draft-summary">
+        <div class="maintenance-summary-card">
+            <span class="maintenance-summary-card__label">{{ 'label.task'|trans }}</span>
+            <strong id="maintenance-task-count">0</strong>
+        </div>
+        <div class="maintenance-summary-card">
+            <span class="maintenance-summary-card__label">{{ 'label.cost'|trans }}</span>
+            <strong><span id="maintenance-total-cost">0.00</span> EUR</strong>
+            <small>{{ 'label.unspecifiedCosts'|trans }} + <span id="maintenance-task-cost">0.00</span> EUR</small>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="maintenance-tasks-table" class="table table-hover maintenance-editor-table">
+            <thead>
+                <tr>
+                    <th>{{ 'label.task'|trans }}</th>
+                    <th>{{ 'label.cost'|trans }}</th>
+                    <th class="text-right">{{ 'label.actions'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody" class="maintenanceTasks"
+                data-prototype="{{ form_widget(form.maintenanceTaskCommands.vars.prototype)|e('html_attr') }}">
+                {% for maintenanceTask in form.maintenanceTaskCommands %}
+                    <tr class="maintenance-task-row" data-item-index="{{ loop.index0 }}">
+                        <td class="taskInput">{{ form_widget(maintenanceTask.task, {'attr': {'class': 'form-control'}}) }}</td>
+                        <td class="costInput">
+                            <div class="input-group unit-input">
+                                {{ form_widget(maintenanceTask.cost, {'attr': {'class': 'form-control'}}) }}
+                                <div class="input-group-append">
+                                    <span class="input-group-text">EUR</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="removeBtn text-right">
+                            <button type="button" class="btn btn-sm btn-outline-danger maintenance-task-remove" data-item-index="{{ loop.index0 }}">
+                                <i class="fa fa-minus" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">
+                        <button type="button" id="add-maintenance-task" class="btn btn-outline-success btn-sm">
+                            <i class="fa fa-plus" aria-hidden="true"></i> {{ 'action.add.task'|trans }}
+                        </button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
-<div class="bs-component">
-	<table id="maintenance-tasks-table" class="table table-hover">
-		<thead>
-			<tr>
-				<th>{{ 'label.task'|trans }}</th>
-				<th>{{ 'label.cost'|trans }}</th>
-				<th></th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody id='tableBody' class="maintenanceTasks"
-			data-prototype="{{ form_widget(form.maintenanceTaskCommands.vars.prototype)|e('html_attr') }}">
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+        <i class="fa fa-save" aria-hidden="true"></i>
+        {{ button_label|default('label.create.maintenance'|trans) }}
+    </button>
+    {% if include_save_and_create_new %}
+        {{ form_widget(form.saveAndCreateNew, {label: 'label.save_and_create_new', attr: {class: 'btn btn-primary'}}) }}
+    {% endif %}
+    {% if include_back_to_home_link %}
+        <a href="{{ path('maintenance_index') }}" class="btn btn-link">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+        </a>
+    {% endif %}
+</div>
 
-			{% for maintenanceTask in form.maintenanceTaskCommands %}
-			<tr class="form-group maintenance-task-tr-{{ loop.index0 }}">
-				<td class="task-Selector" data-stop-index="{{ loop.index0 }}">{{ form_widget(maintenanceTask.task, {'attr': {'class': 'form-control'}})}}</td>
-				<td colspan="2">{{ form_widget(maintenanceTask.cost, {'attr': {'class': 'form-control'}})}}</td>
-				<td><a id="remove-maintenance-task-{{ loop.index0 }}'"
-					class="btn btn-sm btn-block btn-danger"><i class="fa fa-minus"
-						aria-hidden="true"></i></a></td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-</div>
-<div class="form-group">
-	<button type="submit" class="btn btn-primary">
-		<i class="fa fa-save" aria-hidden="true"></i>
-		{{ button_label|default('label.create.maintenance'|trans) }}
-	</button>
-	{% if include_save_and_create_new %}
-	{{ form_widget(form.saveAndCreateNew, {label: 'label.save_and_create_new', attr: {class: 'btn btn-primary'}}) }}
-	{% endif %}
-	{% if include_back_to_home_link %}
-	<a href="{{ path('maintenance_index') }}" class="btn btn-link"> <i
-		class="fa fa-list-alt" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
-	</a>
-	{% endif %}
-</div>
 {{ form_row(form._token) }}
 {{ form_end(form, {'render_rest': false}) }}

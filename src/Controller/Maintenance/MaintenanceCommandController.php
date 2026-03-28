@@ -4,12 +4,9 @@ namespace App\Controller\Maintenance;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Exception;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Bike\Bike;
 use App\Entity\Maintenance\CreateMaintenanceCommand;
 use App\Form\Maintenance\MaintenanceType;
@@ -17,22 +14,15 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Doctrine\Persistence\ManagerRegistry;
 
 class MaintenanceCommandController extends AbstractController {
-
-    /**
-     *
-     * @Route("/dashboard/maintenance/new", methods={"GET", "POST"}, name="maintenance_new")
-     */
-    public function new(Request $request): Response {
+    #[Route('/dashboard/maintenance/new', methods: ['GET', 'POST'], name: 'maintenance_new')]
+    public function new(): Response {
         throw new BadRequestHttpException("Maintenance has to be on a specific bike.");
     }
     
-	/**
-	 *
-	 * @Route("/dashboard/maintenance/new/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}", methods={"GET", "POST"}, name="maintenance_new_id")
-	 */
+	#[Route('/dashboard/maintenance/new/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}', methods: ['GET', 'POST'], name: 'maintenance_new_id')]
     public function new_with_id(Request $request, Bike $bike, ManagerRegistry $doctrine): Response {
 		if ($bike->getOwner () != $this->getUser ())
-			throw new SecurityError ( "Bikes can only be shown to their owners." );
+			throw $this->createAccessDeniedException("Bikes can only be shown to their owners.");
 
 		$cmc = new CreateMaintenanceCommand ();
 		$cmc->bike = $bike;

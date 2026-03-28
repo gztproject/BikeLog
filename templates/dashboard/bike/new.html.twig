@@ -3,14 +3,16 @@
 {% block body_id 'title.new.bike' %}
 
 {% block main %}
-    <h1>{{ 'title.new.bike'|trans }}</h1>
+    <section class="page-shell">
+        <h1 class="page-shell__title">{{ 'title.new.bike'|trans }}</h1>
 
-    {{ include('dashboard/bike/_form.html.twig', {
-        form: form,
-        button_label: 'label.update.bike'|trans,
-        include_save_and_create_new: true,
-        include_back_to_home_link: true,        
-    }, with_context = false) }}
+        {{ include('dashboard/bike/_form.html.twig', {
+            form: form,
+            button_label: 'action.add.bike'|trans,
+            include_save_and_create_new: true,
+            include_back_to_home_link: true,
+        }, with_context = false) }}
+    </section>
 
 {% endblock %}
 

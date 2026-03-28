@@ -20,13 +20,6 @@ security:
 
             # but the firewall does not require login on every page
             # denying access is done in access_control or in your controllers
-            #----- Gapi: Commented out updating to Symfony 6.0
-            #anonymous: true
-            
-            #custom_authenticators:
-            #        - App\Security\LoginFormAuthenticator
-            
-            #----- END
             form_login:
                 # "login" is the name of the route created previously
                 login_path: app_login

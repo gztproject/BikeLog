@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use Doctrine\Common\Collections\Collection;
 
 class WorkshopList 

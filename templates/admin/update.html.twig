@@ -3,14 +3,29 @@
 {% block body_id 'admin_update' %}
 
 {% block main %}
-<h1>
-	{{ 'title.update'|trans }}
-</h1>
-Current version: {{ shivas_app_version }}</br>
-<button type="button" class="btn btn-primary" id="btn-check-updates">    
-	<i class="mdi mdi-update" aria-hidden="true"></i>
-	{{ 'action.update.check'|trans }}
-</button>
+<section
+	class="page-shell update-shell"
+	id="admin-update-panel"
+	data-check-url="{{ path('admin_update_check') }}"
+	data-run-url="{{ path('admin_do_update') }}"
+	data-update-token="{{ csrf_token('admin_update') }}"
+	data-app-env="{{ app.environment }}"
+	data-release-api-url="https://api.github.com/repos/gztproject/BikeLog/releases/latest"
+>
+	<h1 class="page-shell__title">
+		{{ 'title.update'|trans }}
+	</h1>
+	<div class="update-page-card">
+		<div class="update-page-card__version">
+			<span class="update-page-card__label">{{ 'label.currentVersion'|trans }}</span>
+			<strong>{{ shivas_app_version }}</strong>
+		</div>
+		<button type="button" class="btn btn-primary" id="btn-check-updates">
+			<i class="mdi mdi-update" aria-hidden="true"></i>
+			{{ 'action.update.check'|trans }}
+		</button>
+	</div>
+</section>
 
 <!-- Modal -->
 <div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
@@ -19,14 +34,16 @@ Current version: {{ shivas_app_version }}</br>
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="exampleModalLabel">{{ 'title.updater'|trans }}</h5>
-				<button type="button" class="close" data-dismiss="modal"
+				<button type="button" class="close" id="btn-close-update-modal" data-dismiss="modal"
 					aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<div class="modal-body"></div>			
+			<div class="modal-body">
+				<div class="update-modal__placeholder">{{ 'action.update.check'|trans }}</div>
+			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal">{{ 'label.cancel'|trans }}</button>
+				<button type="button" class="btn btn-danger" id="btn-cancel-update" data-dismiss="modal">{{ 'label.cancel'|trans }}</button>
 				<button type="button" class="btn btn-success" id="btn-do-update" disabled="true"><i class="mdi mdi-update" aria-hidden="true"></i> {{ 'label.do-update'|trans }}</button>				
 			</div>
 		</div>

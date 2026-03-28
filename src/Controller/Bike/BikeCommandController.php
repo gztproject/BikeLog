@@ -8,14 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\Persistence\ManagerRegistry;
 
 class BikeCommandController extends AbstractController {
-	/**
-	 *
-	 * @Route("/dashboard/bike/new", methods={"GET", "POST"}, name="bike_new")
-	 */
+	#[Route('/dashboard/bike/new', methods: ['GET', 'POST'], name: 'bike_new')]
     public function new(Request $request, ManagerRegistry $doctrine): Response {
 		$cbc = new CreateBikeCommand ();
 		$cbc->owner = $this->getUser ();

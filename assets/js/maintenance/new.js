@@ -1,102 +1,131 @@
 import 'eonasdan-bootstrap-datetimepicker';
 import moment from 'moment';
 
-$(function() {
-    // Datetime picker initialization.
-    // See http://eonasdan.github.io/bootstrap-datetimepicker/
-    $('#maintenance_date').datetimepicker({
-        locale: 'sl',
-        format: 'dd. mm. yyyy',
-        icons: {
-                    time: "fa fa-clock",
-                    date: "fa fa-calendar",
-                    up: "fa fa-arrow-up",
-                    down: "fa fa-arrow-down",
-                    previous: "fa fa-arrow-left",
-                    next: "fa fa-arrow-right",
-                    today:"fa fa-calendar-day",
-                    clear:"fa fa-backspace",
-                    close:"fa fa-times"
-                }
-    });    
-});
+const { createDateTimePickerOptions } = require('../common/dateTimePickerOptions');
+const {
+    calculateMaintenanceDraftSummary,
+    canRemoveMaintenanceTask,
+} = require('./formState');
 
-var $collectionHolder;
-var $addMaintenanceTaskButton = $('<tr class="table-primary"><td colspan="7"><a id="add-maintenance-task" class="btn btn-sm btn-block btn-success"><i class="fa fa-plus" aria-hidden="true"></i></a></td></tr>');
+let $collectionHolder;
 
-
-jQuery(document).ready(function() {
-    // Get the ul that holds the collection of tags
-    $collectionHolder = $('tbody.maintenanceTasks');
-    
-    $collectionHolder.data('index', $collectionHolder.find('tr').length);   
-
-    if($collectionHolder.find('tr').length == 0)
-    {         
-        addMaintenanceTaskForm($collectionHolder, $addMaintenanceTaskButton, 1);
-    }
-    else
-    {        
-        for(var i=0;i<$collectionHolder.find('tr').length;i++)
-        {        
-            $('#remove-maintenance-task-' + i).on('click', function(e) {   
-                var index = e.target.id.split('-')[3];      
-                removeMaintenanceTaskForm($collectionHolder, index); 
-            });
-        }
-        $collectionHolder.append($addMaintenanceTaskButton);
-        setTotalPrice(calculateTotal());
-    }
-        
-    $('#add-maintenance-task').on('click', function() {
-        // add a new tag form (see next code block)
-        addMaintenanceTaskForm($collectionHolder, $addMaintenanceTaskButton, 1); 
-
-    });    
-});
-
-
-function addMaintenanceTaskForm($collectionHolder, $addRemoveMaintenanceTaskButtons, $number) {
-    console.log("Adding new maintenance row.");
-    for(var i=0; i<$number;i++){
-        // Get the data-prototype explained earlier
-        var prototype = $collectionHolder.data('prototype');
-
-        // get the new index
-        var index = $collectionHolder.data('index')*1;
-
-        var newForm = prototype;
-        
-        // Replace '__name__' in the prototype's HTML to
-        // instead be a number based on how many items we have
-        newForm = newForm.replace(/__name__/g, index);
-        
-        // increase the index with one for the next item
-        $collectionHolder.data('index', index + 1);
-        
-
-        // Display the form in the page in an li, before the "Add a tag" link li
-        var $newFormLi = $('<tr class="maintenance-task-tr-' + index + '">'+
-        '<td class="taskInput">' + $('#maintenance_maintenanceTaskCommands_' + index + '_task', newForm).parent().html() + '</td>'+
-        '<td class="costInput" data-item-index="' + index + '">' + $('#maintenance_maintenanceTaskCommands_' + index + '_cost' ,newForm).parent().html() + '</td>'+        
-        '<td class="removeBtn"><a id="remove-maintenance-task-'+ index +'" class="btn btn-sm btn-block btn-danger removeBtn"><i class="fa fa-minus" aria-hidden="true"></i></a></td></tr>');        
-        
-        $collectionHolder.append($newFormLi);
-        $collectionHolder.append($addRemoveMaintenanceTaskButtons);
-
-        $('#remove-maintenance-task-'+index).on('click', function() {        
-            removeMaintenanceTaskForm($collectionHolder, index); 
-        });
-    }    
+function getTaskRows() {
+    return $collectionHolder.find('tr[data-item-index]');
 }
 
-function removeMaintenanceTaskForm($collectionHolder, index) {
-    console.log("Removing maintenance row #"+index+".");
-    if(index < 1)
-    {
-        alert("Can't delete last item!");
+function getTaskCount() {
+    return getTaskRows().length;
+}
+
+function getTaskCosts() {
+    return getTaskRows()
+        .find('input[id$="_cost"]')
+        .map(function mapTaskCost() {
+            return $(this).val();
+        })
+        .get();
+}
+
+function refreshMaintenanceSummary() {
+    const summary = calculateMaintenanceDraftSummary(
+        getTaskCount(),
+        getTaskCosts(),
+        $('#maintenance_unspecifiedCosts').val()
+    );
+
+    $('#maintenance-task-count').text(summary.taskCount);
+    $('#maintenance-task-cost').text(summary.taskCost.toFixed(2));
+    $('#maintenance-total-cost').text(summary.totalCost.toFixed(2));
+
+    const disableRemoval = !canRemoveMaintenanceTask(summary.taskCount);
+
+    $collectionHolder.find('.maintenance-task-remove').prop('disabled', disableRemoval);
+}
+
+function buildMaintenanceTaskRow(index, formMarkup) {
+    const $prototype = $(formMarkup);
+    const $taskField = $prototype.find(`#maintenance_maintenanceTaskCommands_${index}_task`);
+    const $costField = $prototype.find(`#maintenance_maintenanceTaskCommands_${index}_cost`);
+
+    $taskField.addClass('form-control');
+    $costField.addClass('form-control');
+
+    const $row = $(`
+        <tr class="maintenance-task-row" data-item-index="${index}">
+            <td class="taskInput"></td>
+            <td class="costInput"></td>
+            <td class="removeBtn text-right"></td>
+        </tr>
+    `);
+
+    const $costGroup = $(`
+        <div class="input-group unit-input">
+            <div class="input-group-append">
+                <span class="input-group-text">EUR</span>
+            </div>
+        </div>
+    `);
+
+    const $removeButton = $(`
+        <button type="button" class="btn btn-sm btn-outline-danger maintenance-task-remove" data-item-index="${index}">
+            <i class="fa fa-minus" aria-hidden="true"></i>
+        </button>
+    `);
+
+    $row.find('.taskInput').append($taskField);
+    $costGroup.prepend($costField);
+    $row.find('.costInput').append($costGroup);
+    $row.find('.removeBtn').append($removeButton);
+
+    return $row;
+}
+
+function addMaintenanceTaskForm() {
+    const prototype = $collectionHolder.data('prototype');
+    const index = Number($collectionHolder.data('index'));
+    const formMarkup = prototype.replace(/__name__/g, index);
+    const $newRow = buildMaintenanceTaskRow(index, formMarkup);
+
+    $collectionHolder.append($newRow);
+    $collectionHolder.data('index', index + 1);
+
+    refreshMaintenanceSummary();
+}
+
+function removeMaintenanceTaskForm(index) {
+    if (!canRemoveMaintenanceTask(getTaskCount())) {
+        refreshMaintenanceSummary();
         return;
     }
-    $collectionHolder.data('index', index);
-    $('.maintenance-task-tr-' + index, $collectionHolder).remove();    
+
+    $collectionHolder.find(`tr[data-item-index="${index}"]`).remove();
+    refreshMaintenanceSummary();
 }
+
+$(function () {
+    $('#maintenance_date').datetimepicker(
+        createDateTimePickerOptions({
+            format: 'DD. MM. YYYY',
+        })
+    );
+
+    $collectionHolder = $('tbody.maintenanceTasks');
+    $collectionHolder.data('index', getTaskCount());
+
+    if (getTaskCount() === 0) {
+        addMaintenanceTaskForm();
+    } else {
+        refreshMaintenanceSummary();
+    }
+
+    $('#add-maintenance-task').on('click', function onAddTaskClick() {
+        addMaintenanceTaskForm();
+    });
+
+    $collectionHolder.on('click', '.maintenance-task-remove', function onRemoveTaskClick() {
+        removeMaintenanceTaskForm(Number($(this).data('itemIndex')));
+    });
+
+    $collectionHolder.on('input change', 'input[id$="_cost"], select', refreshMaintenanceSummary);
+    $('#maintenance_unspecifiedCosts').on('input change', refreshMaintenanceSummary);
+});

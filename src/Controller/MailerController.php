@@ -2,19 +2,15 @@
 // src/Controller/MailerController.php
 namespace App\Controller;
 
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Attribute\Route;
 
 class MailerController extends AbstractController
 {
-
-    /**
-     *
-     * @Route("/email", methods={"GET"}, name="email")
-     */
+    #[Route('/email', methods: ['GET'], name: 'email')]
     public function sendEmail(MailerInterface $mailer): Response
     {
         $email = (new Email())->from('bikeLog@gzt.si')
@@ -30,7 +26,6 @@ class MailerController extends AbstractController
 
         $mailer->send($email);
 
-        // ...
+        return new Response('Email sent.');
     }
 }
-?>

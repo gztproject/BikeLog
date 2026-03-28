@@ -50,10 +50,12 @@ label:
   comment: Komentar
   nickname: Vzdevek
   vin: VIN
+  purchaseDate: Datum nakupa
   purchasePrice: Nakupna cena
   purchaseOdometer: Nakupna kilometrina
   model: Model
   picture: Slika
+  fuelTankSize: Velikost rezervoarja
   isTankFull: Polno točenje
   isNotBreakingContinuum: Ni izpuščenih točenj
   email: E-mail
@@ -63,6 +65,7 @@ label:
   mobile: GSM
   profilePicture: Avatar
   isRoleAdmin: Administrator
+  currentVersion: Trenutna različica
   task: Opravilo
   interval: Interval
   remaining: Do nasl. servisa
@@ -94,6 +97,7 @@ action:
     refueling: Dodaj točenje
     user: Dodaj uporabnika
     maintenance: Dodaj servis
+    task: Dodaj opravilo
   delete:
     user: Izbriši uporabnika
   show: Pokaži
@@ -101,6 +105,7 @@ action:
   sign_in: Prijava
   login: Prijava
   save: Shrani
+  locate: Osveži lokacijo
   backToList: Nazaj na seznam
   cancel: Prekliči
   back_to_list: Nazaj na seznam
@@ -128,5 +133,9 @@ menu:
 
 help:
  login: Prijava
+ locationPending: Poskušam pridobiti trenutno lokacijo.
+ locationReady: Trenutna lokacija je dodana.
+ locationUnavailable: Trenutna lokacija ni na voljo.
+ locationUnsupported: Brskalnik ne podpira dostopa do lokacije.
 
 Save: Shrani

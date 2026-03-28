@@ -11,6 +11,8 @@ title:
   homepage: BikeLog 
   myBikes: My bikes
   refueling: Refueling
+  update: Updates
+  updater: Update process
   
 
 label:
@@ -38,10 +40,12 @@ label:
   comment: Comment
   nickname: Nickname
   vin: VIN
+  purchaseDate: Purchase date
   purchasePrice: Purchase price
   purchaseOdometer: Purchase odometer
   model: Model
   picture: Picture
+  fuelTankSize: Tank size
   isTankFull: Full tank
   isNotBreakingContinuum: No skipped refuelings 
   email: E-mail
@@ -51,6 +55,9 @@ label:
   mobile: Mobile
   profilePicture: Profile picture
   isRoleAdmin: Administrator
+  currentVersion: Current version
+  cancel: Cancel
+  do-update: Update
 
 
 action:
@@ -58,6 +65,7 @@ action:
     bike: Add bike
     refueling: Add refueling
     user: Add user
+    task: Add task
   delete:
     user: Delete user
   show: Show
@@ -65,8 +73,12 @@ action:
   sign_in: Sign in
   login: Log in
   save: Save
+  locate: Refresh location
   backToList: Back to list
+  back_to_list: Back to list
   cancel: Cancel
+  update:
+    check: Check for updates
   
 body:
   delete:
@@ -81,8 +93,13 @@ menu:
   user: User
   logout: Logout
   users: Users
+  updater: Updates
 
 help:
  login: Login
+ locationPending: Trying to attach your current location.
+ locationReady: Current location attached.
+ locationUnavailable: Current location is unavailable.
+ locationUnsupported: Browser location is not available.
 
 Save: Save

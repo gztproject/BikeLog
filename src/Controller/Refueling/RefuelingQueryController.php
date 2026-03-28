@@ -7,14 +7,11 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Bike\BikeRepository;
+use Symfony\Component\Routing\Attribute\Route;
 
 class RefuelingQueryController extends AbstractController {
-	/**
-	 *
-	 * @Route("/dashboard/refueling", methods={"GET"}, name="refueling_index")
-	 */
+	#[Route('/dashboard/refueling', methods: ['GET'], name: 'refueling_index')]
 	public function index(RefuelingRepository $refuelings, BikeRepository $bikes, Request $request, PaginatorInterface $paginator): Response {
 		$dateFrom = $request->query->get ( 'dateFrom', null );
 		$dateTo = $request->query->get ( 'dateTo', null );
@@ -26,7 +23,7 @@ class RefuelingQueryController extends AbstractController {
 					'id' => $bikeId
 			] );
 			if ($bike->getOwner () != $this->getUser ())
-				throw new SecurityError ( "Bikes can only be shown to their owners." );
+				throw $this->createAccessDeniedException("Bikes can only be shown to their owners.");
 		}
 				
 		$myRefuelings = $refuelings->getFilteredQuery ( $dateFrom, $dateTo, $bikeId, $this->getUser () );

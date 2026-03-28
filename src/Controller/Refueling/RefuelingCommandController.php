@@ -5,29 +5,23 @@ namespace App\Controller\Refueling;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Bike\Bike;
 use App\Entity\Refueling\CreateRefuelingCommand;
 use App\Form\Refueling\RefuelingType;
 use Doctrine\Persistence\ManagerRegistry;
 
 class RefuelingCommandController extends AbstractController {
-	/**
-	 *
-	 * @Route("/dashboard/refueling/new", methods={"GET", "POST"}, name="refueling_new")
-	 */
+	#[Route('/dashboard/refueling/new', methods: ['GET', 'POST'], name: 'refueling_new')]
     public function new(Request $request, ManagerRegistry $doctrine): Response {
 		$crc = new CreateRefuelingCommand ();
 		return $this->compileForm ( $crc, $request, $doctrine );
 	}
 
-	/**
-	 *
-	 * @Route("/dashboard/refueling/new/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}", methods={"GET", "POST"}, name="refueling_new_id")
-	 */
+	#[Route('/dashboard/refueling/new/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}', methods: ['GET', 'POST'], name: 'refueling_new_id')]
 	public function new_with_id(Request $request, Bike $bike, ManagerRegistry $doctrine): Response {
 		if ($bike->getOwner () != $this->getUser ())
-			throw new SecurityError ( "Bikes can only be shown to their owners." );
+			throw $this->createAccessDeniedException("Bikes can only be shown to their owners.");
 
 		$crc = new CreateRefuelingCommand ();
 		$crc->bike = $bike;
@@ -103,6 +97,5 @@ class RefuelingCommandController extends AbstractController {
 		return $this->render ( 'dashboard/refueling/new.html.twig', [ 
 				'form' => $form->createView ()
 		] );
-		return $this->render ( 'dashboard/refueling/new.html.twig' );
 	}
 }

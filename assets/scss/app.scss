@@ -18,10 +18,195 @@
 // see https://github.com/thomaspark/bootswatch/issues/55#issuecomment-298093182
 $web-font-path: 'data:text/css;base64,';
 
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top right, rgba(38, 128, 194, 0.12), transparent 24rem),
+        linear-gradient(180deg, #eef2f7 0%, #f8fbfd 22rem, #e9eef5 100%);
+}
+
 #main_container {
-    margin-top: 80px;
+    margin-top: 88px;
+    padding-bottom: 3rem;
+}
+
+.navbar {
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
 }
 
 nav.dev {
     background-color: darkred !important;
+}
+
+.page-shell {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #d9e2ec;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
+}
+
+.page-shell__title {
+    margin-bottom: 1.25rem;
+    font-weight: 700;
+}
+
+.form-section {
+    margin-bottom: 1rem;
+    padding: 1rem 1.1rem;
+    background: #ffffff;
+    border: 1px solid #d9e2ec;
+    border-radius: 0.9rem;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.input-group-text {
+    color: #486581;
+    background: #f0f4f8;
+    border-color: #d9e2ec;
+}
+
+.unit-input .input-group-text {
+    min-width: 3.5rem;
+    justify-content: center;
+}
+
+.form-control,
+.custom-select {
+    border-color: #cbd2d9;
+}
+
+.form-control:focus,
+.custom-select:focus {
+    border-color: #2680c2;
+    box-shadow: 0 0 0 0.2rem rgba(38, 128, 194, 0.14);
+}
+
+.form-control-file {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    background: #f8fafc;
+    border: 1px dashed #bcccdc;
+    border-radius: 0.75rem;
+}
+
+.filter-panel {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #d9e2ec;
+    border-radius: 0.9rem;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.filter-panel fieldset:last-child {
+    margin-bottom: 0;
+}
+
+.location-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.75rem 0.9rem;
+    background: #f8fafc;
+    border: 1px dashed #bcccdc;
+    border-radius: 0.8rem;
+}
+
+.location-status {
+    font-weight: 600;
+    color: #52606d;
+}
+
+.location-status.status-ready {
+    color: #0b6e4f;
+}
+
+.location-status.status-error {
+    color: #b42318;
+}
+
+.form-toggle-card {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 1px solid #d9e2ec;
+    border-radius: 0.85rem;
+}
+
+.form-toggle-card .custom-control {
+    width: 100%;
+    min-height: 1.5rem;
+}
+
+.form-toggle-card .custom-control-label {
+    font-weight: 600;
+    color: #334e68;
+}
+
+.maintenance-draft-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.maintenance-summary-card {
+    min-width: 12rem;
+    padding: 0.95rem 1rem;
+    color: #f0f4f8;
+    background: linear-gradient(135deg, #102a43, #243b53);
+    border-radius: 0.85rem;
+    box-shadow: 0 16px 32px rgba(16, 42, 67, 0.18);
+}
+
+.maintenance-summary-card__label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(240, 244, 248, 0.75);
+}
+
+.maintenance-summary-card small {
+    display: block;
+    margin-top: 0.2rem;
+    color: rgba(240, 244, 248, 0.82);
+}
+
+.maintenance-editor-table th,
+.maintenance-editor-table td {
+    vertical-align: middle;
+}
+
+.maintenance-editor-table tfoot td {
+    border-top: 1px dashed #d9e2ec;
+}
+
+@media (max-width: 991.98px) {
+    .page-shell {
+        padding: 1.1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .form-actions {
+        align-items: stretch;
+    }
+
+    .location-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
