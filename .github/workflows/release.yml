@@ -90,6 +90,34 @@ jobs:
 
           tar -C "$STAGING_DIR" -czf "$ARCHIVE_PATH" "BikeLog-$VERSION"
 
+      # Installed updaters only accept archives signed by the private key that
+      # matches config/update-release.pub.
+      - name: Sign release archive
+        env:
+          UPDATE_RELEASE_SIGNING_KEY: ${{ secrets.UPDATE_RELEASE_SIGNING_KEY }}
+        run: |
+          set -euo pipefail
+          VERSION="${RELEASE_VERSION}"
+          ARCHIVE_NAME="BikeLog-$VERSION-build.tar.gz"
+
+          if [[ -z "${UPDATE_RELEASE_SIGNING_KEY:-}" ]]; then
+            echo "The UPDATE_RELEASE_SIGNING_KEY secret is not configured." >&2
+            exit 1
+          fi
+
+          if [[ ! -f config/update-release.pub ]]; then
+            echo "config/update-release.pub is missing." >&2
+            exit 1
+          fi
+
+          KEY_FILE="$(mktemp)"
+          trap 'rm -f "$KEY_FILE"' EXIT
+          chmod 600 "$KEY_FILE"
+          printf '%s\n' "$UPDATE_RELEASE_SIGNING_KEY" > "$KEY_FILE"
+
+          openssl dgst -sha256 -sign "$KEY_FILE" -out "$ARCHIVE_NAME.sig" "$ARCHIVE_NAME"
+          openssl dgst -sha256 -verify config/update-release.pub -signature "$ARCHIVE_NAME.sig" "$ARCHIVE_NAME"
+
       - name: Publish GitHub release asset
         env:
           GH_TOKEN: ${{ github.token }}
@@ -102,4 +130,4 @@ jobs:
             gh release create "$VERSION" --generate-notes
           fi
 
-          gh release upload "$VERSION" "$ARCHIVE_NAME" --clobber
+          gh release upload "$VERSION" "$ARCHIVE_NAME" "$ARCHIVE_NAME.sig" --clobber
