@@ -30,28 +30,24 @@ log() {
 write_state() {
     {
         printf 'LAST_COMPLETED_STEP=%q\n' "$LAST_COMPLETED_STEP"
-        printf 'RELEASE_SOURCE=%q\n' "$RELEASE_SOURCE"
     } > "$STATE_FILE"
 }
 
 load_state() {
     if [[ ! -f "$STATE_FILE" ]]; then
         LAST_COMPLETED_STEP=0
-        RELEASE_SOURCE=""
         return
     fi
 
     # shellcheck disable=SC1090
     source "$STATE_FILE"
     LAST_COMPLETED_STEP="${LAST_COMPLETED_STEP:-0}"
-    RELEASE_SOURCE="${RELEASE_SOURCE:-}"
 }
 
 normalize_state() {
-    if (( LAST_COMPLETED_STEP >= 25 && LAST_COMPLETED_STEP < 35 )) && [[ ! -f "$ARCHIVE_FILE" ]]; then
-        log "Saved update state points to a missing release archive; restarting from the download step."
+    if (( LAST_COMPLETED_STEP >= 25 && LAST_COMPLETED_STEP < 35 )); then
+        log "Saved update state points to an unverified download; restarting from the download step."
         LAST_COMPLETED_STEP=15
-        RELEASE_SOURCE=""
         write_state
         return
     fi
@@ -59,7 +55,6 @@ normalize_state() {
     if (( LAST_COMPLETED_STEP >= 35 && LAST_COMPLETED_STEP < 93 )) && [[ ! -d "$RELEASE_DIR" ]]; then
         log "Saved update state points to a missing extracted release; restarting from the download step."
         LAST_COMPLETED_STEP=15
-        RELEASE_SOURCE=""
         write_state
     fi
 }
@@ -166,28 +161,68 @@ install_frontend_dependencies() {
     exit 1
 }
 
-release_updater_supports_handoff() {
-    local release_updater="$RELEASE_DIR/Scripts/update.sh"
-
-    [[ -f "$release_updater" ]] && grep -q 'BIKELOG_UPDATE_PROJECT_DIR' "$release_updater"
+cleanup_download_dir() {
+    if [[ -n "${DOWNLOAD_DIR:-}" && -d "$DOWNLOAD_DIR" ]]; then
+        rm -rf "$DOWNLOAD_DIR"
+    fi
 }
 
-maybe_delegate_to_release_updater() {
-    local release_updater="$RELEASE_DIR/Scripts/update.sh"
+# The archive is opened twice and then unlinked, so signature verification and
+# extraction both read the same downloaded inode and nothing can swap the file
+# behind its path between the two.
+download_verify_and_extract_release() {
+    local archive signature extract_dir
 
-    if [[ "$CURRENT_SCRIPT_PROJECT_DIR" != "$PROJECT_DIR" ]]; then
-        return 1
+    DOWNLOAD_DIR="$(mktemp -d "$PROJECT_PARENT_DIR/.BikeLog-download-XXXXXXXX")"
+    trap cleanup_download_dir EXIT
+    archive="$DOWNLOAD_DIR/release.tar.gz"
+    signature="$DOWNLOAD_DIR/release.tar.gz.sig"
+    extract_dir="$DOWNLOAD_DIR/extract"
+
+    if ! wget -O "$archive" "$RELEASE_ASSET_URL"; then
+        log "Release artifact is not available: $RELEASE_ASSET_URL"
+        exit 1
+    fi
+    log "Downloaded release artifact: $RELEASE_ASSET_URL"
+
+    if ! wget -O "$signature" "$RELEASE_SIGNATURE_URL"; then
+        log "Release signature is not available: $RELEASE_SIGNATURE_URL"
+        exit 1
     fi
 
-    if ! release_updater_supports_handoff; then
-        log "Extracted release does not support delegated updates; continuing with the bootstrap updater."
-        return 1
+    exec 3< "$archive" 4< "$archive"
+    rm -f "$archive"
+
+    progress 30 "Verifying the release signature."
+    if [[ ! -f "$RELEASE_PUBLIC_KEY" ]]; then
+        exec 3<&- 4<&-
+        log "Release signing key is missing: $RELEASE_PUBLIC_KEY"
+        log "Refusing to install an update that cannot be verified."
+        exit 1
     fi
 
-    progress 40 "Handing off to the updater bundled with the release."
-    export BIKELOG_UPDATE_PROJECT_DIR="$PROJECT_DIR"
-    export BIKELOG_UPDATE_STATE_FILE="$STATE_FILE"
-    exec bash "$release_updater" -v "$VER"
+    if ! openssl dgst -sha256 -verify "$RELEASE_PUBLIC_KEY" -signature "$signature" <&3 > /dev/null; then
+        exec 3<&- 4<&-
+        log "Release signature verification failed; refusing to install $VER."
+        exit 1
+    fi
+    exec 3<&-
+    log "Release signature verified with $RELEASE_PUBLIC_KEY."
+
+    progress 35 "Extracting the release archive."
+    mkdir "$extract_dir"
+    tar -xzf - -C "$extract_dir" <&4
+    exec 4<&-
+
+    if [[ ! -d "$extract_dir/BikeLog-$VER" || -L "$extract_dir/BikeLog-$VER" ]]; then
+        log "Release archive does not contain the expected BikeLog-$VER directory."
+        exit 1
+    fi
+
+    rm -rf "$RELEASE_DIR"
+    mv "$extract_dir/BikeLog-$VER" "$RELEASE_DIR"
+    cleanup_download_dir
+    trap - EXIT
 }
 
 resume_notice() {
@@ -201,16 +236,22 @@ if [[ -z $VER ]]; then
     exit 1
 fi
 
+if [[ ! $VER =~ ^v?[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
+    echo "Invalid version: $VER"
+    exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CURRENT_SCRIPT_PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 PROJECT_DIR="${BIKELOG_UPDATE_PROJECT_DIR:-$CURRENT_SCRIPT_PROJECT_DIR}"
 PROJECT_PARENT_DIR="$(dirname "$PROJECT_DIR")"
 RELEASE_DIR="$PROJECT_PARENT_DIR/BikeLog-$VER"
-ARCHIVE_FILE="$PROJECT_PARENT_DIR/$VER.tar.gz"
 BACKUP_FILE="$PROJECT_PARENT_DIR/BikeLog_backup_before_$VER.tar.gz"
 STATE_FILE="${BIKELOG_UPDATE_STATE_FILE:-$PROJECT_PARENT_DIR/.BikeLog-update-$VER.state}"
 RELEASE_ASSET_URL="https://github.com/gztproject/BikeLog/releases/download/$VER/BikeLog-$VER-build.tar.gz"
-SOURCE_ARCHIVE_URL="https://github.com/gztproject/BikeLog/archive/refs/tags/$VER.tar.gz"
+RELEASE_SIGNATURE_URL="$RELEASE_ASSET_URL.sig"
+RELEASE_PUBLIC_KEY="$PROJECT_DIR/config/update-release.pub"
+DOWNLOAD_DIR=""
 
 load_state
 normalize_state
@@ -225,6 +266,7 @@ if should_run_step 10; then
     progress 10 "Checking update requirements."
     require_command tar
     require_command wget
+    require_command openssl
     require_command php
     require_php_extension xml
     require_php_extension simplexml
@@ -237,37 +279,13 @@ if should_run_step 15; then
     mark_step 15
 fi
 
-if should_run_step 25; then
-    progress 25 "Downloading the desired release."
-    if wget -O "$ARCHIVE_FILE" "$RELEASE_ASSET_URL"; then
-        RELEASE_SOURCE="artifact"
-        log "Using packaged release artifact: $RELEASE_ASSET_URL"
-    else
-        RELEASE_SOURCE="source"
-        log "Packaged release artifact is not available, falling back to the source archive."
-        rm -f "$ARCHIVE_FILE"
-        wget -O "$ARCHIVE_FILE" "$SOURCE_ARCHIVE_URL"
-    fi
-    mark_step 25
-fi
-
 if should_run_step 35; then
-    progress 35 "Extracting the release archive."
-    rm -rf "$RELEASE_DIR"
-    tar -xf "$ARCHIVE_FILE" -C "$PROJECT_PARENT_DIR"
-    rm "$ARCHIVE_FILE"
-
-    if [[ ! -d "$RELEASE_DIR" ]]; then
-        log "Expected release directory was not created: $RELEASE_DIR"
-        exit 1
-    fi
-
+    progress 25 "Downloading the desired release."
+    download_verify_and_extract_release
     mark_step 35
 fi
 
 if should_run_step 45; then
-    maybe_delegate_to_release_updater || true
-
     progress 45 "Copying environment files into the new release."
     copy_file_if_exists "$PROJECT_DIR/.env" "$RELEASE_DIR/.env"
     copy_file_if_exists "$PROJECT_DIR/.env.local" "$RELEASE_DIR/.env.local"
