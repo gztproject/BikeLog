@@ -18,3 +18,7 @@ servicePlan:
   interval_required: Enter the service interval.
   interval_positive: Service interval must be greater than zero.
   interval_type_required: Select the interval type.
+maintenance:
+  spent_time_non_negative: Time spent cannot be negative.
+  unspecified_costs_non_negative: Additional costs cannot be negative.
+  task_cost_non_negative: Task cost cannot be negative.
