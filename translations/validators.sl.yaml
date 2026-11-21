@@ -18,3 +18,7 @@ servicePlan:
   interval_required: Vnesite servisni interval.
   interval_positive: Servisni interval mora biti večji od nič.
   interval_type_required: Izberite vrsto intervala.
+maintenance:
+  spent_time_non_negative: Porabljen čas ne sme biti negativen.
+  unspecified_costs_non_negative: Neopredeljeni stroški ne smejo biti negativni.
+  task_cost_non_negative: Cena opravila ne sme biti negativna.
