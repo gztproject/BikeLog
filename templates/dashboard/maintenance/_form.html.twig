@@ -1,3 +1,13 @@
+{% macro field_errors(field) %}
+    {% if field.vars.errors|length > 0 %}
+        <div class="form-error-list">
+            {{ form_errors(field) }}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% import _self as maintenanceForm %}
+
 {{ form_start(form, {'attr': {'class': 'bs-component form-shell', 'autocomplete': 'off'}}) }}
 {{ form_errors(form) }}
 
@@ -23,6 +33,7 @@
                         <span class="input-group-text mdi mdi-calendar"></span>
                     </div>
                 </div>
+                {{ maintenanceForm.field_errors(form.date) }}
             </div>
         </div>
     </div>
@@ -36,6 +47,7 @@
                     </div>
                     {{ form_widget(form.bike, {'attr': {'class': 'form-control'}}) }}
                 </div>
+                {{ maintenanceForm.field_errors(form.bike) }}
             </div>
         </div>
         <div class="col-lg-3">
@@ -50,6 +62,7 @@
                         <span class="input-group-text">km</span>
                     </div>
                 </div>
+                {{ maintenanceForm.field_errors(form.odometer) }}
             </div>
         </div>
         <div class="col-lg-3">
