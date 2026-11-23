@@ -13,8 +13,10 @@ security:
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
-            pattern: ^/(_profiler|_wdt|css|images|js|assets|build)/
+            # Ensure static assets are always allowed. Keep the profiler and
+            # debug toolbar out of this pattern: security: false would skip
+            # their access_control rules.
+            pattern: ^/(css|images|js|assets|build)/
             security: false
         main:
             lazy: true
@@ -48,6 +50,10 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
+         # The profiler exposes recorded request data and phpinfo(), so it and
+         # the other dev tools are only reachable from the machine running the app.
+         - { path: ^/(_profiler|_wdt|_error), ips: [127.0.0.1, ::1], roles: PUBLIC_ACCESS }
+         - { path: ^/(_profiler|_wdt|_error), roles: ROLE_NO_ACCESS }
          - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/dashboard, roles: ROLE_USER }
          
