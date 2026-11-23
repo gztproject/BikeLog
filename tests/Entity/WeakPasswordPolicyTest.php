@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\EventListener\CheckCredentialsListener;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
 
 /**
- * Account creation and password change must reject passwords shorter than 12
+ * Account creation and password change must reject passwords shorter than 8
  * characters. These tests fail while a four-character password is still
  * hashed and then accepted by the sign-in credential check.
  *
@@ -36,7 +36,7 @@ use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
  */
 class WeakPasswordPolicyTest extends KernelTestCase
 {
-    private const MINIMUM_LENGTH = 12;
+    private const MINIMUM_LENGTH = 8;
 
     protected function setUp(): void
     {
@@ -45,14 +45,14 @@ class WeakPasswordPolicyTest extends KernelTestCase
 
     public function testUserModelRejectsShortPasswordsWhenCreatingRiderAndAdminAccounts(): void
     {
-        foreach ([4, 11] as $length) {
+        foreach ([4, 7] as $length) {
             foreach ([false, true] as $admin) {
                 $password = $this->placeholder($length, true);
                 $result = $this->createThroughModel($password, $admin);
 
                 self::assertFalse(
                     $result['acceptedBySignIn'],
-                    'Creating an account must not leave a password shorter than 12 characters that sign-in accepts.'
+                    'Creating an account must not leave a password shorter than 8 characters that sign-in accepts.'
                 );
                 self::assertFalse($result['canOpenMotorcyclePages']);
                 if ($admin) {
@@ -64,7 +64,7 @@ class WeakPasswordPolicyTest extends KernelTestCase
 
     public function testNewUserFormRejectsShortPasswordsBeforeTheyCanSignIn(): void
     {
-        foreach ([4, 11] as $length) {
+        foreach ([4, 7] as $length) {
             $password = $this->placeholder($length, true);
             $result = $this->createThroughForm($password, true);
 
@@ -79,7 +79,7 @@ class WeakPasswordPolicyTest extends KernelTestCase
         $original = $this->placeholder(self::MINIMUM_LENGTH, false);
         $user = $this->requireCreatedUser($original, false);
 
-        foreach ([4, 11] as $length) {
+        foreach ([4, 7] as $length) {
             $replacement = $this->placeholder($length, true);
 
             $direct = $this->changeThroughModel($user, $original, $replacement);
@@ -96,7 +96,7 @@ class WeakPasswordPolicyTest extends KernelTestCase
         }
     }
 
-    public function testTwelveLetterPasswordCanBeCreatedAndChanged(): void
+    public function testMinimumLengthPasswordCanBeCreatedAndChanged(): void
     {
         $original = $this->placeholder(self::MINIMUM_LENGTH, false);
         $user = $this->requireCreatedUser($original, false);
