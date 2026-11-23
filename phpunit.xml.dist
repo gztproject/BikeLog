@@ -34,5 +34,6 @@
     </listeners>
 
     <extensions>
+        <extension class="App\Tests\Support\ResetSharedCacheExtension" />
     </extensions>
 </phpunit>

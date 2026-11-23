@@ -33,10 +33,12 @@ use App\Entity\Part\Part;
 
 /**
  *
- * @ORM\Table(name="app_users")
+ * @ORM\Table(name="app_users", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_APP_USERS_USERNAME", columns={"username"})})
  * @ORM\Entity(repositoryClass="App\Repository\User\UserRepository")
  */
 class User extends AggregateBase implements UserInterface, PasswordAuthenticatedUserInterface {
+	public const MIN_PASSWORD_LENGTH = 8;
+
 	/**
 	 *
 	 * @ORM\Column(type="string", length=255)
@@ -149,8 +151,22 @@ class User extends AggregateBase implements UserInterface, PasswordAuthenticated
 	}
 	
 	public function update(UpdateUserCommand $c, User $user, UserPasswordHasherInterface $passwordHasher) {
+		$usernameChanged = $c->username !== null && $c->username !== '' && $c->username !== $this->username;
+		$passwordChanged = strlen ( ( string ) $c->password ) != 0;
+
+		// Admins may rename other accounts; everyone else has to confirm the account's current password.
+		$isAdminEditingOther = $user->isAdmin () && ! $user->getId ()->equals ( $this->getId () );
+		if ($usernameChanged && ! $isAdminEditingOther && ! $passwordHasher->isPasswordValid ( $this, ( string ) $c->oldPassword ))
+			throw new \Exception ( "The current password is required to change the username." );
+
+		if ($passwordChanged) {
+			$this->checkPasswordRequirements ( $c->password );
+			if (! $passwordHasher->isPasswordValid ( $this, ( string ) $c->oldPassword ))
+				throw new \Exception ( "Old password is incorrect." );
+		}
+
 		parent::updateBase ( $user );
-		if ($c->username != null && $c->username != $this->username)
+		if ($usernameChanged)
 			$this->username = $c->username;
 		if ($c->email != null && $c->email != $this->email)
 			$this->email = $c->email;
@@ -163,22 +179,16 @@ class User extends AggregateBase implements UserInterface, PasswordAuthenticated
 		if ($c->profilePictureFilename != null && $c->profilePictureFilename != $this->profilePictureFilename)
 			$this->profilePictureFilename = $c->profilePictureFilename;
 
-		if (strlen ( $c->password ) != 0) {
-			$this->checkPasswordRequirements ( $c->password );
-			if ($passwordHasher->isPasswordValid ( $this, $c->oldPassword ))
-			    $this->password = $passwordHasher->hashPassword ( $this, $c->password );
-			else
-				throw new \Exception ( "Old password is incorrect." );
-		}
+		if ($passwordChanged)
+			$this->password = $passwordHasher->hashPassword ( $this, $c->password );
 	}
 	private function checkPasswordRequirements(string $password) {
-		// ToDo: Read this from application settings?
-		$minPasswordLength = 4;
 		$passwordMustHaveNumbers = false;
 		$passwordMustHaveSpecials = false;
 
-		if (strlen ( $password ) < $minPasswordLength)
-			throw new \Exception ( "The password is too short." );
+		// Count characters, not bytes, so multibyte input cannot satisfy the minimum with fewer characters.
+		if (mb_strlen ( $password, 'UTF-8' ) < self::MIN_PASSWORD_LENGTH)
+			throw new \Exception ( "The password must be at least " . self::MIN_PASSWORD_LENGTH . " characters long." );
 
 		if ($passwordMustHaveNumbers && preg_match ( '/\\d/', $password ) === 0)
 			throw new \Exception ( "The password must contain at least one number." );
