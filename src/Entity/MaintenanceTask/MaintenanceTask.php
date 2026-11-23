@@ -45,6 +45,8 @@ class MaintenanceTask extends AggregateBaseWithComment {
 			throw new \Exception ( "Can't create entity without a user." );
 		if ($c == null)
 			throw new \Exception ( "Can't create entity without a command." );
+		if ($c->cost !== null && (! is_numeric ( $c->cost ) || ! ($c->cost >= 0)))
+			throw new \InvalidArgumentException ( "Task cost can't be negative." );
 
 		parent::__construct ( $user );
 		$this->maintenance = $maintenance;
