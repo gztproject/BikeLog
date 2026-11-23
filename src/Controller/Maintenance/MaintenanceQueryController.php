@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Maintenance\Maintenance;
+use App\Entity\User\User;
 use App\Repository\Bike\BikeRepository;
 use App\Repository\Maintenance\MaintenanceRepository;
 use Knp\Component\Pager\PaginatorInterface;
@@ -40,6 +41,10 @@ class MaintenanceQueryController extends AbstractController
     #[Route('/dashboard/maintenance/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}', methods: ['GET'], name: 'maintenance_show')]
     public function show(Maintenance $maintenance): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User || !$maintenance->getBike()->getOwner()->getId()->equals($user->getId()))
+            throw $this->createNotFoundException("Maintenances can only be shown to the owners of their bikes.");
+
         return $this->render('dashboard/maintenance/show.html.twig', [
             'maintenance' => $maintenance
         ]);
