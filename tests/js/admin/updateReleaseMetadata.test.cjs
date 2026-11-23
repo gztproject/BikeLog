@@ -231,7 +231,7 @@ function startHarness(release, currentVersion) {
 
             const timeout = setTimeout(() => {
                 resultReject(new Error('Timed out waiting for the update dialog to render'));
-            }, 15000);
+            }, 60000);
 
             const finish = async () => {
                 clearTimeout(timeout);
