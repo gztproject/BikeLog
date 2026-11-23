@@ -7,9 +7,10 @@ security:
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         sql_db_provider:
+            # No "property" here: UserRepository::loadUserByIdentifier() refuses
+            # usernames that match more than one account.
             entity:
                 class: App\Entity\User\User
-                property: username
 
     firewalls:
         dev:
