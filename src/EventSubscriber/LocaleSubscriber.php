@@ -11,14 +11,27 @@ use Psr\Log\LoggerInterface;
 
 class LocaleSubscriber implements EventSubscriberInterface {
 	private $defaultLocale;
+	private $locales;
 	private $logger;
-	public function __construct(LoggerInterface $logger, $defaultLocale = 'en') {
+	public function __construct(LoggerInterface $logger, $defaultLocale = 'en', string $locales = 'en|sl') {
 		$this->logger = $logger;
+		$this->locales = array_values ( array_filter ( explode ( '|', trim ( $locales ) ), 'strlen' ) );
+		if (empty ( $this->locales )) {
+			throw new \UnexpectedValueException ( 'The list of supported locales must not be empty.' );
+		}
+		if (! \in_array ( $defaultLocale, $this->locales, true )) {
+			throw new \UnexpectedValueException ( sprintf ( 'The default locale ("%s") must be one of "%s".', $defaultLocale, $locales ) );
+		}
 		$this->defaultLocale = $defaultLocale;
 	}
 	
 	public function onKernelRequest(RequestEvent $event): void {
 		$request = $event->getRequest ();
+
+		// Symfony's LocaleListener runs after this subscriber and applies the _locale attribute unchecked.
+		if ($request->attributes->has ( '_locale' ) && ! $this->isEnabledLocale ( $request->attributes->get ( '_locale' ) )) {
+			$request->attributes->remove ( '_locale' );
+		}
 
 		// try to see if the locale has been set as a _locale routing parameter
 		if ($locale = $this->getRequestedLocale ( $request )) {
@@ -32,7 +45,13 @@ class LocaleSubscriber implements EventSubscriberInterface {
 
 		if ($request->hasPreviousSession ()) {
 			// if no explicit locale has been set on this request, use one from the session
-			$request->setLocale ( $request->getSession ()->get ( '_locale', $this->defaultLocale ) );
+			$session = $request->getSession ();
+			$locale = $session->get ( '_locale', $this->defaultLocale );
+			if (! $this->isEnabledLocale ( $locale )) {
+				$session->remove ( '_locale' );
+				$locale = $this->defaultLocale;
+			}
+			$request->setLocale ( $locale );
 			$this->logger->debug("Settting default locale: ". $this->defaultLocale);
 			return;
 		}
@@ -54,8 +73,16 @@ class LocaleSubscriber implements EventSubscriberInterface {
 
 	private function getRequestedLocale(Request $request): ?string
 	{
-		return $request->attributes->get ( '_locale' )
-			?? $request->query->get ( '_locale' )
-			?? $request->request->get ( '_locale' );
+		$locale = $request->attributes->get ( '_locale' )
+			?? $request->query->all ()['_locale']
+			?? $request->request->all ()['_locale']
+			?? null;
+
+		return $this->isEnabledLocale ( $locale ) ? $locale : null;
+	}
+
+	private function isEnabledLocale($locale): bool
+	{
+		return \is_string ( $locale ) && \in_array ( $locale, $this->locales, true );
 	}
 }

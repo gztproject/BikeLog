@@ -18,9 +18,11 @@ use App\Entity\User\UpdateUserCommand;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormError;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 class UserController extends AbstractController
 {
+    private const USERNAME_TAKEN_MESSAGE = 'This username is already used by another account.';
     
     /**
      * Lists all Users.
@@ -38,7 +40,7 @@ class UserController extends AbstractController
     }
     
     #[Route('/admin/user/new', methods: ['GET', 'POST'], name: 'admin_user_new')]
-    public function new(Request $request, UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine)
+    public function new(Request $request, UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine, UserRepository $users)
     {
         // 1) build the form
         $createUserCommand = new CreateUserCommand();
@@ -47,6 +49,13 @@ class UserController extends AbstractController
         // 2) handle the submit (will only happen on POST)
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($users->isUsernameTaken((string) $createUserCommand->username)) {
+                $this->addFlash('danger', self::USERNAME_TAKEN_MESSAGE);
+                return $this->render(
+                    '/admin/user/new.html.twig',
+                    array('form' => $form->createView())
+                    );
+            }
             
         	//Handle the file stuff
         	$profilePictureFile = $form['profilePicture']->getData();        	
@@ -87,7 +96,12 @@ class UserController extends AbstractController
             // 4) save the User!
             $entityManager = $doctrine->getManager();
             $entityManager->persist($user);
-            $entityManager->flush();
+            try {
+                $entityManager->flush();
+            } catch (UniqueConstraintViolationException $e) {
+                $this->addFlash('danger', self::USERNAME_TAKEN_MESSAGE);
+                return $this->redirectToRoute('admin_user_new');
+            }
             
             // ... do any other work - like sending them an email, etc
             $this->addFlash('success', 'user.saved_successfully');
@@ -123,7 +137,7 @@ class UserController extends AbstractController
     #[Route('/user/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}/edit', methods: ['GET', 'POST'], name: 'user_edit')]
     #[Route('/admin/user/{id<[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}>}/edit', methods: ['GET', 'POST'], name: 'admin_user_edit')]
     #[IsGranted('edit', subject: 'user', message: 'Users can only be edited by their authors.')]
-    public function edit(Request $request, User $user, UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine): Response
+    public function edit(Request $request, User $user, UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine, UserRepository $users): Response
     {
     	$c = new UpdateUserCommand();
     	$user->mapTo($c);
@@ -133,34 +147,25 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+        	if ($c->username !== null && $c->username !== '' && $users->isUsernameTaken($c->username, $user)) {
+        		$this->addFlash('danger', self::USERNAME_TAKEN_MESSAGE);
+        		return $this->render('admin/user/edit.html.twig', [
+        				'user' => $user,
+        				'form' => $form->createView(),
+        				'showChangePassword' => $this->getUser() === $user,
+        		]);
+        	}
         	
         	//Handle the file stuff
         	$profilePictureFile = $form['profilePicture']->getData();
+        	$hadProfilePicture = $user->hasProfilePicture();
+        	$oldProfilePictureFilename = $user->getProfilePictureFilename();
         	if($profilePictureFile)
         	{
         		$originalFilename = pathinfo($profilePictureFile->getClientOriginalName(), PATHINFO_FILENAME);
         		// this is needed to safely include the file name as part of the URL
         		$safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
         		$newFilename = $safeFilename.'-'.uniqid().'.'.$profilePictureFile->guessExtension();
-        		
-        		// Move the file to the directory where brochures are stored
-        		try {
-                    $profilePictureFile->move(
-                        $this->getParameter('user_pictures_directory'),
-                        $newFilename
-                    );
-        			
-        			//delete old file
-        			if($user->hasProfilePicture())
-        				unlink($this->getParameter('user_pictures_directory').'/'.$user->getProfilePictureFilename());
-        		} catch (\Exception $e) {
-        			$this->addFlash('warning', "File Exception: ".$e->getMessage());
-        			return $this->render('admin/user/edit.html.twig', [
-        					'user' => $user,
-        					'form' => $form->createView(),
-        					'showChangePassword' => true,
-        			]);
-        		}
         		$c->profilePictureFilename = $newFilename;
         	}
         	
@@ -177,11 +182,38 @@ class UserController extends AbstractController
         				'showChangePassword' => true,
         		]);
         	}
+        	
+        	if($profilePictureFile)
+        	{
+        		// Move the file to the directory where brochures are stored
+        		try {
+                    $profilePictureFile->move(
+                        $this->getParameter('user_pictures_directory'),
+                        $newFilename
+                    );
+        			
+        			//delete old file
+        			if($hadProfilePicture)
+        				unlink($this->getParameter('user_pictures_directory').'/'.$oldProfilePictureFilename);
+        		} catch (\Exception $e) {
+        			$this->addFlash('warning', "File Exception: ".$e->getMessage());
+        			return $this->render('admin/user/edit.html.twig', [
+        					'user' => $user,
+        					'form' => $form->createView(),
+        					'showChangePassword' => true,
+        			]);
+        		}
+        	}
             
                                    
             $doctrine->getManager()->persist($user);
             
-            $doctrine->getManager()->flush();
+            try {
+                $doctrine->getManager()->flush();
+            } catch (UniqueConstraintViolationException $e) {
+                $this->addFlash('danger', self::USERNAME_TAKEN_MESSAGE);
+                return $this->redirectToRoute($request->attributes->get('_route'), ['id' => $user->getId()]);
+            }
             
             $this->addFlash('success', 'user.updated_successfully');
             

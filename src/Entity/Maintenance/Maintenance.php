@@ -74,13 +74,20 @@ class Maintenance extends AggregateBaseWithComment
         if ($c == null)
             throw new \Exception("Can't create entity without a command.");
 
+        $spentTime = $c->spentTime ?? 0;
+        $unspecifiedCosts = $c->unspecifiedCosts ?? 0;
+        if (! is_numeric($spentTime) || ! ($spentTime >= 0))
+            throw new \InvalidArgumentException("Spent time can't be negative.");
+        if (! is_numeric($unspecifiedCosts) || ! ($unspecifiedCosts >= 0))
+            throw new \InvalidArgumentException("Unspecified costs can't be negative.");
+
         parent::__construct($user);
         $this->workshop = $c->workshop;
         $this->bike = $bike;
         $this->date = $c->date;
         $this->odometer = $c->odometer ?? 0;
-        $this->spentTime = $c->spentTime ?? 0;
-        $this->unspecifiedCosts = $c->unspecifiedCosts ?? 0;
+        $this->spentTime = $spentTime;
+        $this->unspecifiedCosts = $unspecifiedCosts;
         $this->maintenanceTasks = new ArrayCollection();
     }
 

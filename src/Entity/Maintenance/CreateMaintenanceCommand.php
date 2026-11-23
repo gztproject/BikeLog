@@ -50,6 +50,15 @@ class CreateMaintenanceCommand
 			'message' => 'maintenance.odometer_non_negative',
 		]));
 		$metadata->addConstraint(new Assert\Callback('validateOdometer'));
+		$metadata->addPropertyConstraint('spentTime', new Assert\GreaterThanOrEqual([
+			'value' => 0,
+			'message' => 'maintenance.spent_time_non_negative',
+		]));
+		$metadata->addPropertyConstraint('unspecifiedCosts', new Assert\GreaterThanOrEqual([
+			'value' => 0,
+			'message' => 'maintenance.unspecified_costs_non_negative',
+		]));
+		$metadata->addPropertyConstraint('maintenanceTaskCommands', new Assert\Valid());
 	}
 
 	public function validateOdometer(ExecutionContextInterface $context): void

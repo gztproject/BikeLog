@@ -17,6 +17,9 @@ maintenance:
   odometer_numeric: Stanje števca mora biti število.
   odometer_non_negative: Stanje števca ne sme biti negativno.
   odometer_below_recorded: Stanje števca mora biti vsaj %minimum% km, kolikor je bilo do tega datuma že zabeleženo.
+  spent_time_non_negative: Porabljen čas ne sme biti negativen.
+  unspecified_costs_non_negative: Neopredeljeni stroški ne smejo biti negativni.
+  task_cost_non_negative: Cena opravila ne sme biti negativna.
 servicePlan:
   task_required: Izberite opravilo.
   part_required: Izberite del ali uporabite obstoječe opravilo.
