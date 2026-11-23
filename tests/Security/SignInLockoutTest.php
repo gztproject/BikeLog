@@ -80,10 +80,7 @@ final class SignInLockoutTest extends WebTestCase
         $rider = $this->createRider('lockout-rider', self::PLACEHOLDER_PASSWORD, true);
         $bikeId = $this->giveRiderAMotorcycle($rider);
 
-        $client->request('POST', '/login', [
-            '_username' => 'lockout-rider',
-            '_password' => self::PLACEHOLDER_PASSWORD,
-        ]);
+        $this->submitSignIn($client, 'lockout-rider', self::PLACEHOLDER_PASSWORD);
         self::assertResponseRedirects('/dashboard');
 
         $client->request('GET', '/dashboard');
@@ -259,9 +256,11 @@ final class SignInLockoutTest extends WebTestCase
 
     private function submitSignIn(KernelBrowser $client, string $username, string $password): void
     {
+        $loginPage = $client->request('GET', '/login');
         $client->request('POST', '/login', [
             '_username' => $username,
             '_password' => $password,
+            '_csrf_token' => $loginPage->filter('input[name="_csrf_token"]')->attr('value'),
         ]);
     }
 
