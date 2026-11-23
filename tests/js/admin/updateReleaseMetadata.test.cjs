@@ -10,7 +10,16 @@ const updateSourcePath = path.join(root, 'assets/js/admin/update.js');
 const versionSourcePath = path.join(root, 'assets/js/common/update/version.js');
 const jqueryPath = path.join(root, 'node_modules/jquery/dist/jquery.js');
 const bootstrapPath = path.join(root, 'node_modules/bootstrap/dist/js/bootstrap.js');
-const chromePath = process.env.CHROME_PATH || '/usr/local/bin/google-chrome';
+const chromeCandidates = [
+    '/usr/local/bin/google-chrome',
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+];
+const chromePath = process.env.CHROME_PATH
+    || chromeCandidates.find((candidate) => fs.existsSync(candidate))
+    || chromeCandidates[0];
 
 const PLACEHOLDER_UPDATE_TOKEN = 'csrf-token-placeholder';
 
