@@ -180,6 +180,7 @@ class UnsignedReleaseUpdateTest extends TestCase
             $this->signatureUrl($version) => ['status' => 0, 'body' => $layout['work'].'/invalid.sig'],
         ]);
         file_put_contents($layout['work'].'/invalid.sig', 'invalid-signature');
+        $envBefore = (string) file_get_contents($layout['project'].'/.env');
 
         $kernel = new IsolatedProdKernel('prod', false);
         $kernel->boot();
@@ -216,7 +217,7 @@ class UnsignedReleaseUpdateTest extends TestCase
         );
         $this->assertArchiveUpdaterDidNotRun($layout, ['output' => '']);
         $this->assertMarkerAbsent($layout, 'unsigned-extract-marker');
-        self::assertSame(self::CANARY_LINE, trim((string) file_get_contents($layout['project'].'/.env')));
+        self::assertSame($envBefore, (string) file_get_contents($layout['project'].'/.env'));
         self::assertSame('kept', (string) file_get_contents($layout['project'].'/INSTALL_SENTINEL'));
         self::assertDirectoryDoesNotExist($layout['parent'].'/BikeLog-'.$version);
     }
@@ -336,6 +337,8 @@ BASH;
         $archive = $work.'/'.bin2hex(random_bytes(4)).'.tar.gz';
         $tar = new Process(['tar', '-C', $stage, '-czf', $archive, 'BikeLog-'.$version]);
         $tar->mustRun();
+        // The staging tree holds the marker and sits under the directory assertMarkerAbsent() scans.
+        $this->removeTree($stage);
 
         return $archive;
     }
