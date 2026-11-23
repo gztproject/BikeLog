@@ -37,6 +37,8 @@ use App\Entity\Part\Part;
  * @ORM\Entity(repositoryClass="App\Repository\User\UserRepository")
  */
 class User extends AggregateBase implements UserInterface, PasswordAuthenticatedUserInterface {
+	public const MIN_PASSWORD_LENGTH = 8;
+
 	/**
 	 *
 	 * @ORM\Column(type="string", length=255)
@@ -181,13 +183,12 @@ class User extends AggregateBase implements UserInterface, PasswordAuthenticated
 			$this->password = $passwordHasher->hashPassword ( $this, $c->password );
 	}
 	private function checkPasswordRequirements(string $password) {
-		// ToDo: Read this from application settings?
-		$minPasswordLength = 8;
 		$passwordMustHaveNumbers = false;
 		$passwordMustHaveSpecials = false;
 
-		if (mb_strlen ( $password, 'UTF-8' ) < $minPasswordLength)
-			throw new \Exception ( "The password is too short." );
+		// Count characters, not bytes, so multibyte input cannot satisfy the minimum with fewer characters.
+		if (mb_strlen ( $password, 'UTF-8' ) < self::MIN_PASSWORD_LENGTH)
+			throw new \Exception ( "The password must be at least " . self::MIN_PASSWORD_LENGTH . " characters long." );
 
 		if ($passwordMustHaveNumbers && preg_match ( '/\\d/', $password ) === 0)
 			throw new \Exception ( "The password must contain at least one number." );
