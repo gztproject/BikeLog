@@ -307,10 +307,16 @@ class DuplicateUsernameLockoutTest extends WebTestCase
         $client->request('POST', '/login', [
             '_username' => $username,
             '_password' => $password,
+            '_csrf_token' => $this->loginCsrfToken($client),
         ]);
         self::assertTrue($client->getResponse()->isRedirect(), 'Sign-in did not redirect. Status '.$client->getResponse()->getStatusCode().' body '.substr((string) $client->getResponse()->getContent(), 0, 800));
         $location = (string) $client->getResponse()->headers->get('Location');
         self::assertStringContainsString('/dashboard', $location, 'Sign-in was rejected. Location: '.$location);
+    }
+
+    private function loginCsrfToken(KernelBrowser $client): string
+    {
+        return (string) $client->request('GET', '/login')->filter('input[name="_csrf_token"]')->attr('value');
     }
 
     private function loginRejected(KernelBrowser $client, string $username, string $password): bool
@@ -319,6 +325,7 @@ class DuplicateUsernameLockoutTest extends WebTestCase
             $client->request('POST', '/login', [
                 '_username' => $username,
                 '_password' => $password,
+                '_csrf_token' => $this->loginCsrfToken($client),
             ]);
         } catch (\Throwable $e) {
             return true;
