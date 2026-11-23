@@ -173,11 +173,11 @@ class User extends AggregateBase implements UserInterface, PasswordAuthenticated
 	}
 	private function checkPasswordRequirements(string $password) {
 		// ToDo: Read this from application settings?
-		$minPasswordLength = 4;
+		$minPasswordLength = 8;
 		$passwordMustHaveNumbers = false;
 		$passwordMustHaveSpecials = false;
 
-		if (strlen ( $password ) < $minPasswordLength)
+		if (mb_strlen ( $password, 'UTF-8' ) < $minPasswordLength)
 			throw new \Exception ( "The password is too short." );
 
 		if ($passwordMustHaveNumbers && preg_match ( '/\\d/', $password ) === 0)
