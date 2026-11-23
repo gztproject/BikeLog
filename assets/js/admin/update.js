@@ -13,37 +13,63 @@ function setModalBody(content) {
     $('.modal-body').html(content);
 }
 
-function escapeHtml(value) {
-    return String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
+function toText(value) {
+    return String(value ?? '');
+}
+
+function safeReleaseUrl(value) {
+    if (typeof value !== 'string' || value === '') {
+        return null;
+    }
+
+    let url;
+    try {
+        url = new URL(value);
+    } catch (error) {
+        return null;
+    }
+
+    if (url.protocol !== 'https:' || url.hostname !== 'github.com' || url.port !== ''
+        || url.username !== '' || url.password !== '') {
+        return null;
+    }
+
+    return url.href;
 }
 
 function renderLoadingState(message) {
     setModalBody(`
         <div class="update-modal__state">
             <div class="spinner-border text-primary mr-3" role="status" aria-hidden="true"></div>
-            <span>${message}</span>
+            <span class="update-modal__state-message"></span>
         </div>
     `);
+    $('.update-modal__state-message').text(toText(message));
+}
+
+function renderReleaseNotes($container, changes) {
+    const lines = toText(changes || 'No release notes were provided.').split('\n');
+
+    $container.empty();
+    lines.forEach(function appendLine(line, index) {
+        if (index > 0) {
+            $container.append(document.createElement('br'));
+        }
+        $container.append(document.createTextNode(line));
+    });
 }
 
 function renderUpdateDetails(currentVersion, newVersion, newUrl, changes) {
-    const notes = escapeHtml(changes || 'No release notes were provided.').replaceAll('\n', '<br>');
-
     setModalBody(`
         <div class="alert alert-info mb-3" id="update-status-banner"></div>
         <div class="update-modal__summary">
             <div class="update-modal__metric">
                 <span class="update-modal__label">Current version</span>
-                <strong id="currentA">${currentVersion}</strong>
+                <strong id="currentA"></strong>
             </div>
             <div class="update-modal__metric">
                 <span class="update-modal__label">Latest version</span>
-                <a href="${newUrl}" target="_blank" rel="noopener noreferrer" id="newA">${newVersion}</a>
+                <a target="_blank" rel="noopener noreferrer" id="newA"></a>
             </div>
         </div>
         <div class="update-modal__progress-shell" id="update-progress-shell" hidden>
@@ -66,17 +92,30 @@ function renderUpdateDetails(currentVersion, newVersion, newUrl, changes) {
         </div>
         <div class="update-modal__release-notes">
             <h4>Changes</h4>
-            <div id="changes">${notes}</div>
+            <div id="changes"></div>
         </div>
         <div class="update-modal__log-shell" id="update-log-shell" hidden>
             <h4>Live output</h4>
             <pre class="update-modal__log" id="update-log"></pre>
         </div>
     `);
+
+    $('#currentA').text(toText(currentVersion));
+
+    const $newLink = $('#newA');
+    const releaseUrl = safeReleaseUrl(newUrl);
+    if (releaseUrl) {
+        $newLink.attr('href', releaseUrl).text(toText(newVersion));
+    } else {
+        $newLink.replaceWith($('<span>', { id: 'newVersionText', text: toText(newVersion) }));
+    }
+
+    renderReleaseNotes($('#changes'), changes);
 }
 
 function renderErrorState(message) {
-    setModalBody(`<div class="alert alert-danger mb-0">${message}</div>`);
+    setModalBody('<div class="alert alert-danger mb-0"></div>');
+    $('.modal-body .alert-danger').text(toText(message));
 }
 
 function setStatusBanner(message, tone = 'info') {
