@@ -136,9 +136,11 @@ final class MaintenanceShowAuthorizationTest extends WebTestCase
     private function signIn(string $username): KernelBrowser
     {
         $client = static::createClient();
+        $loginPage = $client->request('GET', '/login');
         $client->request('POST', '/login', [
             '_username' => $username,
             '_password' => self::PASSWORD,
+            '_csrf_token' => $loginPage->filter('input[name="_csrf_token"]')->attr('value'),
         ]);
 
         self::assertResponseRedirects();
