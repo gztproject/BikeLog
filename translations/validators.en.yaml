@@ -10,6 +10,16 @@ refueling:
   fuel_quantity_positive: Fuel quantity must be greater than zero.
   price_required: Enter the total price.
   price_non_negative: Price cannot be negative.
+maintenance:
+  date_required: Choose the service date.
+  bike_required: Choose the bike for this entry.
+  odometer_required: Enter the odometer reading.
+  odometer_numeric: Odometer must be a number.
+  odometer_non_negative: Odometer cannot be negative.
+  odometer_below_recorded: Odometer must be at least %minimum% km, the reading already recorded by this date.
+  spent_time_non_negative: Time spent cannot be negative.
+  unspecified_costs_non_negative: Additional costs cannot be negative.
+  task_cost_non_negative: Task cost cannot be negative.
 servicePlan:
   task_required: Select a task.
   part_required: Select a part or reuse an existing task.
@@ -18,7 +28,3 @@ servicePlan:
   interval_required: Enter the service interval.
   interval_positive: Service interval must be greater than zero.
   interval_type_required: Select the interval type.
-maintenance:
-  spent_time_non_negative: Time spent cannot be negative.
-  unspecified_costs_non_negative: Additional costs cannot be negative.
-  task_cost_non_negative: Task cost cannot be negative.
