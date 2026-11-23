@@ -222,9 +222,17 @@ class Bike extends AggregateBase implements iHasServiceIntervals
      */
     public function createMaintenance(CreateMaintenanceCommand $c, User $user): Maintenance
     {
+        if (! $c->date instanceof DateTimeInterface)
+            throw new \Exception("Can't create a maintenance without a date.");
+
+        $minimumOdometer = $this->getHighestOdometerUntil($c->date);
+        if ((int) ($c->odometer ?? 0) < $minimumOdometer)
+            throw new \Exception("Maintenance odometer state (" . (int) ($c->odometer ?? 0) . ") is smaller 
+											than the odometer state already recorded by that date (" . $minimumOdometer . ").");
+
         $maintenance = new Maintenance($c, $this, $user);
         $this->maintenances->add($maintenance);
-        $this->sortMaintenances(null);
+        $this->sortMaintenances();
         $this->lastMaintenance = $this->maintenances->last();
         return $maintenance;
     }
@@ -363,7 +371,7 @@ class Bike extends AggregateBase implements iHasServiceIntervals
      */
     public function getMaintenances(): Collection
     {
-        $this->sortMaintenances(null);
+        $this->sortMaintenances();
         return $this->maintenances;
     }
 
@@ -373,8 +381,13 @@ class Bike extends AggregateBase implements iHasServiceIntervals
      */
     public function getFilteredMaintenances(?Workshop $workshop): Collection
     {
-        $this->sortMaintenances($workshop);
-        return $this->maintenances;
+        $this->sortMaintenances();
+        if ($workshop == null)
+            return $this->maintenances;
+
+        return $this->maintenances->filter(function ($m) use ($workshop) {
+            return $m->getWorkshop() == $workshop;
+        });
     }
 
     /**
@@ -401,7 +414,36 @@ class Bike extends AggregateBase implements iHasServiceIntervals
      */
     public function getOdometer(): int
     {
-        return max($this->getPurchaseOdometer(), $this->getLastRefueling() != null ? $this->getLastRefueling()->getOdometer() : 0, $this->getLastMaintenance() != null ? $this->getLastMaintenance()->getOdometer() : 0);
+        $highestMaintenanceOdometer = 0;
+        foreach ($this->maintenances as $m) {
+            $highestMaintenanceOdometer = max($highestMaintenanceOdometer, $m->getOdometer());
+        }
+
+        return max($this->getPurchaseOdometer(), $this->getLastRefueling() != null ? $this->getLastRefueling()->getOdometer() : 0, $highestMaintenanceOdometer);
+    }
+
+    /**
+     * Returns the highest odometer state recorded on or before the given day.
+     *
+     * @param DateTimeInterface $date
+     * @return int
+     */
+    public function getHighestOdometerUntil(DateTimeInterface $date): int
+    {
+        $day = $date->format('Y-m-d');
+        $highest = $this->getPurchaseOdometer();
+
+        foreach ($this->maintenances as $m) {
+            if ($m->getDate()->format('Y-m-d') <= $day)
+                $highest = max($highest, $m->getOdometer());
+        }
+
+        foreach ($this->refuelings as $r) {
+            if ($r->getDate()->format('Y-m-d') <= $day)
+                $highest = max($highest, $r->getOdometer());
+        }
+
+        return $highest;
     }
 
     /**
@@ -1393,19 +1435,13 @@ class Bike extends AggregateBase implements iHasServiceIntervals
 
     /**
      */
-    private function sortMaintenances(?Workshop $workshop)
+    private function sortMaintenances()
     {
         $iterator = $this->maintenances->getIterator();
         $iterator->uasort(function ($a, $b) {
             return ($a->getDate() < $b->getDate()) ? - 1 : 1;
         });
-        $array = iterator_to_array($iterator);
-        if ($workshop != null) {
-            $array = array_filter($array, function ($a) use ($workshop) {
-                return $a->getWorkshop() == $workshop;
-            });
-        }
-        $this->maintenances = new ArrayCollection($array);
+        $this->maintenances = new ArrayCollection(iterator_to_array($iterator));
     }
 
     // /**

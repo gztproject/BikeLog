@@ -1,0 +1,14 @@
+framework:
+    rate_limiter:
+        # Sign-in attempts per username + client IP (App\Security\LoginRateLimiter).
+        login_local:
+            policy: fixed_window
+            limit: 5
+            interval: '15 minutes'
+            lock_factory: lock.factory
+        # Sign-in attempts per client IP, across all usernames.
+        login_global:
+            policy: fixed_window
+            limit: 25
+            interval: '15 minutes'
+            lock_factory: lock.factory
