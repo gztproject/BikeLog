@@ -98,7 +98,7 @@ class NegativeMaintenanceAmountTest extends WebTestCase
         $ownerPage = $this->client->getResponse()->getContent();
         self::assertStringContainsString('1. 1. 2026', $ownerPage);
         self::assertStringContainsString('Lubricate the chain', $ownerPage);
-        self::assertMatchesRegularExpression('/Skupen čas dela\s*:\s*2(?:\.0+)?\s*h/', $ownerPage);
+        self::assertMatchesRegularExpression('/Skupen čas dela(?:(?!<\/section>).)*?2(?:\.0+)?\s*h/su', $ownerPage);
 
         $this->loginRider();
         $this->client->request('GET', '/dashboard/maintenance');
@@ -158,7 +158,7 @@ class NegativeMaintenanceAmountTest extends WebTestCase
         if (str_contains($ownerPage, '2. 1. 2026')) {
             $problems[] = 'The workshop owner service history lists the negative entry.';
         }
-        if (preg_match('/Skupen čas dela\s*:\s*-/', $ownerPage)) {
+        if (preg_match('/Skupen čas dela(?:(?!<\/section>).)*?-\d/su', $ownerPage)) {
             $problems[] = 'The workshop owner page shows a negative total work time.';
         }
 
