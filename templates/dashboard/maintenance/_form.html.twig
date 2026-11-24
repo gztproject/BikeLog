@@ -77,6 +77,7 @@
                         <span class="input-group-text">h</span>
                     </div>
                 </div>
+                {{ maintenanceForm.field_errors(form.spentTime) }}
             </div>
         </div>
         <div class="col-lg-3">
@@ -91,6 +92,7 @@
                         <span class="input-group-text">EUR</span>
                     </div>
                 </div>
+                {{ maintenanceForm.field_errors(form.unspecifiedCosts) }}
             </div>
         </div>
     </div>
@@ -130,6 +132,7 @@
                                     <span class="input-group-text">EUR</span>
                                 </div>
                             </div>
+                            {{ maintenanceForm.field_errors(maintenanceTask.cost) }}
                         </td>
                         <td class="removeBtn text-right">
                             <button type="button" class="btn btn-sm btn-outline-danger maintenance-task-remove" data-item-index="{{ loop.index0 }}">

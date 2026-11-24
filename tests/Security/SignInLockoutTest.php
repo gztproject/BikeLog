@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  * User::checkPasswordRequirements allows a four-character password. They pass
  * once the main firewall enables Symfony login throttling at its defaults
  * (five attempts per username and client address, twenty-five attempts per
- * client address, both inside one minute) and account create/update reject
+ * client address, both inside a 15-minute window) and account create/update reject
  * any password shorter than eight characters.
  */
 final class SignInLockoutTest extends WebTestCase
@@ -60,7 +60,7 @@ final class SignInLockoutTest extends WebTestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$databasePath = dirname(__DIR__, 2).'/var/signin-lockout-test.sqlite';
+        self::$databasePath = sys_get_temp_dir().'/bikelog-signin-lockout-test.sqlite';
         self::useSqliteDatabase();
         self::writeAssetStubs();
     }
