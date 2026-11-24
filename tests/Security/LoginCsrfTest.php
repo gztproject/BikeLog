@@ -236,13 +236,9 @@ final class LoginCsrfTest extends WebTestCase
 
 	private static function useSqliteDatabase(): void
 	{
-		$path = dirname(__DIR__, 2).'/var/login-csrf-test.sqlite';
+		$path = sys_get_temp_dir().'/bikelog-login-csrf-test.sqlite';
 		if (is_file($path)) {
 			unlink($path);
-		}
-		$directory = dirname($path);
-		if (!is_dir($directory)) {
-			mkdir($directory, 0777, true);
 		}
 		$url = 'sqlite:///'.$path;
 		putenv('DATABASE_URL='.$url);
