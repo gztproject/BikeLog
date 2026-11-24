@@ -113,7 +113,10 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 						</a>
 							<div class="dropdown-menu" aria-labelledby="admin">
 								<a class="dropdown-item" href="{{ path('admin_index') }}">{{ 'menu.admin'|trans }}</a>
-								<a class="dropdown-item" href="{{ path('admin_update') }}">{{ 'menu.updater'|trans }}</a>
+								<a class="dropdown-item js-update-badge" href="{{ path('admin_update') }}" data-status-url="{{ path('admin_update_status') }}">
+									{{ 'menu.updater'|trans }}
+									<span class="update-nav-badge js-update-badge-dot" hidden></span>
+								</a>
 								<div class="dropdown-divider"></div>
 								<a class="dropdown-item" href="{{ path('admin_user_index') }}">{{ 'menu.users'|trans }}</a>
 							</div></li>
@@ -212,7 +215,7 @@ https://symfony.com/doc/current/book/templating.html#template-inheritance-and-la
 			<div class="row">
 				<div id="footer-copyright" class="col-sm-6">
 					<p>
-					    {{ shivas_app_version }}
+					    {{ app_version }}
 						<span class="mdi mdi-open-source-initiative"></span> 2020 -
 						{{ 'now'|date('Y') }}
 						GZT Project

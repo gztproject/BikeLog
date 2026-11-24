@@ -1438,3 +1438,13 @@ nav.dev {
         flex-direction: column;
     }
 }
+
+.update-nav-badge {
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    background: var(--theme-warning, #ffc107);
+    border-radius: 50%;
+}

@@ -1,264 +1,251 @@
-const { isNewerVersion } = require('../common/update/version');
+const STEPS = ['requirements', 'fetch', 'checkout', 'composer', 'frontend', 'migrate', 'cache'];
 
-const $updatePanel = $('#admin-update-panel');
-const checkUrl = $updatePanel.data('check-url');
-const runUrl = $updatePanel.data('run-url');
-const updateToken = $updatePanel.data('update-token');
-const releaseApiUrl = $updatePanel.data('release-api-url');
+const $panel = $('#admin-update-panel');
+const statusUrl = $panel.data('status-url');
+const channelUrl = $panel.data('channel-url');
+const runUrl = $panel.data('run-url');
+const updateToken = $panel.data('update-token');
+const checkFailed = $panel.data('check-failed');
+const startFailed = $panel.data('start-failed');
+const upToDate = $panel.data('up-to-date');
+const noneLabel = $panel.data('none');
+const availableTemplate = $panel.data('available');
 
-let updateInProgress = false;
-let lastUpdateStatus = 'idle';
+let running = false;
+let outcome = 'idle';
+let canStart = false;
+let currentStep = null;
 
-function setModalBody(content) {
-    $('.modal-body').html(content);
-}
+const $channelButtons = $panel.find('.js-update-channel');
+const $channelWarning = $panel.find('.js-update-channel-warning');
+const $checking = $panel.find('.js-update-checking');
+const $summary = $panel.find('.js-update-summary');
+const $currentVersion = $panel.find('.js-update-current-version');
+const $latestVersion = $panel.find('.js-update-latest-version');
+const $releaseLink = $panel.find('.js-update-release-link');
+const $summaryText = $panel.find('.js-update-summary-text');
+const $discardWarning = $panel.find('.js-update-discard-warning');
+const $targetWarning = $panel.find('.js-update-target-warning');
+const $prodWarning = $panel.find('.js-update-prod-warning');
+const $error = $panel.find('.js-update-error');
+const $checkButton = $panel.find('.js-update-check');
+const $startButton = $panel.find('.js-update-start');
+const $notesCard = $panel.find('.js-update-notes-card');
+const $notes = $panel.find('.js-update-notes');
+const $progressCard = $panel.find('.js-update-progress-card');
+const $progressValue = $panel.find('.js-update-progress-value');
+const $progressBar = $panel.find('.js-update-progress-bar');
+const $progressLabel = $panel.find('.js-update-progress-label');
+const $runningNotice = $panel.find('.js-update-running-notice');
+const $log = $panel.find('.js-update-log');
+const $reloadButton = $panel.find('.js-update-reload');
+const $retryButton = $panel.find('.js-update-retry');
 
-function toText(value) {
-    return String(value ?? '');
-}
-
-function safeReleaseUrl(value) {
-    if (typeof value !== 'string' || value === '') {
-        return null;
+function onLeave(event) {
+    if (!running) {
+        return;
     }
-
-    let url;
-    try {
-        url = new URL(value);
-    } catch (error) {
-        return null;
-    }
-
-    if (url.protocol !== 'https:' || url.hostname !== 'github.com' || url.port !== ''
-        || url.username !== '' || url.password !== '') {
-        return null;
-    }
-
-    return url.href;
+    event.preventDefault();
+    event.returnValue = '';
 }
 
-function renderLoadingState(message) {
-    setModalBody(`
-        <div class="update-modal__state">
-            <div class="spinner-border text-primary mr-3" role="status" aria-hidden="true"></div>
-            <span class="update-modal__state-message"></span>
-        </div>
-    `);
-    $('.update-modal__state-message').text(toText(message));
-}
+window.addEventListener('beforeunload', onLeave);
 
-function renderReleaseNotes($container, changes) {
-    const lines = toText(changes || 'No release notes were provided.').split('\n');
-
-    $container.empty();
-    lines.forEach(function appendLine(line, index) {
-        if (index > 0) {
-            $container.append(document.createElement('br'));
-        }
-        $container.append(document.createTextNode(line));
+function highlightChannel(channel) {
+    $channelButtons.each(function () {
+        const $button = $(this);
+        const selected = $button.data('channel') === channel;
+        $button.toggleClass('btn-primary', selected);
+        $button.toggleClass('btn-outline-primary', !selected);
+        $button.attr('aria-pressed', selected ? 'true' : 'false');
     });
 }
 
-function renderUpdateDetails(currentVersion, newVersion, newUrl, changes) {
-    setModalBody(`
-        <div class="alert alert-info mb-3" id="update-status-banner"></div>
-        <div class="update-modal__summary">
-            <div class="update-modal__metric">
-                <span class="update-modal__label">Current version</span>
-                <strong id="currentA"></strong>
-            </div>
-            <div class="update-modal__metric">
-                <span class="update-modal__label">Latest version</span>
-                <a target="_blank" rel="noopener noreferrer" id="newA"></a>
-            </div>
-        </div>
-        <div class="update-modal__progress-shell" id="update-progress-shell" hidden>
-            <div class="update-modal__progress-header">
-                <span>Progress</span>
-                <strong id="update-progress-value">0%</strong>
-            </div>
-            <div class="progress">
-                <div
-                    class="progress-bar progress-bar-striped progress-bar-animated"
-                    id="update-progress-bar"
-                    role="progressbar"
-                    style="width: 0%;"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-valuenow="0"
-                >0%</div>
-            </div>
-            <div class="update-modal__progress-label" id="update-progress-label"></div>
-        </div>
-        <div class="update-modal__release-notes">
-            <h4>Changes</h4>
-            <div id="changes"></div>
-        </div>
-        <div class="update-modal__log-shell" id="update-log-shell" hidden>
-            <h4>Live output</h4>
-            <pre class="update-modal__log" id="update-log"></pre>
-        </div>
-    `);
+function showChecking() {
+    $checking.prop('hidden', false);
+    $summary.prop('hidden', true);
+    $error.prop('hidden', true);
+    $notesCard.prop('hidden', true);
+    $startButton.prop('disabled', true);
+}
 
-    $('#currentA').text(toText(currentVersion));
+function showError(message) {
+    $checking.prop('hidden', true);
+    $summary.prop('hidden', true);
+    $error.prop('hidden', false).text(message);
+    canStart = false;
+    $startButton.prop('disabled', true);
+}
 
-    const $newLink = $('#newA');
-    const releaseUrl = safeReleaseUrl(newUrl);
-    if (releaseUrl) {
-        $newLink.attr('href', releaseUrl).text(toText(newVersion));
-    } else {
-        $newLink.replaceWith($('<span>', { id: 'newVersionText', text: toText(newVersion) }));
+function showLatest(version, url) {
+    const label = version || '—';
+    const safe = typeof url === 'string' && url.startsWith('https://github.com/gztproject/BikeLog/');
+
+    $latestVersion.prop('hidden', safe).text(label);
+    $releaseLink.prop('hidden', !safe);
+    if (safe) {
+        $releaseLink.attr('href', url).text(label);
+    }
+}
+
+function render(data) {
+    $checking.prop('hidden', true);
+    highlightChannel(data.channel);
+    $channelWarning.prop('hidden', data.channel !== 'prerelease');
+
+    if (data.error) {
+        showError(checkFailed);
+        return;
     }
 
-    renderReleaseNotes($('#changes'), changes);
+    $error.prop('hidden', true);
+    $summary.prop('hidden', false);
+    $currentVersion.text(data.currentVersion || '');
+    showLatest(data.latestVersion, data.releaseUrl);
+    $notesCard.prop('hidden', !data.notesHtml);
+    $notes.html(data.notesHtml || '');
+
+    const available = Boolean(data.updateAvailable);
+    canStart = available && Boolean(data.canUpdate);
+    $discardWarning.prop('hidden', !available);
+    $targetWarning.prop('hidden', !(available && data.prerelease));
+    $prodWarning.prop('hidden', !(available && !data.canUpdate));
+    $startButton.prop('disabled', !canStart);
+
+    if (!data.latestVersion) {
+        $summaryText.text(noneLabel);
+    } else if (available) {
+        $summaryText.text(String(availableTemplate).split('__VERSION__').join(data.latestVersion));
+    } else {
+        $summaryText.text(upToDate);
+    }
 }
 
-function renderErrorState(message) {
-    setModalBody('<div class="alert alert-danger mb-0"></div>');
-    $('.modal-body .alert-danger').text(toText(message));
+async function refresh(force) {
+    showChecking();
+    const url = new URL(statusUrl, window.location.origin);
+    if (force) {
+        url.searchParams.set('refresh', '1');
+    }
+
+    try {
+        const response = await fetch(url, { headers: { Accept: 'application/json' } });
+        if (!response.ok) {
+            throw new Error(checkFailed);
+        }
+        render(await response.json());
+    } catch (error) {
+        showError(checkFailed);
+    }
 }
 
-function setStatusBanner(message, tone = 'info') {
-    const $banner = $('#update-status-banner');
-
-    $banner.removeClass('alert-info alert-success alert-danger alert-warning');
-    $banner.addClass(`alert-${tone}`);
-    $banner.text(message);
+function lock(locked) {
+    $channelButtons.prop('disabled', locked);
+    $checkButton.prop('disabled', locked);
+    if (locked) {
+        $startButton.prop('disabled', true);
+    }
 }
 
 function setProgress(progress, message) {
-    const normalizedProgress = Math.max(0, Math.min(100, Number(progress) || 0));
-    const progressText = `${normalizedProgress}%`;
-
-    $('#update-progress-shell').prop('hidden', false);
-    $('#update-progress-value').text(progressText);
-    $('#update-progress-label').text(message || '');
-    $('#update-progress-bar')
-        .css('width', progressText)
-        .attr('aria-valuenow', normalizedProgress)
-        .text(progressText);
+    const value = Math.max(0, Math.min(100, Number(progress) || 0));
+    const text = `${value}%`;
+    $progressValue.text(text);
+    $progressBar.css('width', text).text(text).attr('aria-valuenow', String(value));
+    $progressLabel.text(message || '');
 }
 
-function appendLogLine(message, channel = 'stdout') {
-    const $log = $('#update-log');
-
-    $('#update-log-shell').prop('hidden', false);
-    $log.append(document.createTextNode(`${channel === 'stderr' ? '[stderr] ' : ''}${message}\n`));
-    $log.scrollTop($log.prop('scrollHeight'));
-}
-
-function setModalLocked(locked) {
-    $('#btn-close-update-modal, #btn-cancel-update').prop('disabled', locked);
-    $('#btn-check-updates').prop('disabled', locked);
-}
-
-function updateActionState(currentVersion, newVersion) {
-    const $button = $('#btn-do-update');
-
-    $button.removeAttr('title').removeAttr('data-toggle');
-
-    if (isDev()) {
-        $button.prop('disabled', true);
-        $button.attr('title', "Can't update in DEV env.");
-        $button.attr('data-toggle', 'tooltip');
-        return {
-            message: 'Updates can only be started in production.',
-            tone: 'warning',
-        };
+function markStep(step, failed = false) {
+    if (step && step !== 'done') {
+        currentStep = step;
     }
 
-    if (isNewerVersion(currentVersion, newVersion)) {
-        $button.prop('disabled', false);
-        $button.attr('data-version', newVersion);
-        return {
-            message: `Version ${newVersion} is ready to install.`,
-            tone: 'info',
-        };
-    }
-
-    $button.prop('disabled', true);
-    $button.removeAttr('data-version');
-
-    return {
-        message: 'You are already on the latest release.',
-        tone: 'success',
-    };
+    const index = STEPS.indexOf(step);
+    $panel.find('[data-step]').each(function () {
+        const $item = $(this);
+        const itemIndex = STEPS.indexOf($item.data('step'));
+        if (step === 'done') {
+            $item.attr('data-state', 'done');
+            return;
+        }
+        if (failed && $item.data('step') === (step || currentStep)) {
+            $item.attr('data-state', 'failed');
+            return;
+        }
+        if (index === -1) {
+            return;
+        }
+        if (itemIndex < index) {
+            $item.attr('data-state', 'done');
+        } else if (itemIndex === index) {
+            $item.attr('data-state', failed ? 'failed' : 'current');
+        } else {
+            $item.attr('data-state', 'pending');
+        }
+    });
 }
 
-function applyUpdateAvailabilityState(currentVersion, newVersion) {
-    const state = updateActionState(currentVersion, newVersion);
-
-    setStatusBanner(state.message, state.tone);
+function resetProgress() {
+    currentStep = null;
+    $panel.find('[data-step]').attr('data-state', 'pending');
+    $progressBar.addClass('progress-bar-animated progress-bar-striped').removeClass('bg-danger bg-success');
+    $runningNotice.prop('hidden', false);
+    setProgress(0, '');
 }
 
-function checkUpdates() {
-    renderLoadingState('Checking for updates...');
-    $('#btn-do-update').prop('disabled', true).removeAttr('data-version');
-
-    $.when(
-        $.getJSON(releaseApiUrl),
-        $.get(checkUrl)
-    )
-        .done(function onUpdatesLoaded(releaseResponse, currentResponse) {
-            const releaseData = releaseResponse[0];
-            const currentData = currentResponse[0];
-            const currentVersion = currentData.current_version;
-            const newVersion = releaseData.tag_name;
-            const newUrl = releaseData.html_url;
-            const changes = releaseData.body || '';
-
-            renderUpdateDetails(currentVersion, newVersion, newUrl, changes);
-            applyUpdateAvailabilityState(currentVersion, newVersion);
-        })
-        .fail(function onUpdateError() {
-            renderErrorState('Unable to load update information.');
-            $('#btn-do-update').prop('disabled', true);
-        });
+function appendLog(message) {
+    $log.append(document.createTextNode(`${message}\n`));
+    $log.scrollTop($log[0].scrollHeight);
 }
 
-function handleStreamEvent(event) {
+function fail(message) {
+    outcome = 'failed';
+    markStep(currentStep, true);
+    appendLog(message);
+    $progressBar.removeClass('progress-bar-animated').addClass('bg-danger');
+    $runningNotice.prop('hidden', true);
+}
+
+function handleEvent(event) {
     switch (event.type) {
     case 'meta':
-        appendLogLine(`Updating from ${event.currentVersion} to ${event.targetVersion}.`);
+        appendLog(`Updating from ${event.currentVersion} to ${event.targetVersion}.`);
         break;
     case 'progress':
+        markStep(event.step);
         setProgress(event.progress, event.message);
-        setStatusBanner(event.message, 'info');
         break;
     case 'output':
-        appendLogLine(event.message, event.channel);
+        appendLog(event.channel === 'stderr' ? `[stderr] ${event.message}` : event.message);
         break;
     case 'complete':
-        lastUpdateStatus = 'success';
-        setProgress(event.progress, event.message);
-        setStatusBanner(event.message, 'success');
+        outcome = 'success';
+        markStep('done');
+        setProgress(100, event.message);
+        $progressBar.removeClass('progress-bar-animated').addClass('bg-success');
+        $runningNotice.prop('hidden', true);
         break;
     case 'failed':
-        lastUpdateStatus = 'failed';
+        fail(event.message || startFailed);
         setProgress(event.progress, event.message);
-        setStatusBanner(event.message, 'danger');
-        appendLogLine(event.message, 'stderr');
         break;
     default:
-        appendLogLine(JSON.stringify(event));
+        appendLog(JSON.stringify(event));
         break;
     }
 }
 
-function handleStreamChunk(chunk, onEvent) {
-    return chunk
-        .split('\n')
-        .filter((line) => line.trim() !== '')
-        .forEach(function onLine(line) {
-            try {
-                onEvent(JSON.parse(line));
-            } catch (error) {
-                appendLogLine(line, 'stderr');
-            }
-        });
+function consumeLines(chunk) {
+    String(chunk).split('\n').filter((line) => line.trim() !== '').forEach((line) => {
+        try {
+            handleEvent(JSON.parse(line));
+        } catch (error) {
+            appendLog(line);
+        }
+    });
 }
 
-async function streamUpdate(version) {
+async function stream() {
     const response = await fetch(runUrl, {
         method: 'POST',
         headers: {
@@ -266,18 +253,15 @@ async function streamUpdate(version) {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'X-Requested-With': 'XMLHttpRequest',
         },
-        body: $.param({
-            token: updateToken,
-            version,
-        }),
+        body: new URLSearchParams({ token: updateToken }),
     });
 
     if (!response.ok) {
-        throw new Error('Unable to start the update.');
+        throw new Error(startFailed);
     }
 
     if (!response.body || typeof response.body.getReader !== 'function') {
-        handleStreamChunk(await response.text(), handleStreamEvent);
+        consumeLines(await response.text());
         return;
     }
 
@@ -287,67 +271,91 @@ async function streamUpdate(version) {
 
     while (true) {
         const { done, value } = await reader.read();
-
         buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
-        handleStreamChunk(lines.join('\n'), handleStreamEvent);
-
+        consumeLines(lines.join('\n'));
         if (done) {
             break;
         }
     }
 
     if (buffer.trim() !== '') {
-        handleStreamChunk(buffer, handleStreamEvent);
+        consumeLines(buffer);
     }
 }
 
-$('#btn-check-updates').on('click', function onCheckUpdatesClick() {
-    const $confirm = $('#updateModal');
-
-    $confirm.modal('show');
-    checkUpdates();
-});
-
-$('#btn-do-update').on('click', async function onDoUpdateClick() {
-    const version = $('#btn-do-update').attr('data-version');
-
-    if (!version || updateInProgress) {
+async function start() {
+    if (running || $startButton.prop('disabled')) {
         return;
     }
 
-    updateInProgress = true;
-    lastUpdateStatus = 'running';
-    setModalLocked(true);
-    $('#btn-do-update').prop('disabled', true);
-    setStatusBanner('Starting update. Keep this dialog open.', 'info');
-    setProgress(0, 'Waiting for the updater to start.');
-    $('#update-log').text('');
-    $('#update-log-shell').prop('hidden', false);
+    running = true;
+    outcome = 'running';
+    lock(true);
+    resetProgress();
+    $progressCard.prop('hidden', false);
+    $reloadButton.prop('hidden', true);
+    $retryButton.prop('hidden', true);
+    $log.text('');
 
     try {
-        await streamUpdate(version);
-
-        if (lastUpdateStatus === 'success') {
-            window.setTimeout(checkUpdates, 1200);
-        }
+        await stream();
     } catch (error) {
-        lastUpdateStatus = 'failed';
-        setStatusBanner(error.message || 'Update failed.', 'danger');
-        appendLogLine(error.message || 'Update failed.', 'stderr');
+        fail(error.message || startFailed);
     } finally {
-        updateInProgress = false;
-        setModalLocked(false);
+        running = false;
+        lock(false);
+        $startButton.prop('disabled', !canStart || outcome === 'success');
+        $reloadButton.prop('hidden', outcome !== 'success');
+        $retryButton.prop('hidden', outcome !== 'failed');
+    }
+}
 
-        if (lastUpdateStatus !== 'success' && $('#btn-do-update').attr('data-version') && !isDev()) {
-            $('#btn-do-update').prop('disabled', false);
-        }
+$checkButton.on('click', () => {
+    if (!running) {
+        refresh(true);
     }
 });
 
-function isDev() {
-    const environment = String($updatePanel.data('app-env') || '').toLowerCase();
+$channelButtons.on('click', async function () {
+    if (running) {
+        return;
+    }
 
-    return environment !== 'prod';
-}
+    const channel = $(this).data('channel');
+    highlightChannel(channel);
+    showChecking();
+
+    try {
+        const response = await fetch(channelUrl, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: new URLSearchParams({
+                token: updateToken,
+                channel,
+            }),
+        });
+
+        if (!response.ok) {
+            await refresh(false);
+            $error.prop('hidden', false).text(checkFailed);
+            return;
+        }
+    } catch (error) {
+        showError(checkFailed);
+        return;
+    }
+
+    await refresh(true);
+});
+
+$startButton.on('click', start);
+$retryButton.on('click', start);
+$reloadButton.on('click', () => window.location.reload());
+
+refresh(false);

@@ -288,7 +288,7 @@ class WeakPasswordPolicyTest extends KernelTestCase
 
     private function canStartUpdate(User $user): bool
     {
-        return $this->accessGranted($user, Request::create('/admin/update/do', 'POST'));
+        return $this->accessGranted($user, Request::create('/admin/update', 'POST'));
     }
 
     private function accessGranted(User $user, Request $request): bool

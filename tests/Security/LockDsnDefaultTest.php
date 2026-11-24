@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * An upgraded install may keep a pre-lock .env without LOCK_DSN because
- * Scripts/update.sh copies the existing environment file over the release.
+ * Update.sh checkouts keep untracked files such as .env / .env.local.
  * Sign-in must still work when that variable is missing.
  */
 final class LockDsnDefaultTest extends WebTestCase

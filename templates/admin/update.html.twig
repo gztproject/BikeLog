@@ -4,62 +4,110 @@
 
 {% block main %}
 <section
-	class="page-shell update-shell"
+	class="page-shell update-page"
 	id="admin-update-panel"
-	data-check-url="{{ path('admin_update_check') }}"
-	data-run-url="{{ path('admin_do_update') }}"
+	data-status-url="{{ path('admin_update_status') }}"
+	data-channel-url="{{ path('admin_update_channel') }}"
+	data-run-url="{{ path('admin_update_run') }}"
 	data-update-token="{{ csrf_token('admin_update') }}"
-	data-app-env="{{ app.environment }}"
-	data-release-api-url="https://api.github.com/repos/gztproject/BikeLog/releases/latest"
+	data-check-failed="{{ 'update.checkFailed'|trans }}"
+	data-start-failed="{{ 'update.startFailed'|trans }}"
+	data-up-to-date="{{ 'update.upToDate'|trans }}"
+	data-none="{{ 'update.none'|trans }}"
+	data-available="{{ 'update.available'|trans({'%version%': '__VERSION__'}) }}"
 >
 	<h1 class="page-shell__title">
 		{{ 'title.update'|trans }}
 	</h1>
-	<div class="update-page-card">
-		<div class="update-page-card__version">
-			<span class="update-page-card__label">{{ 'label.currentVersion'|trans }}</span>
-			<strong>{{ shivas_app_version }}</strong>
-		</div>
-		<button type="button" class="btn btn-primary" id="btn-check-updates">
-			<i class="mdi mdi-update" aria-hidden="true"></i>
-			{{ 'action.update.check'|trans }}
-		</button>
-	</div>
-</section>
 
-<!-- Modal -->
-<div class="modal fade" id="updateModal" tabindex="-1" role="dialog"
-	aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">{{ 'title.updater'|trans }}</h5>
-				<button type="button" class="close" id="btn-close-update-modal" data-dismiss="modal"
-					aria-label="Close">
-					<span aria-hidden="true">&times;</span>
+	<div class="update-card">
+		<div class="update-channel">
+			<span class="update-label" id="update-channel-label">{{ 'update.channel.label'|trans }}</span>
+			<div class="btn-group" role="group" aria-labelledby="update-channel-label">
+				<button type="button" class="btn btn-outline-primary js-update-channel" data-channel="stable" aria-pressed="false">
+					{{ 'update.channel.stable'|trans }}
+				</button>
+				<button type="button" class="btn btn-outline-primary js-update-channel" data-channel="prerelease" aria-pressed="false">
+					{{ 'update.channel.prerelease'|trans }}
 				</button>
 			</div>
-			<div class="modal-body">
-				<div class="update-modal__placeholder">{{ 'action.update.check'|trans }}</div>
+		</div>
+		<p class="update-warning js-update-channel-warning" hidden>{{ 'update.prereleaseWarning'|trans }}</p>
+	</div>
+
+	<div class="update-card">
+		<div class="js-update-checking">
+			<span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+			{{ 'update.checking'|trans }}
+		</div>
+
+		<div class="js-update-summary" hidden>
+			<div class="update-metrics">
+				<div>
+					<span class="update-label">{{ 'update.current'|trans }}</span>
+					<strong class="js-update-current-version"></strong>
+				</div>
+				<div>
+					<span class="update-label">{{ 'update.latest'|trans }}</span>
+					<strong class="js-update-latest-version"></strong>
+					<a class="js-update-release-link" target="_blank" rel="noopener noreferrer" hidden></a>
+				</div>
 			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" id="btn-cancel-update" data-dismiss="modal">{{ 'label.cancel'|trans }}</button>
-				<button type="button" class="btn btn-success" id="btn-do-update" disabled="true"><i class="mdi mdi-update" aria-hidden="true"></i> {{ 'label.do-update'|trans }}</button>				
-			</div>
+			<p class="js-update-summary-text"></p>
+			<p class="update-warning js-update-discard-warning" hidden>{{ 'update.discardWarning'|trans }}</p>
+			<p class="update-warning js-update-target-warning" hidden>{{ 'update.prereleaseWarning'|trans }}</p>
+			<p class="update-warning js-update-prod-warning" hidden>{{ 'update.prodOnly'|trans }}</p>
+		</div>
+
+		<div class="alert alert-danger mb-0 js-update-error" hidden></div>
+
+		<div class="update-actions">
+			<button type="button" class="btn btn-outline-primary js-update-check">
+				<i class="mdi mdi-refresh" aria-hidden="true"></i>
+				{{ 'update.checkAgain'|trans }}
+			</button>
+			<button type="button" class="btn btn-success js-update-start" disabled>
+				<i class="mdi mdi-update" aria-hidden="true"></i>
+				{{ 'update.start'|trans }}
+			</button>
 		</div>
 	</div>
-</div>
 
-{% endblock %}
+	<div class="update-card js-update-notes-card" hidden>
+		<h2 class="h6">{{ 'update.notes'|trans }}</h2>
+		<div class="update-notes js-update-notes"></div>
+	</div>
 
-{% block sidebar %}
-
-{{ parent() }}
-
-
+	<div class="update-card js-update-progress-card" hidden>
+		<div class="update-progress-header">
+			<span>{{ 'update.progress'|trans }}</span>
+			<strong class="js-update-progress-value">0%</strong>
+		</div>
+		<div class="progress">
+			<div class="progress-bar progress-bar-striped progress-bar-animated js-update-progress-bar" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0%</div>
+		</div>
+		<p class="js-update-progress-label"></p>
+		<p class="js-update-running-notice">{{ 'update.running'|trans }}</p>
+		<ol class="update-steps">
+			<li data-step="requirements" data-state="pending">{{ 'update.step.requirements'|trans }}</li>
+			<li data-step="fetch" data-state="pending">{{ 'update.step.fetch'|trans }}</li>
+			<li data-step="checkout" data-state="pending">{{ 'update.step.checkout'|trans }}</li>
+			<li data-step="composer" data-state="pending">{{ 'update.step.composer'|trans }}</li>
+			<li data-step="frontend" data-state="pending">{{ 'update.step.frontend'|trans }}</li>
+			<li data-step="migrate" data-state="pending">{{ 'update.step.migrate'|trans }}</li>
+			<li data-step="cache" data-state="pending">{{ 'update.step.cache'|trans }}</li>
+		</ol>
+		<h2 class="h6">{{ 'update.log'|trans }}</h2>
+		<pre class="update-log js-update-log"></pre>
+		<div class="update-actions">
+			<button type="button" class="btn btn-primary js-update-reload" hidden>{{ 'update.reload'|trans }}</button>
+			<button type="button" class="btn btn-outline-primary js-update-retry" hidden>{{ 'update.retry'|trans }}</button>
+		</div>
+	</div>
+</section>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('js/admin/update') }}  
+	{{ parent() }}
+	{{ encore_entry_script_tags('js/admin/update') }}
 {% endblock %}

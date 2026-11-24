@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
-use Shivas\VersioningBundle\Service\VersionManagerInterface;
+use App\Update\ReleaseChecker;
+use App\Update\UpdateChannel;
+use App\Update\UpdateChannelStore;
+use App\Update\UpdatePolicy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,46 +14,55 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class UpdateController extends AbstractController
 {
     private const PROGRESS_PREFIX = '__BL_PROGRESS__|';
 
-    #[Route('/admin/update', methods: ['GET'], name: 'admin_update')]
+    #[Route(path: '/admin/update', methods: ['GET'], name: 'admin_update')]
     public function index(): Response
     {
         return $this->render('admin/update.html.twig');
     }
 
-    #[Route('/admin/update/check', methods: ['GET'], name: 'admin_update_check')]
-    public function checkForUpdates(VersionManagerInterface $manager): Response
+    #[Route(path: '/admin/update/status', methods: ['GET'], name: 'admin_update_status')]
+    public function status(Request $request, ReleaseChecker $checker): Response
     {
-        $currentVersion = $manager->getVersion();
-
-        return $this->json(['current_version' => $currentVersion]);
+        return $this->json($checker->status($request->query->getBoolean('refresh'))->toArray());
     }
 
-    #[Route('/admin/update/do', methods: ['POST'], name: 'admin_do_update')]
-    public function doUpdate(Request $request, VersionManagerInterface $manager): StreamedResponse
+    #[Route(path: '/admin/update/channel', methods: ['POST'], name: 'admin_update_channel')]
+    public function saveChannel(Request $request, UpdateChannelStore $channels): Response
     {
-        if (!$this->isCsrfTokenValid('admin_update', (string) $request->request->get('token', ''))) {
-            throw new AccessDeniedHttpException('Invalid CSRF token.');
+        $this->assertCsrf($request);
+
+        $channel = (string) $request->request->get('channel', '');
+        if (!UpdateChannel::isValid($channel)) {
+            throw new BadRequestHttpException('Unknown update channel.');
         }
+
+        $channels->save($channel);
+
+        return $this->json(['channel' => $channel]);
+    }
+
+    #[Route(path: '/admin/update', methods: ['POST'], name: 'admin_update_run')]
+    public function run(Request $request, ReleaseChecker $checker, UpdatePolicy $policy): StreamedResponse
+    {
+        $this->assertCsrf($request);
 
         if ('prod' !== $this->getParameter('kernel.environment')) {
             throw new BadRequestHttpException('Updates can only run in the prod environment.');
         }
 
-        $requestedVersion = $this->normalizeRequestedVersion((string) $request->request->get('version', ''));
-        $currentVersion = $this->normalizeComparableVersion((string) $manager->getVersion());
+        $status = $checker->status(false);
+        $version = $policy->versionToInstall($status);
+        $currentVersion = $status->currentVersion;
+        $process = $this->createUpdateProcess($version);
 
-        if (version_compare($this->normalizeComparableVersion($requestedVersion), $currentVersion, '<=')) {
-            throw new BadRequestHttpException('Requested version must be newer than the installed version.');
-        }
-
-        $process = $this->createUpdateProcess($requestedVersion);
-
-        $response = new StreamedResponse(function () use ($process, $requestedVersion, $currentVersion): void {
+        $response = new StreamedResponse(function () use ($process, $version, $currentVersion): void {
             $this->prepareStream();
 
             $emit = function (array $payload): void {
@@ -60,12 +72,7 @@ class UpdateController extends AbstractController
             $emit([
                 'type' => 'meta',
                 'currentVersion' => $currentVersion,
-                'targetVersion' => $requestedVersion,
-            ]);
-            $emit([
-                'type' => 'progress',
-                'progress' => 2,
-                'message' => 'Preparing update process.',
+                'targetVersion' => $version,
             ]);
 
             $buffers = [
@@ -76,17 +83,15 @@ class UpdateController extends AbstractController
             $process->run(function (string $type, string $chunk) use (&$buffers, $emit): void {
                 $buffers[$type] .= $chunk;
 
-                while (($position = strpos($buffers[$type], "\n")) !== false) {
+                while (false !== ($position = strpos($buffers[$type], "\n"))) {
                     $line = rtrim(substr($buffers[$type], 0, $position), "\r");
                     $buffers[$type] = substr($buffers[$type], $position + 1);
-
                     $this->streamProcessLine($line, $type, $emit);
                 }
             });
 
             foreach ($buffers as $type => $buffer) {
                 $line = trim($buffer);
-
                 if ('' !== $line) {
                     $this->streamProcessLine($line, $type, $emit);
                 }
@@ -96,7 +101,8 @@ class UpdateController extends AbstractController
                 $emit([
                     'type' => 'complete',
                     'progress' => 100,
-                    'message' => 'Update completed successfully.',
+                    'step' => 'done',
+                    'message' => 'Update completed.',
                 ]);
 
                 return;
@@ -105,10 +111,7 @@ class UpdateController extends AbstractController
             $emit([
                 'type' => 'failed',
                 'progress' => 100,
-                'message' => sprintf(
-                    'Update failed with exit code %s.',
-                    $process->getExitCode() ?? 'unknown'
-                ),
+                'message' => sprintf('Update failed with exit code %s.', $process->getExitCode() ?? 'unknown'),
             ]);
         });
 
@@ -119,38 +122,23 @@ class UpdateController extends AbstractController
         return $response;
     }
 
-    private function createUpdateProcess(string $requestedVersion): Process
+    private function assertCsrf(Request $request): void
+    {
+        if (!$this->isCsrfTokenValid('admin_update', (string) $request->request->get('token', ''))) {
+            throw new AccessDeniedHttpException('Invalid CSRF token.');
+        }
+    }
+
+    private function createUpdateProcess(string $version): Process
     {
         $projectDir = (string) $this->getParameter('kernel.project_dir');
         $process = new Process(
-            ['bash', $projectDir . '/Scripts/update.sh', '-v', $requestedVersion],
+            ['bash', $projectDir.'/Update.sh', '-v', $version],
             $projectDir
         );
-
         $process->setTimeout(null);
 
         return $process;
-    }
-
-    private function normalizeRequestedVersion(string $version): string
-    {
-        $normalized = trim($version);
-
-        if (!preg_match('/^v?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/', $normalized)) {
-            throw new BadRequestHttpException('Invalid version.');
-        }
-
-        return $normalized;
-    }
-
-    private function normalizeComparableVersion(string $version): string
-    {
-        $normalized = strtolower(trim($version));
-        $normalized = preg_replace('/^v/', '', $normalized) ?? '';
-        $normalized = explode('-', $normalized, 2)[0];
-        $normalized = explode('+', $normalized, 2)[0];
-
-        return '' !== $normalized ? $normalized : '0.0.0';
     }
 
     private function prepareStream(): void
@@ -173,13 +161,13 @@ class UpdateController extends AbstractController
         }
 
         if (str_starts_with($line, self::PROGRESS_PREFIX)) {
-            $parts = explode('|', $line, 3);
-
-            if (3 === count($parts) && is_numeric($parts[1])) {
+            $parts = explode('|', $line, 4);
+            if (4 === count($parts) && is_numeric($parts[1])) {
                 $emit([
                     'type' => 'progress',
                     'progress' => max(0, min(100, (int) $parts[1])),
-                    'message' => $parts[2],
+                    'step' => $parts[2],
+                    'message' => $parts[3],
                 ]);
 
                 return;
@@ -195,7 +183,7 @@ class UpdateController extends AbstractController
 
     private function emitStreamEvent(array $payload): void
     {
-        echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+        echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n";
 
         @ob_flush();
         flush();

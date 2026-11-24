@@ -1,5 +1,5 @@
 parameters:
-    # Survives Scripts/update.sh copying an older install .env that never defined LOCK_DSN.
+    # Survives upgrades that keep an older install .env that never defined LOCK_DSN.
     env(LOCK_DSN): 'flock'
 
 framework:

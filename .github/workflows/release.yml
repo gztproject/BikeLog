@@ -1,147 +1,30 @@
-name: Release Artifact
+name: Release
 
 on:
   push:
     tags:
-      - "*"
-  workflow_dispatch:
-    inputs:
-      version:
-        description: Existing tag to package and publish
-        required: true
-        type: string
+      - '*.*.*'
 
 permissions:
   contents: write
 
 jobs:
-  build-release:
-    name: Build Release Artifact
+  ci:
+    uses: ./.github/workflows/php.yml
+
+  release:
+    needs: ci
     runs-on: ubuntu-latest
-    env:
-      RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: app
-          POSTGRES_PASSWORD: "!ChangeMe!"
-          POSTGRES_DB: app_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U app"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref }}
+      - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          coverage: none
-          tools: composer:v2
-          extensions: intl, xml, simplexml, pdo_pgsql
-
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: npm
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Validate composer.json and composer.lock
-        run: composer validate --no-check-publish
-
-      - name: Lint Twig templates
-        run: php bin/console lint:twig templates/dashboard/bike/show.html.twig templates/dashboard/refueling/index.html.twig templates/dashboard/maintenance/index.html.twig templates/admin/servicePlan/model.html.twig
-
-      - name: Lint YAML config
-        run: php bin/console lint:yaml translations/messages.en.yaml translations/messages.sl.yaml config/packages config/routes
-
-      - name: Run PHPUnit
-        run: php bin/phpunit
-
-      - name: Run frontend tests
-        run: npm test
-
-      - name: Install production Composer dependencies
-        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
-
-      - name: Build frontend assets
-        run: npm run build
-
-      - name: Create release archive
-        run: |
-          set -euo pipefail
-          VERSION="${RELEASE_VERSION}"
-          STAGING_DIR="$(mktemp -d)"
-          PACKAGE_DIR="$STAGING_DIR/BikeLog-$VERSION"
-          ARCHIVE_NAME="BikeLog-$VERSION-build.tar.gz"
-          ARCHIVE_PATH="$PWD/$ARCHIVE_NAME"
-
-          mkdir -p "$PACKAGE_DIR"
-          rsync -a \
-            --exclude=".git" \
-            --exclude=".github" \
-            --exclude="node_modules" \
-            --exclude="var" \
-            --exclude=".env.local" \
-            --exclude=".env.*.local" \
-            ./ "$PACKAGE_DIR"/
-
-          tar -C "$STAGING_DIR" -czf "$ARCHIVE_PATH" "BikeLog-$VERSION"
-
-      # Installed updaters only accept archives signed by the private key that
-      # matches config/update-release.pub.
-      - name: Sign release archive
+      - name: Create GitHub Release
         env:
-          UPDATE_RELEASE_SIGNING_KEY: ${{ secrets.UPDATE_RELEASE_SIGNING_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
         run: |
-          set -euo pipefail
-          VERSION="${RELEASE_VERSION}"
-          ARCHIVE_NAME="BikeLog-$VERSION-build.tar.gz"
-
-          if [[ -z "${UPDATE_RELEASE_SIGNING_KEY:-}" ]]; then
-            echo "The UPDATE_RELEASE_SIGNING_KEY secret is not configured." >&2
-            exit 1
+          if [[ "$TAG" == *-* ]]; then
+            gh release create "$TAG" --title "$TAG" --generate-notes --prerelease
+          else
+            gh release create "$TAG" --title "$TAG" --generate-notes
           fi
-
-          if [[ ! -f config/update-release.pub ]]; then
-            echo "config/update-release.pub is missing." >&2
-            exit 1
-          fi
-
-          KEY_FILE="$(mktemp)"
-          trap 'rm -f "$KEY_FILE"' EXIT
-          chmod 600 "$KEY_FILE"
-          printf '%s\n' "$UPDATE_RELEASE_SIGNING_KEY" > "$KEY_FILE"
-
-          openssl dgst -sha256 -sign "$KEY_FILE" -out "$ARCHIVE_NAME.sig" "$ARCHIVE_NAME"
-          openssl dgst -sha256 -verify config/update-release.pub -signature "$ARCHIVE_NAME.sig" "$ARCHIVE_NAME"
-
-      - name: Publish GitHub release asset
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          VERSION="${RELEASE_VERSION}"
-          ARCHIVE_NAME="BikeLog-$VERSION-build.tar.gz"
-
-          if ! gh release view "$VERSION" > /dev/null 2>&1; then
-            gh release create "$VERSION" --generate-notes
-          fi
-
-          gh release upload "$VERSION" "$ARCHIVE_NAME" "$ARCHIVE_NAME.sig" --clobber

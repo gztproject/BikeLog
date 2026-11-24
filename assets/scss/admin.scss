@@ -1,116 +1,140 @@
 // assets/scss/admin.scss
 
-.update-page-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.update-page {
+    display: grid;
     gap: 1rem;
+    max-width: 46rem;
+}
+
+.update-card {
+    display: grid;
+    gap: 0.9rem;
     padding: 1.1rem 1.2rem;
     background: var(--theme-surface);
     border: 1px solid var(--theme-border);
     border-radius: 0.9rem;
 }
 
-.update-page-card__version {
+.update-channel,
+.update-actions,
+.update-progress-header {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-.update-page-card__label {
+.update-progress-header {
+    justify-content: space-between;
+}
+
+.update-label {
+    display: block;
     margin-bottom: 0.2rem;
     font-size: 0.75rem;
-    text-transform: uppercase;
     letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--theme-muted);
 }
 
-.update-modal__state {
-    display: flex;
-    align-items: center;
-    color: var(--theme-muted);
-}
-
-.update-modal__summary {
+.update-metrics {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 0.75rem;
-    margin-bottom: 1rem;
 }
 
-.update-modal__placeholder {
-    color: var(--theme-muted);
-}
-
-.update-modal__metric {
+.update-metrics > div {
     padding: 0.9rem 1rem;
     background: var(--theme-surface-soft);
     border: 1px solid var(--theme-border);
     border-radius: 0.8rem;
 }
 
-.update-modal__label {
-    display: block;
-    margin-bottom: 0.25rem;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--theme-muted);
+.update-warning {
+    margin: 0;
+    color: var(--theme-warning, #856404);
 }
 
-.update-modal__progress-shell {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background: var(--theme-surface-soft);
-    border: 1px solid var(--theme-border);
-    border-radius: 0.8rem;
+.update-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-.update-modal__progress-header {
+.update-steps li {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
     color: var(--theme-muted);
 }
 
-.update-modal__progress-label {
-    margin-top: 0.75rem;
-    color: var(--theme-muted);
+.update-steps li::before {
+    content: "";
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-top: 0.35rem;
+    border: 2px solid var(--theme-border);
+    border-radius: 50%;
+    flex: 0 0 auto;
 }
 
-.update-modal__release-notes {
+.update-steps li[data-state="current"] {
+    color: var(--theme-text, inherit);
+    font-weight: 600;
+}
+
+.update-steps li[data-state="current"]::before {
+    border-color: var(--theme-primary, #007bff);
+    border-right-color: transparent;
+    animation: update-spin 0.8s linear infinite;
+}
+
+.update-steps li[data-state="done"] {
+    color: var(--theme-text, inherit);
+}
+
+.update-steps li[data-state="done"]::before {
+    background: var(--theme-success, #28a745);
+    border-color: var(--theme-success, #28a745);
+}
+
+.update-steps li[data-state="failed"] {
+    color: var(--theme-danger, #dc3545);
+}
+
+.update-steps li[data-state="failed"]::before {
+    background: var(--theme-danger, #dc3545);
+    border-color: var(--theme-danger, #dc3545);
+}
+
+.update-notes,
+.update-log {
     max-height: 18rem;
-    margin-bottom: 1rem;
-    padding: 1rem;
     overflow: auto;
-    background: var(--theme-surface);
-    border: 1px solid var(--theme-border);
-    border-radius: 0.8rem;
 }
 
-.update-modal__release-notes h4 {
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-}
-
-.update-modal__log-shell h4 {
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-}
-
-.update-modal__log {
-    max-height: 18rem;
-    margin-bottom: 0;
+.update-log {
+    margin: 0;
     padding: 1rem;
-    overflow: auto;
-    color: var(--theme-primary-contrast);
-    background: var(--theme-surface-strong);
+    color: var(--theme-text, inherit);
+    background: var(--theme-surface-soft);
     border-radius: 0.8rem;
+    white-space: pre-wrap;
 }
 
-@media (max-width: 767.98px) {
-    .update-page-card {
-        flex-direction: column;
-        align-items: stretch;
+.update-nav-badge {
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    background: var(--theme-warning, #ffc107);
+    border-radius: 50%;
+}
+
+@keyframes update-spin {
+    to {
+        transform: rotate(360deg);
     }
 }

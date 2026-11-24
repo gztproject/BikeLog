@@ -189,7 +189,40 @@ action:
   edit_contents: Uredi vsebino
   update:
     check: Preveri posodobitve
-  
+
+update:
+  channel:
+    label: Kanal
+    stable: Stabilni
+    prerelease: Predizdaja
+  prereleaseWarning: Predizdaja ni namenjena produkciji, razen če jo namerno testirate.
+  current: Nameščena različica
+  latest: Najnovejša različica
+  checking: Preverjam posodobitve…
+  upToDate: Nameščena je že najnovejša različica.
+  available: Na voljo je različica %version%.
+  none: Objavljene izdaje ni bilo najti.
+  checkFailed: Preverjanje posodobitev ni uspelo.
+  checkAgain: Preveri znova
+  start: Začni posodobitev
+  startFailed: Posodobitve ni bilo mogoče začeti.
+  notes: Spremembe
+  progress: Napredek
+  log: Dnevnik
+  running: Posodobitev poteka. Pustite to stran odprto. BikeLog do konca ni na voljo.
+  discardWarning: Posodobitev zavrže sledene lokalne spremembe. Nesledene datoteke, npr. .env.local, ostanejo.
+  prodOnly: Posodobitve je mogoče zagnati samo v produkciji.
+  reload: Naloži novo različico
+  retry: Poskusi znova
+  step:
+    requirements: Preveri zahteve
+    fetch: Prenesi oznake
+    checkout: Preklopi na izdajo
+    composer: Namesti PHP odvisnosti
+    frontend: Zgradi vmesnik
+    migrate: Zaženi migracije podatkovne baze
+    cache: Počisti predpomnilnik
+
 body:
   dashboard:
     summary: Pregleden delavniški prikaz motorjev, servisne zgodovine in vsakodnevnih opravil.

@@ -171,7 +171,40 @@ action:
   cancel: Cancel
   update:
     check: Check for updates
-  
+
+update:
+  channel:
+    label: Channel
+    stable: Stable
+    prerelease: Pre-release
+  prereleaseWarning: A pre-release is not for production unless you intend to test it.
+  current: Installed version
+  latest: Latest version
+  checking: Checking for updates…
+  upToDate: The installed version is the latest one.
+  available: Version %version% is available.
+  none: No published release was found.
+  checkFailed: The update check failed.
+  checkAgain: Check again
+  start: Start update
+  startFailed: The update could not be started.
+  notes: Changes
+  progress: Progress
+  log: Log
+  running: The update is running. Keep this page open. BikeLog stays unavailable until it finishes.
+  discardWarning: The update discards tracked local changes. Untracked files such as .env.local are kept.
+  prodOnly: Updates can only be started in production.
+  reload: Load the new version
+  retry: Try again
+  step:
+    requirements: Check requirements
+    fetch: Fetch tags
+    checkout: Check out the release
+    composer: Install PHP dependencies
+    frontend: Build the frontend
+    migrate: Run database migrations
+    cache: Clear the cache
+
 body:
   dashboard:
     summary: A clear workshop-style view of your bikes, service history, and day-to-day activity.
