@@ -1188,6 +1188,74 @@ nav.dev {
     background: color-mix(in srgb, var(--theme-surface) 92%, var(--theme-surface-muted));
 }
 
+.workshop-client-panel + .workshop-client-panel {
+    margin-top: 1rem;
+}
+
+.workshop-bike-block {
+    margin-top: 1rem;
+}
+
+.workshop-bike-block:first-of-type {
+    margin-top: 0;
+}
+
+.workshop-bike-block__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.workshop-bike-block__title {
+    margin-bottom: 0.2rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--theme-heading);
+}
+
+.workshop-bike-block__meta {
+    margin-bottom: 0;
+    color: var(--theme-muted);
+}
+
+.workshop-sidebar-facts,
+.workshop-member-facts {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.workshop-sidebar-facts dt,
+.workshop-member-facts__item dt {
+    margin-bottom: 0.15rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--theme-muted);
+}
+
+.workshop-sidebar-facts dd,
+.workshop-member-facts__item dd {
+    margin-bottom: 0;
+    font-weight: 600;
+    color: var(--theme-heading);
+}
+
+.workshop-member-facts__item {
+    padding: 0.85rem 1rem;
+    background: linear-gradient(160deg, var(--theme-surface), var(--theme-surface-soft));
+    border: 1px solid var(--theme-border);
+    border-radius: 0.9rem;
+}
+
+.workshop-stat-card__value--text {
+    font-size: 1.15rem;
+    word-break: break-word;
+}
+
 .part-stat-grid,
 .service-plan-groups {
     display: grid;

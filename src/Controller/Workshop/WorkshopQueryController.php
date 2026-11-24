@@ -35,14 +35,16 @@ class WorkshopQueryController extends AbstractController
 
         if ($area == "admin" || $workshop->getOwner() == $user) {
             return $this->render('dashboard/workshop/showOwner.html.twig', [
-                'workshop' => $workshop
+                'workshop' => $workshop,
+                'area' => $area
             ]);
         } else {
             if (! $workshop->hasClient($user))
                 throw $this->createAccessDeniedException("Workshops can only be shown to their members.");
 
                 return $this->render('dashboard/workshop/show.html.twig', [
-                'workshop' => $workshop
+                'workshop' => $workshop,
+                'area' => $area
             ]);
         }
     }

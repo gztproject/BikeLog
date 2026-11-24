@@ -3,13 +3,60 @@
 {% block body_id 'workshop_show' %}
 
 {% block main %}
+<section class="page-shell dashboard-page dashboard-page--workshop-detail">
+    <div class="dashboard-page__header">
+        <div>
+            <span class="dashboard-page__eyebrow">{{ 'title.workshop'|trans }}</span>
+            <h1 class="page-shell__title">{{ workshop.name }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.workshopShow.memberSummary'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <a href="{{ path('workshop_index', { 'area': area|default('dashboard') }) }}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+            </a>
+        </div>
+    </div>
 
-<h1>
-	{{ 'title.workshop'|trans }}
-</h1>
+    <div class="dashboard-stat-strip">
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.workshop.owner'|trans }}</span>
+            <strong class="dashboard-stat-card__value workshop-stat-card__value--text">{{ workshop.owner.username }}</strong>
+        </article>
+    </div>
 
-<h2>{{ workshop.name }}</h2>
-<p>{{ 'label.workshop.owner' | trans}} : {{ workshop.owner.username }}</p>
+    <section class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'label.workshop.workshop'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.workshopShow.memberInventory'|trans }}</p>
+            </div>
+        </div>
 
+        <dl class="workshop-member-facts">
+            <div class="workshop-member-facts__item">
+                <dt>{{ 'label.name'|trans }}</dt>
+                <dd>{{ workshop.name }}</dd>
+            </div>
+            <div class="workshop-member-facts__item">
+                <dt>{{ 'label.workshop.owner'|trans }}</dt>
+                <dd>{{ workshop.owner.username }}</dd>
+            </div>
+        </dl>
+    </section>
+</section>
+{% endblock %}
 
+{% block sidebar %}
+    {{ parent() }}
+
+    <section class="sidebar-card">
+        <h2 class="sidebar-card__title">{{ 'label.workshopActions'|trans }}</h2>
+        <p class="sidebar-card__text">{{ 'body.workshopShow.memberSidebar'|trans }}</p>
+        <a href="{{ path('workshop_index', { 'area': area|default('dashboard') }) }}" class="btn btn-outline-secondary btn-block">
+            <i class="fa fa-list" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+        </a>
+        <a href="{{ path('dashboard_index') }}" class="btn btn-outline-secondary btn-block">
+            <i class="fa fa-tachometer-alt" aria-hidden="true"></i> {{ 'menu.home'|trans }}
+        </a>
+    </section>
 {% endblock %}

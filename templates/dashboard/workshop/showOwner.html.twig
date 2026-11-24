@@ -1,58 +1,148 @@
 {% extends 'dashboard/layout.html.twig' %}
 
-{% block body_id 'workshop_show' %}
+{% set clientCount = workshop.clients|length %}
+{% set bikeCount = 0 %}
+{% set maintenanceCount = 0 %}
+{% for client in workshop.clients %}
+    {% set bikeCount = bikeCount + client.bikes|length %}
+    {% for bike in client.bikes %}
+        {% set maintenanceCount = maintenanceCount + bike.getFilteredMaintenances(workshop)|length %}
+    {% endfor %}
+{% endfor %}
+
+{% block body_id 'workshop_show_owner' %}
 
 {% block main %}
+<section class="page-shell dashboard-page dashboard-page--workshop-detail">
+    <div class="dashboard-page__header">
+        <div>
+            <span class="dashboard-page__eyebrow">{{ 'label.workshop.owner'|trans }} · {{ workshop.owner.username }}</span>
+            <h1 class="page-shell__title">{{ workshop.name }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.workshopShow.ownerSummary'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <a href="{{ path('workshop_index', { 'area': area|default('dashboard') }) }}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+            </a>
+        </div>
+    </div>
 
-<h1>
-	{{ 'title.workshop'|trans }}
-</h1>
+    <div class="dashboard-stat-strip">
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.workshop.clients'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ clientCount|number_format }}</strong>
+        </article>
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.inventoryCount'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ bikeCount|number_format }}</strong>
+            <span class="dashboard-stat-card__meta">{{ 'label.units.bikes'|trans }}</span>
+        </article>
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'title.maintenance'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ maintenanceCount|number_format }}</strong>
+            <span class="dashboard-stat-card__meta">{{ 'label.units.services'|trans }}</span>
+        </article>
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.workshop.totalWorkTime'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ workshop.workTime|number_format(1) }}</strong>
+            <span class="dashboard-stat-card__meta">{{ 'label.workshop.hours'|trans }}</span>
+        </article>
+    </div>
 
-<h2>
-	{{ workshop.name }}
-</h2>
-<div>
-	<h3>
-		{{ 'label.workshop.clients' | trans}}
-		:
-	</h3>
-	<ul>
-		{% for client in workshop.getClients %}
+    {% if clientCount == 0 %}
+        <section class="inventory-panel">
+            <div class="inventory-panel__header">
+                <div>
+                    <h2 class="inventory-panel__title">{{ 'label.workshop.clients'|trans }}</h2>
+                    <p class="inventory-panel__subtitle">{{ 'body.workshopShow.noClients'|trans }}</p>
+                </div>
+            </div>
+        </section>
+    {% else %}
+        {% for client in workshop.clients %}
+            <section class="inventory-panel workshop-client-panel">
+                <div class="inventory-panel__header">
+                    <div>
+                        <h2 class="inventory-panel__title">{{ client.username }}</h2>
+                        <p class="inventory-panel__subtitle">{{ 'body.workshopShow.clientInventory'|trans }}</p>
+                    </div>
+                    <span class="inventory-panel__badge">{{ client.bikes|length|number_format }} {{ 'label.units.bikes'|trans }}</span>
+                </div>
 
-		<li>{{ client.username }}: </li>
-		<ul>
-			{% for bike in client.getBikes %}
-			<li>{{ bike.getYear }} {{ bike.getModel }} ({{ bike.getOdometer | number_format}} km): </li>
-			  <ul>
-              {% for maintenance in bike.getFilteredMaintenances(workshop) %}
-              <li>{{ maintenance.getDateString }} @ {{ maintenance.getOdometer | number_format}} km: {{ maintenance.getDescription }} </li>
-              {% endfor %}
-        </ul>
-			{% endfor %}
-		</ul>
+                {% if client.bikes is empty %}
+                    <p class="text-muted mb-0">{{ 'label.noneFound.bikes'|trans }}</p>
+                {% else %}
+                    {% for bike in client.bikes %}
+                        {% set bikeMaintenances = bike.getFilteredMaintenances(workshop) %}
+                        <div class="workshop-bike-block">
+                            <div class="workshop-bike-block__header">
+                                <div>
+                                    <h3 class="workshop-bike-block__title">
+                                        {{ bike.year }} {{ bike.model }} ({{ bike.odometer|number_format }} km)
+                                    </h3>
+                                    <p class="workshop-bike-block__meta">
+                                        {{ bikeMaintenances|length|number_format }} {{ 'label.units.services'|trans }}
+                                    </p>
+                                </div>
+                            </div>
 
-		{% endfor %}
-	</ul>
-</div>
-<div>
-	<h3>
-		{{ 'label.workshop.totalWorkTime' | trans}}
-		:
-		{{ workshop.getWorkTime }}
-		{{ 'label.workshop.hours' | trans}}
-	</h3>
-</div>
-
+                            <div class="table-responsive-sm inventory-panel__table-shell">
+                                <table class="table table-hover table-bordered workshop-table">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th scope="col">{{ 'label.date'|trans }}</th>
+                                            <th scope="col">{{ 'label.odometer'|trans }}</th>
+                                            <th scope="col">{{ 'label.description'|trans }}</th>
+                                            <th scope="col">{{ 'label.spentTime'|trans }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for maintenance in bikeMaintenances %}
+                                        <tr>
+                                            <td><strong>{{ maintenance.dateString }}</strong></td>
+                                            <td>{{ maintenance.odometer|number_format }} km</td>
+                                            <td>{{ maintenance.description }}</td>
+                                            <td>{{ maintenance.spentTime|number_format(1) }} {{ 'label.workshop.hours'|trans }}</td>
+                                        </tr>
+                                        {% else %}
+                                        <tr class="table-warning">
+                                            <td colspan="4" class="text-center">{{ 'label.noneFound.maintenances'|trans }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </section>
+        {% endfor %}
+    {% endif %}
+</section>
 {% endblock %}
 
 {% block sidebar %}
+    {{ parent() }}
 
-{{ parent() }}
-<a
-    href="{{  path('addWorkshopUser', { 'id': workshop.id }) }}"
-    class="btn btn-sm btn-block btn-success"> <i class="fa fa-plus"
-    aria-hidden="true"></i> {{ 'action.add.user'|trans }}
-</a>
-
-
+    <section class="sidebar-card">
+        <h2 class="sidebar-card__title">{{ 'label.workshopActions'|trans }}</h2>
+        <p class="sidebar-card__text">{{ 'body.workshopShow.ownerSidebar'|trans }}</p>
+        <dl class="workshop-sidebar-facts">
+            <div>
+                <dt>{{ 'label.workshop.owner'|trans }}</dt>
+                <dd>{{ workshop.owner.username }}</dd>
+            </div>
+            <div>
+                <dt>{{ 'label.workshop.totalWorkTime'|trans }}</dt>
+                <dd>{{ workshop.workTime|number_format(1) }} {{ 'label.workshop.hours'|trans }}</dd>
+            </div>
+            <div>
+                <dt>{{ 'label.workshop.clients'|trans }}</dt>
+                <dd>{{ clientCount|number_format }}</dd>
+            </div>
+        </dl>
+        <a href="{{ path('workshop_index', { 'area': area|default('dashboard') }) }}" class="btn btn-outline-secondary btn-block">
+            <i class="fa fa-list" aria-hidden="true"></i> {{ 'action.back_to_list'|trans }}
+        </a>
+    </section>
 {% endblock %}

@@ -1,41 +1,40 @@
-<div class="table-responsive-sm">
-	<table class="table table-hover table-striped">
+<div class="table-responsive-sm inventory-panel__table-shell">
+	<table class="table table-hover table-bordered workshop-table">
 		<thead class="thead-dark">
 			<tr>
 				<th scope="col">{{ 'label.name'|trans }}</th>
-				<th scope="col">{{ 'label.owner'|trans }}</th>
+				<th scope="col">{{ 'label.workshop.owner'|trans }}</th>
 
 				{% if area == "admin" %}
-				<th scope="col">{{ 'label.clients'|trans }}</th>
-				<th scope="col">{{ 'label.actions'|trans }}</th>
+				<th scope="col">{{ 'label.workshop.clients'|trans }}</th>
 				{% endif %}
-
 			</tr>
 		</thead>
 		<tbody>
 			{% for workshop in workshops %}
 			<tr>
-				<th scope="row"><a href="workshop/{{ workshop.id }}">{{ workshop.name }}</a></th>
-				<td>{{ workshop.owner.username}}</td>
+				<th scope="row">
+					<a href="{{ path('workshop_show', { 'id': workshop.id, 'area': area }) }}">{{ workshop.name }}</a>
+				</th>
+				<td>{{ workshop.owner.username }}</td>
 
 				{% if area == "admin" %}
 				<td>
-					<ul>
-						{% for user in workshop.clients %}
-						<li>{{ user.username }}</li>
-						{% endfor %}
-					</ul>
+					{% if workshop.clients is not empty %}
+						<ul class="workshop-table__stack mb-0 pl-3">
+							{% for user in workshop.clients %}
+							<li>{{ user.username }}</li>
+							{% endfor %}
+						</ul>
+					{% else %}
+						<span class="text-muted">{{ 'label.noneFound.clients'|trans }}</span>
+					{% endif %}
 				</td>
-				<td><a
-					href="{{  path('addWorkshopUser', { 'id': workshop.id }) }}"
-					class="btn btn-sm btn-success"> <i class="fa fa-plus"
-						aria-hidden="true"></i> {{ 'action.add.user'|trans }}
-				</a></td>
 				{% endif %}
 			</tr>
 			{% else %}
 			<tr class="table-warning">
-				<td colspan="8" align="center">{{ 'label.noneFound.workshops'|trans }}</td>
+				<td colspan="{{ area == 'admin' ? 3 : 2 }}" class="text-center">{{ 'label.noneFound.workshops'|trans }}</td>
 			</tr>
 			{% endfor %}
 		</tbody>

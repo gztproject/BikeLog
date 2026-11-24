@@ -3,21 +3,80 @@
 {% block body_id 'workshops_index' %}
 
 {% block main %}
-<h1>
-	{{ 'title.workshops'|trans }}
-</h1>
-<div class="bs-component">
-	{{ include('dashboard/workshop/_table.html.twig', {
-                workshops : workshops,
-                area : area,
-             }, with_context = false) }}
-</div>
-{{ knp_pagination_render(workshops) }}
+{% set workshopCount = workshops|length %}
+{% set totalClients = 0 %}
+{% set totalWorkTime = 0 %}
+
+{% for workshop in workshops %}
+    {% set totalClients = totalClients + workshop.clients|length %}
+    {% set totalWorkTime = totalWorkTime + workshop.workTime %}
+{% endfor %}
+
+<section class="page-shell dashboard-page dashboard-page--workshops">
+    <div class="dashboard-page__header">
+        <div>
+            <span class="dashboard-page__eyebrow">{{ 'label.workshopProfile'|trans }}</span>
+            <h1 class="page-shell__title">{{ 'title.workshops'|trans }}</h1>
+            <p class="dashboard-page__intro">{{ 'body.workshopIndex.summary'|trans }}</p>
+        </div>
+        <div class="dashboard-page__header-actions">
+            <a href="{{ path('dashboard_index') }}" class="btn btn-outline-secondary">
+                <i class="fa fa-tachometer-alt" aria-hidden="true"></i> {{ 'menu.home'|trans }}
+            </a>
+        </div>
+    </div>
+
+    <div class="dashboard-stat-strip">
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.workshopCount'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ workshopCount|number_format }}</strong>
+            <span class="dashboard-stat-card__meta">{{ 'label.visibleOnThisPage'|trans }}</span>
+        </article>
+        {% if area == 'admin' %}
+            <article class="dashboard-stat-card">
+                <span class="dashboard-stat-card__label">{{ 'label.workshop.clients'|trans }}</span>
+                <strong class="dashboard-stat-card__value">{{ totalClients|number_format }}</strong>
+                <span class="dashboard-stat-card__meta">{{ 'label.visibleOnThisPage'|trans }}</span>
+            </article>
+        {% endif %}
+        <article class="dashboard-stat-card">
+            <span class="dashboard-stat-card__label">{{ 'label.workshop.totalWorkTime'|trans }}</span>
+            <strong class="dashboard-stat-card__value">{{ totalWorkTime|number_format(1) }}</strong>
+            <span class="dashboard-stat-card__meta">{{ 'label.workshop.hours'|trans }}</span>
+        </article>
+    </div>
+
+    <div class="inventory-panel">
+        <div class="inventory-panel__header">
+            <div>
+                <h2 class="inventory-panel__title">{{ 'label.workshopOverview'|trans }}</h2>
+                <p class="inventory-panel__subtitle">{{ 'body.workshopIndex.inventory'|trans }}</p>
+            </div>
+            {% if workshopCount > 0 %}
+                <span class="inventory-panel__badge">{{ workshopCount|number_format }} {{ 'label.units.workshops'|trans }}</span>
+            {% endif %}
+        </div>
+
+        {{ include('dashboard/workshop/_table.html.twig', {
+            workshops: workshops,
+            area: area
+        }, with_context = false) }}
+    </div>
+
+    <div class="pagination-shell">
+        {{ knp_pagination_render(workshops) }}
+    </div>
+</section>
 {% endblock %}
 
 {% block sidebar %}
+    {{ parent() }}
 
-{{ parent() }}
-
-
+    <section class="sidebar-card">
+        <h2 class="sidebar-card__title">{{ 'label.workshopActions'|trans }}</h2>
+        <p class="sidebar-card__text">{{ 'body.workshopIndex.sidebar'|trans }}</p>
+        <a href="{{ path('dashboard_index') }}" class="btn btn-outline-secondary btn-block">
+            <i class="fa fa-tachometer-alt" aria-hidden="true"></i> {{ 'menu.home'|trans }}
+        </a>
+    </section>
 {% endblock %}

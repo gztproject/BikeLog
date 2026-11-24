@@ -14,6 +14,7 @@ title:
   refueling: Točenje
   maintenance: Servisi
   workshop: Delavnica
+  workshops: Delavnice
   update: Posodobitve
   updater: Posodabljanje
   serviceIntervals: Servisni intervali
@@ -31,6 +32,9 @@ label:
     refueling: Posodobi točenje
   workshopProfile: Profil delavnice
   workshopActions: Dejanja delavnice
+  workshopCount: Prikazane delavnice
+  workshopOverview: Pregled delavnic
+  name: Naziv
   inventoryCount: Prikazani motorji
   visibleOnThisPage: Trenutna stran
   totalOdometer: Skupni števec
@@ -51,10 +55,14 @@ label:
   units:
     bikes: motorjev
     services: servisov
+    workshops: delavnic
   noneFound:
     users: Ne najdem nobenega uporabnika
     refuelings: Ne najdem nobenega točenja.
     maintenances: Ne najdem nobenih servisov.
+    workshops: Ne najdem nobene delavnice.
+    clients: Ni še nobene stranke.
+    bikes: Ne najdem nobenega motorja.
   save:
     maintenance: Shrani servis
   create:
@@ -233,6 +241,18 @@ body:
     inventory: Preglejte posamezen motor, odprite podrobnosti ali takoj vnesite točenje oziroma servis.
     sidebar: Ustvarite nov zapis motorja ali dodajte naslednje točenje kar iz nadzorne plošče.
     empty: Začnite evidenco z vašim prvim motorjem in njegovim delavniškim zapisom.
+  workshopIndex:
+    summary: Delavnice, v katerih sodelujete, z lastništvom in zabeleženim delovnim časom na prvi pogled.
+    inventory: Odprite delavnico za pregled strank, motorjev in servisne zgodovine.
+    sidebar: Vrnite se na nadzorno ploščo ali odprite delavnico s seznama za nadaljnje delo.
+  workshopShow:
+    ownerSummary: Motorji strank in servisi, zabeleženi v tej delavnici, s skupnim porabljenim časom.
+    ownerSidebar: Preglejte lastništvo, število strank in skupni delovni čas te delavnice.
+    clientInventory: Motorji in servisni vnosi te stranke v tej delavnici.
+    noClients: Na to delavnico še ni vezanih strank.
+    memberSummary: Podatki o vašem članstvu v tej delavnici.
+    memberInventory: Osnovni podatki delavnice, vidni članom.
+    memberSidebar: Vrnite se na seznam delavnic ali na glavno nadzorno ploščo.
   bikeShow:
     summary: Delavniški karton motorja z gorivom, servisi in časovnico opravil na enem mestu.
     statistics: Ključni stroški, kakovost vzorca točenj in spremljani servisni intervali.

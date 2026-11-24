@@ -14,6 +14,7 @@ title:
   refueling: Refueling
   maintenance: Maintenance
   workshop: Workshop
+  workshops: Workshops
   update: Updates
   updater: Update process
   serviceIntervals: Service intervals
@@ -31,6 +32,9 @@ label:
     refueling: Update refueling
   workshopProfile: Workshop profile
   workshopActions: Workshop actions
+  workshopCount: Workshops shown
+  workshopOverview: Workshop overview
+  name: Name
   inventoryCount: Bikes shown
   visibleOnThisPage: Current page
   totalOdometer: Fleet odometer
@@ -105,10 +109,21 @@ label:
   units:
     bikes: bikes
     services: services
+    workshops: workshops
+  workshop:
+    workshop: Workshop
+    mine: Mine
+    owner: Owner
+    clients: Clients
+    totalWorkTime: Total work time
+    hours: h
   noneFound:
     users: Can't find any users.
     refuelings: Can't find any refuelings
     maintenances: Can't find any maintenance entries.
+    workshops: Can't find any workshops.
+    clients: No clients yet.
+    bikes: Can't find any bikes.
   username: Username
   password: Password
   repeatPassword: Repeat password
@@ -215,6 +230,18 @@ body:
     inventory: Review each bike, open its detail page, or jump straight into refueling and maintenance work.
     sidebar: Create a bike or register the next fuel stop without leaving the dashboard.
     empty: Start the inventory with your first motorcycle and its workshop record.
+  workshopIndex:
+    summary: Workshops you belong to, with ownership and logged service time at a glance.
+    inventory: Open a workshop to review clients, bikes, and maintenance history recorded there.
+    sidebar: Return to the dashboard or open a workshop from the list to continue shop-floor work.
+  workshopShow:
+    ownerSummary: Client bikes and maintenance logged against this workshop, with total time spent.
+    ownerSidebar: Review ownership, client count, and accumulated work time for this workshop.
+    clientInventory: Bikes and service entries recorded for this client at this workshop.
+    noClients: No clients are linked to this workshop yet.
+    memberSummary: Your membership details for this workshop.
+    memberInventory: Basic workshop information available to members.
+    memberSidebar: Jump back to the workshop list or the main dashboard.
   bikeShow:
     summary: A workshop-ready bike file with fuel, maintenance, and service timing in one place.
     statistics: Key running costs, refueling sample quality, and tracked service items.
@@ -274,6 +301,7 @@ menu:
   logout: Logout
   users: Users
   bikes: Bikes
+  workshops: Workshops
   updater: Updates
 
 help:
